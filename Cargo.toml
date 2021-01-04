@@ -12,7 +12,6 @@ repository = "https://github.com/zenlist/serde_dynamo"
 keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
-bytes = "0.5"
 rusoto_dynamodb = { version = "0.45", default-features = false }
 serde = "1"
 

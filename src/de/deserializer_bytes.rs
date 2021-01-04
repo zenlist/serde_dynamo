@@ -1,19 +1,21 @@
 use super::{Error, Result};
-use bytes::Bytes;
 use serde::de::{self, Visitor};
 use serde::forward_to_deserialize_any;
 
-pub struct DeserializerBytes {
-    input: Bytes,
+pub struct DeserializerBytes<T> {
+    input: T,
 }
 
-impl DeserializerBytes {
-    pub fn from_bytes(input: Bytes) -> Self {
+impl<T> DeserializerBytes<T> {
+    pub fn from_bytes(input: T) -> Self {
         DeserializerBytes { input }
     }
 }
 
-impl<'de, 'a> de::Deserializer<'de> for DeserializerBytes {
+impl<'de, 'a, T> de::Deserializer<'de> for DeserializerBytes<T>
+where
+    T: AsRef<[u8]>,
+{
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to

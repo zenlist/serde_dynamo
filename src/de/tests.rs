@@ -169,7 +169,7 @@ fn deserialize_bytes() {
     let attribute_value = AttributeValue {
         m: Some(hashmap! {
             String::from("value") => AttributeValue {
-                b: Some(bytes::Bytes::from(vec![116, 101, 115, 116, 0, 0, 0, 0])),
+                b: Some(vec![116, 101, 115, 116, 0, 0, 0, 0].into()),
                 ..AttributeValue::default()
             },
         }),
@@ -196,9 +196,9 @@ fn deserialize_byte_arrays() {
         m: Some(hashmap! {
             String::from("value") => AttributeValue {
                 bs: Some(vec![
-                    bytes::Bytes::from(vec![116, 101, 115, 116, 0, 0, 0, 0]),
-                    bytes::Bytes::from(vec![2]),
-                    bytes::Bytes::from(vec![0, 0, 0, 0]),
+                    vec![116, 101, 115, 116, 0, 0, 0, 0].into(),
+                    vec![2].into(),
+                    vec![0, 0, 0, 0].into(),
                 ]),
                 ..AttributeValue::default()
             },

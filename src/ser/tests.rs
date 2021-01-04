@@ -159,7 +159,7 @@ fn serialize_bytes() {
     assert_eq!(
         result,
         hashmap! {
-            String::from("value") => AttributeValue { b: Some(bytes::Bytes::from(vec![116, 101, 115, 116, 0, 0, 0, 0])), ..AttributeValue::default() },
+            String::from("value") => AttributeValue { b: Some(vec![116, 101, 115, 116, 0, 0, 0, 0].into()), ..AttributeValue::default() },
         }
     );
 }

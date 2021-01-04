@@ -2,7 +2,6 @@ use super::{
     AttributeValue, Error, Item, SerializerMap, SerializerSeq, SerializerStruct,
     SerializerStructVariant, SerializerTupleVariant,
 };
-use bytes::Bytes;
 use serde::{ser, Serialize};
 
 /// A structure for serializing Rust values into AttributeValues.
@@ -127,7 +126,7 @@ impl<'a> ser::Serializer for Serializer {
     }
     fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
         Ok(AttributeValue {
-            b: Some(Bytes::copy_from_slice(v)),
+            b: Some(v.to_vec().into()),
             ..AttributeValue::default()
         })
     }

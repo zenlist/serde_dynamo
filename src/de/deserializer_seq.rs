@@ -1,7 +1,6 @@
 use super::{AttributeValue, Deserializer, Error, Result};
 use crate::de::deserializer_bytes::DeserializerBytes;
 use crate::de::deserializer_number::DeserializerNumber;
-use bytes::Bytes;
 use serde::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
 pub struct DeserializerSeq {
@@ -88,19 +87,22 @@ impl<'de, 'a> SeqAccess<'de> for DeserializerSeqNumbers {
     }
 }
 
-pub struct DeserializerSeqBytes {
-    iter: std::vec::IntoIter<Bytes>,
+pub struct DeserializerSeqBytes<T> {
+    iter: std::vec::IntoIter<T>,
 }
 
-impl DeserializerSeqBytes {
-    pub fn from_vec(vec: Vec<Bytes>) -> Self {
+impl<T> DeserializerSeqBytes<T> {
+    pub fn from_vec(vec: Vec<T>) -> Self {
         Self {
             iter: vec.into_iter(),
         }
     }
 }
 
-impl<'de, 'a> SeqAccess<'de> for DeserializerSeqBytes {
+impl<'de, 'a, B> SeqAccess<'de> for DeserializerSeqBytes<B>
+where
+    B: AsRef<[u8]>,
+{
     type Error = Error;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
