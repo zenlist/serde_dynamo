@@ -290,8 +290,6 @@
 //! [untagged enums]: https://serde.rs/enum-representations.html#untagged
 //! [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
 
-use rusoto_dynamodb;
-
 use rusoto_dynamodb::AttributeValue;
 use std::collections::HashMap;
 

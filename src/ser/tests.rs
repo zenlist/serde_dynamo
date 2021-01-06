@@ -1,3 +1,5 @@
+#![allow(clippy::float_cmp, clippy::redundant_clone)]
+
 use super::*;
 use maplit::hashmap;
 use serde_derive::{Deserialize, Serialize};

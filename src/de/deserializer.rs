@@ -56,13 +56,11 @@ impl<'de, 'a> de::Deserializer<'de> for Deserializer {
             self.deserialize_unit(visitor)
         } else if self.input.m.is_some() {
             self.deserialize_map(visitor)
-        } else if self.input.l.is_some() {
-            self.deserialize_seq(visitor)
-        } else if self.input.ss.is_some() {
-            self.deserialize_seq(visitor)
-        } else if self.input.ns.is_some() {
-            self.deserialize_seq(visitor)
-        } else if self.input.bs.is_some() {
+        } else if self.input.l.is_some()
+            || self.input.ss.is_some()
+            || self.input.ns.is_some()
+            || self.input.bs.is_some()
+        {
             self.deserialize_seq(visitor)
         } else {
             unreachable!()
@@ -146,7 +144,7 @@ impl<'de, 'a> de::Deserializer<'de> for Deserializer {
         if let Some(s) = self.input.s {
             visitor.visit_string(s)
         } else {
-            return Err(ErrorImpl::ExpectedString.into());
+            Err(ErrorImpl::ExpectedString.into())
         }
     }
 
@@ -157,7 +155,7 @@ impl<'de, 'a> de::Deserializer<'de> for Deserializer {
         if let Some(s) = self.input.s {
             visitor.visit_string(s)
         } else {
-            return Err(ErrorImpl::ExpectedString.into());
+            Err(ErrorImpl::ExpectedString.into())
         }
     }
 

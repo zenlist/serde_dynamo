@@ -28,7 +28,7 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
             let de = DeserializerMapKey::from_string(key);
             seed.deserialize(de).map(Some)
         } else {
-            return Ok(None);
+            Ok(None)
         }
     }
 
