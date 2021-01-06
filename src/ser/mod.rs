@@ -138,6 +138,8 @@ where
     T: Serialize,
 {
     let attribute_value = to_attribute_value(value)?;
-    let item = attribute_value.m.ok_or(ErrorImpl::NotMaplike.into())?;
+    let item = attribute_value
+        .m
+        .ok_or_else(|| ErrorImpl::NotMaplike.into())?;
     Ok(item)
 }

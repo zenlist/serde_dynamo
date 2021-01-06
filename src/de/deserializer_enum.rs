@@ -22,8 +22,10 @@ impl<'de, 'a> EnumAccess<'de> for DeserializerEnum {
         V: DeserializeSeed<'de>,
     {
         let mut drain = self.input.drain();
-        let (key, value) = drain.next().ok_or(ErrorImpl::ExpectedSingleKey.into())?;
-        if !drain.next().is_none() {
+        let (key, value) = drain
+            .next()
+            .ok_or_else(|| ErrorImpl::ExpectedSingleKey.into())?;
+        if drain.next().is_some() {
             return Err(ErrorImpl::ExpectedSingleKey.into());
         }
         let deserializer = DeserializerVariant::from_attribute_value(value);
