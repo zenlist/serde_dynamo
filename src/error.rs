@@ -3,7 +3,7 @@ use std::fmt::{self, Display};
 
 /// This type represents all possible errors that can occur when serializing or deserializing
 /// DynamoDB data.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Error(ErrorImpl);
 
 impl Display for Error {
@@ -26,7 +26,7 @@ impl de::Error for Error {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ErrorImpl {
     /// Serde error
     Message(String),
