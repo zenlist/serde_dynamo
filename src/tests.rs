@@ -85,3 +85,18 @@ fn subsequent_flattened() {
         }),
     });
 }
+
+#[test]
+fn error_eq() {
+    use super::{Error, ErrorImpl};
+
+    assert_eq!(
+        Into::<Error>::into(ErrorImpl::Message(String::from("one"))),
+        Into::<Error>::into(ErrorImpl::Message(String::from("one"))),
+    );
+
+    assert_ne!(
+        Into::<Error>::into(ErrorImpl::Message(String::from("one"))),
+        Into::<Error>::into(ErrorImpl::Message(String::from("two"))),
+    );
+}
