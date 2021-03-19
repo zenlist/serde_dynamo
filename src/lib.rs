@@ -91,7 +91,38 @@
 //!
 //! ## Parsing items as strongly-typed data structures.
 //!
-//! [`Item`]s received from a [rusoto_dynamodb] call can be run through [`from_item`].
+//! [`Item`]s received from a [rusoto_dynamodb] call can be run through [`from_items`].
+//!
+//! ```
+//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
+//! # use serde::{Serialize, Deserialize};
+//! # use serde_dynamo::from_items;
+//! #
+//! # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
+//! #[derive(Serialize, Deserialize)]
+//! pub struct User {
+//!     id: String,
+//!     name: String,
+//!     age: u8,
+//! };
+//!
+//! // Get documents from DynamoDB
+//! let input = ScanInput {
+//!     table_name: "users".to_string(),
+//!     ..ScanInput::default()
+//! };
+//! let result = client.scan(input).await?;
+//!
+//! // And deserialize them as strongly-typed data structures
+//! if let Some(items) = result.items {
+//!     let users: Vec<User> = from_items(items)?;
+//!     println!("Got {} users", users.len());
+//! }
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! Alternatively, to deserialize one item at a time, [`from_item`] can be used.
 //!
 //! ```
 //! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
@@ -297,7 +328,7 @@ mod de;
 mod error;
 mod ser;
 
-pub use de::{from_attribute_value, from_item, Deserializer};
+pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
 pub use ser::{to_attribute_value, to_item, Serializer};
 
