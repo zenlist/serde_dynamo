@@ -21,7 +21,7 @@ See [the docs](https://docs.rs/serde_dynamo) for more examples.
 ### Parsing items as strongly-typed data structures.
 
 
-Items received from a [rusoto_dynamodb] call can be run through `from_item`.
+Items received from a [rusoto_dynamodb] call can be run through `from_items`.
 
 ```rust
 #[derive(Serialize, Deserialize)]
@@ -39,6 +39,15 @@ let input = ScanInput {
 let result = client.scan(input).await?;
 
 // And deserialize them as strongly-typed data structures
+if let Some(items) = result.items {
+    let users: Vec<User> = from_items(items)?;
+    println!("Got {} users", users.len());
+}
+```
+
+Alternatively, to deserialize one item at a time, `from_item` can be used.
+
+```rust
 for item in result.items.unwrap() {
     let user: User = from_item(item)?;
     println!("{} is {}", user.name, user.age);

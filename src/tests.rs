@@ -100,3 +100,71 @@ fn error_eq() {
         Into::<Error>::into(ErrorImpl::Message(String::from("two"))),
     );
 }
+
+#[cfg(test)]
+mod from_items {
+    use maplit::hashmap;
+    use serde_derive::{Deserialize, Serialize};
+
+    use crate::*;
+
+    #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+    struct User {
+        id: String,
+        name: String,
+        age: u8,
+    }
+
+    #[test]
+    fn same_types() {
+        let items = vec![
+            hashmap! {
+                String::from("id") => to_attribute_value("one").unwrap(),
+                String::from("name") => to_attribute_value("Jane").unwrap(),
+                String::from("age") => to_attribute_value(20).unwrap(),
+            },
+            hashmap! {
+                String::from("id") => to_attribute_value("two").unwrap(),
+                String::from("name") => to_attribute_value("John").unwrap(),
+                String::from("age") => to_attribute_value(7).unwrap(),
+            },
+        ];
+
+        let users = from_items(items).unwrap();
+
+        assert_eq!(
+            vec![
+                User {
+                    id: String::from("one"),
+                    name: String::from("Jane"),
+                    age: 20,
+                },
+                User {
+                    id: String::from("two"),
+                    name: String::from("John"),
+                    age: 7,
+                },
+            ],
+            users
+        );
+    }
+
+    #[test]
+    fn wrong_types() {
+        let items = vec![
+            hashmap! {
+                String::from("id") => to_attribute_value("one").unwrap(),
+                String::from("name") => to_attribute_value("Jane").unwrap(),
+                String::from("age") => to_attribute_value(20).unwrap(),
+            },
+            hashmap! {
+                String::from("id") => to_attribute_value(42).unwrap(),
+                String::from("name") => to_attribute_value("John").unwrap(),
+                String::from("age") => to_attribute_value("not a number").unwrap(),
+            },
+        ];
+
+        let err = from_items::<Vec<User>>(items).unwrap_err();
+        assert_eq!(Into::<Error>::into(ErrorImpl::ExpectedSeq), err);
+    }
+}

@@ -71,3 +71,54 @@ where
     let t = T::deserialize(deserializer)?;
     Ok(t)
 }
+
+/// Interpret an `Vec<Item>` as `Vec<T>`.
+///
+/// ```
+/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
+/// # use serde::{Serialize, Deserialize};
+/// # use serde_dynamo::from_items;
+/// #
+/// # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
+/// #[derive(Serialize, Deserialize)]
+/// pub struct User {
+///     id: String,
+///     name: String,
+///     age: u8,
+/// };
+///
+/// // Get documents from DynamoDB
+/// let input = ScanInput {
+///     table_name: "users".to_string(),
+///     ..ScanInput::default()
+/// };
+/// let result = client.scan(input).await?;
+///
+/// // And deserialize them as strongly-typed data structures
+/// if let Some(items) = result.items {
+///     let users: Vec<User> = from_items(items)?;
+///     println!("Got {} users", users.len());
+/// }
+/// # Ok(())
+/// # }
+/// ```
+pub fn from_items<'a, T>(items: Vec<Item>) -> Result<Vec<T>>
+where
+    T: Deserialize<'a>,
+{
+    let attribute_value = AttributeValue {
+        l: Some(
+            items
+                .into_iter()
+                .map(|item| AttributeValue {
+                    m: Some(item),
+                    ..AttributeValue::default()
+                })
+                .collect(),
+        ),
+        ..AttributeValue::default()
+    };
+    let deserializer = Deserializer::from_attribute_value(attribute_value);
+    let t = Vec::<T>::deserialize(deserializer)?;
+    Ok(t)
+}
