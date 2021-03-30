@@ -48,7 +48,7 @@ fn serialize_num() {
                 }
             );
         }};
-    };
+    }
 
     serialize_num!(i8, -1);
     serialize_num!(u8, 1);
@@ -438,7 +438,7 @@ fn internally_tagged_enum() {
     enum Enum {
         One { one: u8 },
         Two { one: u8, two: u8 },
-    };
+    }
 
     let result = to_attribute_value(Enum::Two { one: 1, two: 2 }).unwrap();
 

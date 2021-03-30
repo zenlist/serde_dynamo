@@ -17,7 +17,7 @@ fn internally_tagged_enum() {
     enum Subject {
         One { one: u8 },
         Two { two: u8 },
-    };
+    }
 
     round_trip(Subject::One { one: 1 });
     round_trip(Subject::Two { two: 2 });
@@ -30,7 +30,7 @@ fn adjacently_tagged_enum() {
     enum Subject {
         One { one: u8 },
         Two { two: u8 },
-    };
+    }
 
     round_trip(Subject::One { one: 1 });
     round_trip(Subject::Two { two: 2 });
@@ -43,7 +43,7 @@ fn untagged_enum() {
     enum Simple {
         One { one: u8 },
         Two { two: u8 },
-    };
+    }
 
     round_trip(Simple::One { one: 1 });
     round_trip(Simple::Two { two: 2 });
@@ -53,7 +53,7 @@ fn untagged_enum() {
     enum Overlapping {
         Two { one: u8, two: u8 },
         Three { one: u8, three: u8 },
-    };
+    }
 
     round_trip(Overlapping::Two { one: 1, two: 2 });
     round_trip(Overlapping::Three { one: 1, three: 3 });
