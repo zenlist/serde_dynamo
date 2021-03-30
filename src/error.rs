@@ -60,6 +60,8 @@ pub enum ErrorImpl {
     FailedToParseInt(String, std::num::ParseIntError),
     /// Failed to parse as a float
     FailedToParseFloat(String, std::num::ParseFloatError),
+    /// Key must be a string
+    KeyMustBeAString,
 }
 
 #[allow(clippy::from_over_into)]
@@ -91,6 +93,7 @@ impl Display for ErrorImpl {
             ErrorImpl::FailedToParseFloat(s, err) => {
                 write!(f, "Failed to parse '{0}' as a float: {1}", s, err)
             }
+            ErrorImpl::KeyMustBeAString => f.write_str("Key must be a string"),
         }
     }
 }

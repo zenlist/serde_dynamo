@@ -1,4 +1,4 @@
-use super::{AttributeValue, Error, Item, Result, Serializer};
+use super::{AttributeValue, Error, ErrorImpl, Item, Result, Serializer};
 use serde::{ser, Serialize};
 
 pub struct SerializerMap {
@@ -117,32 +117,32 @@ impl<'a> ser::Serializer for MapKeySerializer {
         unreachable!()
     }
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_some<T: ?Sized>(self, _value: &T) -> Result<Self::Ok, Self::Error>
     where
         T: Serialize,
     {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_bytes(self, _v: &[u8]) -> Result<Self::Ok, Self::Error> {
         unreachable!()
     }
     fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_struct(
         self,
         _name: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStruct, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_unit_variant(
         self,
@@ -157,7 +157,7 @@ impl<'a> ser::Serializer for MapKeySerializer {
         _name: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeTupleStruct, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_tuple_variant(
         self,
@@ -166,7 +166,7 @@ impl<'a> ser::Serializer for MapKeySerializer {
         _variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeTupleVariant, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_newtype_struct<T: ?Sized>(
         self,
@@ -185,7 +185,7 @@ impl<'a> ser::Serializer for MapKeySerializer {
         _variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStructVariant, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_newtype_variant<T: ?Sized>(
         self,
@@ -197,7 +197,7 @@ impl<'a> ser::Serializer for MapKeySerializer {
     where
         T: Serialize,
     {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
 }
 
