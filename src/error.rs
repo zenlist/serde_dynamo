@@ -62,6 +62,7 @@ pub enum ErrorImpl {
     FailedToParseFloat(String, std::num::ParseFloatError),
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<Error> for ErrorImpl {
     fn into(self) -> Error {
         Error(self)
