@@ -261,6 +261,11 @@ mod map_key {
             "Serialized value is not what was expected"
         );
 
+        println!(
+            "{} as dynamo item: {:?}",
+            original_as_json, expected_serialized
+        );
+
         let deserialized = from_attribute_value(actual_serialized.clone()).unwrap_or_else(|err| {
             panic!(
                 "Failed to deserialize: {}\nThe serialized value was:\n{:#?}\n",
@@ -298,10 +303,7 @@ mod map_key {
 
             #[test]
             fn unit_variant() {
-                // TODO: Fix this. It currently panics (`unreachable!()`) in serde_dynamo,
-                //       but works in serde_json. Making it round-trip properly in serde_dynamo
-                //       is more complicated.
-                // map_key_round_trip(VariantType::Unit, Ok("Unit"));
+                map_key_round_trip(VariantType::Unit, Ok("Unit"));
             }
 
             #[test]

@@ -148,9 +148,9 @@ impl<'a> ser::Serializer for MapKeySerializer {
         self,
         _name: &'static str,
         _variant_index: u32,
-        _variant: &'static str,
+        variant: &'static str,
     ) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        self.serialize_str(variant)
     }
     fn serialize_tuple_struct(
         self,

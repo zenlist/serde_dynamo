@@ -55,7 +55,7 @@ impl DeserializerMapKey {
     }
 }
 
-impl<'de, 'a> de::Deserializer<'de> for DeserializerMapKey {
+impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
@@ -89,8 +89,24 @@ impl<'de, 'a> de::Deserializer<'de> for DeserializerMapKey {
         visitor.visit_string(self.input)
     }
 
+    fn deserialize_enum<V>(
+        self,
+        name: &'static str,
+        variants: &'static [&'static str],
+        visitor: V,
+    ) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        let de = Deserializer::from_attribute_value(AttributeValue {
+            s: Some(self.input),
+            ..AttributeValue::default()
+        });
+        de.deserialize_enum(name, variants, visitor)
+    }
+
     forward_to_deserialize_any! {
-        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char enum bytes byte_buf option unit
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char bytes byte_buf option unit
         unit_struct newtype_struct seq tuple tuple_struct map struct ignored_any
     }
 }
