@@ -174,7 +174,7 @@ mod from_items {
 mod map_key {
     use std::{fmt::Debug, hash::Hash};
 
-    use maplit::hashmap;
+    use maplit::{btreemap, hashmap};
     use serde::de::DeserializeOwned;
     use serde::{Deserialize, Serialize};
 
@@ -198,9 +198,9 @@ mod map_key {
     /// If `Err(E)` is provided and there is no error, this panics.
     fn map_key_round_trip<K>(key: K, expect_serialized_key: Result<&str>)
     where
-        K: Debug + Clone + Eq + Hash + Serialize + DeserializeOwned,
+        K: Debug + Clone + Ord + Serialize + DeserializeOwned,
     {
-        let original = hashmap! { key => String::from("value") };
+        let original = btreemap! { key => String::from("value") };
 
         let original_as_json = match serde_json::to_string(&original) {
             Ok(original_as_json) => {
@@ -543,7 +543,7 @@ mod map_key {
 
     #[test]
     fn struct_() {
-        #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct {}
 
         map_key_round_trip(Struct {}, key_must_be_a_string());
@@ -551,7 +551,7 @@ mod map_key {
 
     #[test]
     fn unit_struct() {
-        #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct;
 
         map_key_round_trip(Struct {}, key_must_be_a_string());
@@ -559,7 +559,7 @@ mod map_key {
 
     #[test]
     fn tuple_struct() {
-        #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct(String, String);
 
         map_key_round_trip(
@@ -568,12 +568,11 @@ mod map_key {
         );
     }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn newtype_struct() {
-    //     #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-    //     struct Struct(i64);
+    #[test]
+    fn newtype_struct() {
+        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+        struct Struct(i64);
 
-    //     map_key_round_trip(Struct(5), Ok("5"));
-    // }
+        map_key_round_trip(Struct(5), Ok("5"));
+    }
 }

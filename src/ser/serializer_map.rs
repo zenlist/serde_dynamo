@@ -177,12 +177,12 @@ impl<'a> ser::Serializer for MapKeySerializer {
     fn serialize_newtype_struct<T: ?Sized>(
         self,
         _name: &'static str,
-        _value: &T,
+        value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: Serialize,
     {
-        unreachable!()
+        value.serialize(self)
     }
     fn serialize_struct_variant(
         self,

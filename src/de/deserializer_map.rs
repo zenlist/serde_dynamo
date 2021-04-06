@@ -121,6 +121,17 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
         de.deserialize_enum(name, variants, visitor)
     }
 
+    fn deserialize_newtype_struct<V>(
+        self,
+        _name: &'static str,
+        visitor: V,
+    ) -> Result<V::Value, Self::Error>
+    where
+        V: Visitor<'de>,
+    {
+        visitor.visit_newtype_struct(self)
+    }
+
     deserialize_integer_key!(deserialize_i8   => visit_i8);
     deserialize_integer_key!(deserialize_i16  => visit_i16);
     deserialize_integer_key!(deserialize_i32  => visit_i32);
