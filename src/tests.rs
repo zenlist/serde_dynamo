@@ -466,63 +466,65 @@ mod map_key {
         }
     }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn i8() {
-    //     map_key_round_trip(5_i8, Ok("5"));
-    // }
+    #[test]
+    fn i8() {
+        map_key_round_trip(5_i8, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn u8() {
-    //     map_key_round_trip(5_u8, Ok("5"));
-    // }
+    #[test]
+    fn u8() {
+        map_key_round_trip(5_u8, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn i16() {
-    //     map_key_round_trip(5_i16, Ok("5"));
-    // }
+    #[test]
+    fn i16() {
+        map_key_round_trip(5_i16, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn u16() {
-    //     map_key_round_trip(5_u16, Ok("5"));
-    // }
+    #[test]
+    fn u16() {
+        map_key_round_trip(5_u16, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn i32() {
-    //     map_key_round_trip(5_i32, Ok("5"));
-    // }
+    #[test]
+    fn i32() {
+        map_key_round_trip(5_i32, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn u32() {
-    //     map_key_round_trip(5_u32, Ok("5"));
-    // }
+    #[test]
+    fn u32() {
+        map_key_round_trip(5_u32, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn i64() {
-    //     map_key_round_trip(5_i64, Ok("5"));
-    // }
+    #[test]
+    fn i64() {
+        map_key_round_trip(5_i64, Ok("5"));
+    }
 
-    // TODO: Make this not panic (`unreachable!()`)
-    // #[test]
-    // fn u64() {
-    //     map_key_round_trip(5_u64, Ok("5"));
-    // }
+    #[test]
+    fn u64() {
+        map_key_round_trip(5_u64, Ok("5"));
+    }
 
-    // #[test]
-    // fn bool() {
-    //     map_key_round_trip(true, key_must_be_a_string());
-    // }
+    #[test]
+    fn i128() {
+        map_key_round_trip(5_i128, Ok("5"));
+    }
 
-    // #[test]
-    // fn char() {
-    //     map_key_round_trip('a', Ok("a"));
-    // }
+    #[test]
+    fn u128() {
+        map_key_round_trip(5_u128, Ok("5"));
+    }
+
+    #[test]
+    fn bool() {
+        map_key_round_trip(true, key_must_be_a_string());
+    }
+
+    #[test]
+    fn char() {
+        map_key_round_trip('a', Ok("a"));
+    }
 
     #[test]
     fn none() {

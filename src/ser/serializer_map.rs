@@ -71,35 +71,41 @@ impl<'a> ser::Serializer for MapKeySerializer {
     type SerializeStruct = Self;
     type SerializeStructVariant = Self;
 
-    fn serialize_i8(self, _v: i8) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_i8(self, v: i8) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_u8(self, _v: u8) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_u8(self, v: u8) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_i16(self, _v: i16) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_i16(self, v: i16) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_i32(self, _v: i32) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_i32(self, v: i32) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_i64(self, _v: i64) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_u16(self, _v: u16) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_i128(self, v: i128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_u32(self, _v: u32) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
-    fn serialize_u64(self, _v: u64) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_u32(self, v: u32) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
+    }
+    fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
+    }
+    fn serialize_u128(self, v: u128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
     fn serialize_f32(self, _v: f32) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_f64(self, _v: f64) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
     fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
@@ -111,10 +117,10 @@ impl<'a> ser::Serializer for MapKeySerializer {
         unreachable!()
     }
     fn serialize_bool(self, _v: bool) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+        Err(ErrorImpl::KeyMustBeAString.into())
     }
-    fn serialize_char(self, _v: char) -> Result<Self::Ok, Self::Error> {
-        unreachable!()
+    fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
+        self.serialize_str(&v.to_string())
     }
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())

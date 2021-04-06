@@ -1,4 +1,4 @@
-use super::{AttributeValue, Deserializer, Error, Item, Result};
+use super::{AttributeValue, Deserializer, Error, ErrorImpl, Item, Result};
 use serde::de::{self, DeserializeSeed, MapAccess, Visitor};
 use serde::forward_to_deserialize_any;
 
@@ -55,6 +55,22 @@ impl DeserializerMapKey {
     }
 }
 
+macro_rules! deserialize_integer_key {
+    ($method:ident => $visit:ident) => {
+        fn $method<V>(self, visitor: V) -> Result<V::Value>
+        where
+            V: de::Visitor<'de>,
+        {
+            let number = self
+                .input
+                .parse()
+                .map_err(|_| ErrorImpl::ExpectedNum.into())?;
+
+            visitor.$visit(number)
+        }
+    };
+}
+
 impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     type Error = Error;
 
@@ -105,8 +121,19 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
         de.deserialize_enum(name, variants, visitor)
     }
 
+    deserialize_integer_key!(deserialize_i8   => visit_i8);
+    deserialize_integer_key!(deserialize_i16  => visit_i16);
+    deserialize_integer_key!(deserialize_i32  => visit_i32);
+    deserialize_integer_key!(deserialize_i64  => visit_i64);
+    deserialize_integer_key!(deserialize_i128 => visit_i128);
+    deserialize_integer_key!(deserialize_u8   => visit_u8);
+    deserialize_integer_key!(deserialize_u16  => visit_u16);
+    deserialize_integer_key!(deserialize_u32  => visit_u32);
+    deserialize_integer_key!(deserialize_u64  => visit_u64);
+    deserialize_integer_key!(deserialize_u128 => visit_u128);
+
     forward_to_deserialize_any! {
-        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char bytes byte_buf option unit
-        unit_struct newtype_struct seq tuple tuple_struct map struct ignored_any
+        bool f32 f64 char bytes byte_buf option unit
+        unit_struct seq tuple tuple_struct map struct ignored_any
     }
 }

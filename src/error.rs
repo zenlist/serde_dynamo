@@ -40,7 +40,7 @@ pub enum ErrorImpl {
     ExpectedMap,
     /// Expected seq
     ExpectedSeq,
-    /// Expected seq
+    /// Expected num
     ExpectedNum,
     /// Expected bool
     ExpectedBool,
