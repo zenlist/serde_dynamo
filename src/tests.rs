@@ -174,7 +174,7 @@ mod from_items {
 mod map_key {
     use std::{fmt::Debug, hash::Hash};
 
-    use maplit::{btreemap, hashmap};
+    use maplit::btreemap;
     use serde::de::DeserializeOwned;
     use serde::{Deserialize, Serialize};
 
@@ -196,13 +196,15 @@ mod map_key {
     /// If `Ok(&str)` is provided and there is an error, this panics.
     ///
     /// If `Err(E)` is provided and there is no error, this panics.
-    fn map_key_round_trip<K>(key: K, expect_serialized_key: Result<&str>)
+    fn map_key_round_trip<K>(key: K, expect_serialized_key: Result<&str>, json_should_match: bool)
     where
         K: Debug + Clone + Ord + Serialize + DeserializeOwned,
     {
+        use serde_json::{json, Value};
+
         let original = btreemap! { key => String::from("value") };
 
-        let original_as_json = match serde_json::to_string(&original) {
+        let (as_json, json_key) = match serde_json::to_value(&original) {
             Ok(original_as_json) => {
                 if expect_serialized_key.is_err() {
                     panic!(
@@ -212,10 +214,24 @@ mod map_key {
                     );
                 }
 
-                original_as_json
+                println!("{:?} as JSON: {}", original, original_as_json);
+
+                let json_key = match &original_as_json {
+                    Value::Object(object) => object
+                        .keys()
+                        .next()
+                        .expect("There should be a key")
+                        .to_owned(),
+                    _ => panic!(
+                        "Should have gotten a JSON object with one field, got: {:?}",
+                        original_as_json
+                    ),
+                };
+
+                (original_as_json, json_key)
             }
             Err(err) => {
-                if expect_serialized_key.is_ok() {
+                if json_should_match && expect_serialized_key.is_ok() {
                     panic!(
                         "Expecting to be able to serialize {:?} to AttributeValue, \
                         but it could not be serialized to JSON: {}",
@@ -223,11 +239,14 @@ mod map_key {
                     );
                 }
 
-                format!("unsupported by serde_json: {}", err)
+                println!("{:?} cannot be serialized by serde_json: {}", original, err);
+
+                (
+                    json!("unsupported by serde_json"),
+                    String::from("unsupported by serde_json"),
+                )
             }
         };
-
-        println!("{:?} as JSON: {}", original, original_as_json);
 
         let actual_serialized = to_attribute_value(original.clone());
 
@@ -238,7 +257,7 @@ mod map_key {
                     panic!(
                         "Failed to serialize to AttributeValue: {}\n\n\
                     The JSON representation would be:\n{}\n",
-                        err, original_as_json,
+                        err, as_json,
                     )
                 }),
             ),
@@ -252,19 +271,21 @@ mod map_key {
             }
         };
 
-        let expected_serialized = to_attribute_value(hashmap! {
-            expected_serialized_key => "value",
-        })
-        .expect("Failed to serialize expected value");
+        let actual_serialized_key = actual_serialized
+            .m
+            .as_ref()
+            .expect("Should have serialized to a map")
+            .keys()
+            .next()
+            .expect("The map should have one key")
+            .to_owned();
+
         assert_eq!(
-            expected_serialized, actual_serialized,
-            "Serialized value is not what was expected"
+            expected_serialized_key, actual_serialized_key,
+            "Serialized map key is not what was expected"
         );
 
-        println!(
-            "{} as dynamo item: {:?}",
-            original_as_json, expected_serialized
-        );
+        println!("{} as dynamo item: {:?}", as_json, actual_serialized);
 
         let deserialized = from_attribute_value(actual_serialized.clone()).unwrap_or_else(|err| {
             panic!(
@@ -276,6 +297,13 @@ mod map_key {
             original, deserialized,
             "Deserialized value is not what was expected"
         );
+
+        if json_should_match {
+            assert_eq!(
+                json_key, actual_serialized_key,
+                "Serialized map key doesn't match the serde_json serialized map key"
+            );
+        }
     }
 
     fn key_must_be_a_string<T>() -> Result<T> {
@@ -303,7 +331,7 @@ mod map_key {
 
             #[test]
             fn unit_variant() {
-                map_key_round_trip(VariantType::Unit, Ok("Unit"));
+                map_key_round_trip(VariantType::Unit, Ok("Unit"), true);
             }
 
             #[test]
@@ -311,6 +339,7 @@ mod map_key {
                 map_key_round_trip(
                     VariantType::Newtype(String::from("newtype")),
                     key_must_be_a_string(),
+                    true,
                 );
             }
 
@@ -321,6 +350,7 @@ mod map_key {
                         value: String::from("STRUCT VALUE"),
                     },
                     key_must_be_a_string(),
+                    true,
                 );
             }
 
@@ -329,6 +359,7 @@ mod map_key {
                 map_key_round_trip(
                     VariantType::Tuple(String::from("TUPLE.0"), String::from("TUPLE.1")),
                     key_must_be_a_string(),
+                    true,
                 );
             }
         }
@@ -350,7 +381,7 @@ mod map_key {
 
             #[test]
             fn unit_variant() {
-                map_key_round_trip(VariantType::Unit, key_must_be_a_string());
+                map_key_round_trip(VariantType::Unit, key_must_be_a_string(), true);
             }
 
             #[test]
@@ -359,7 +390,7 @@ mod map_key {
                     VariantType::Newtype(String::from("newtype")),
                     Err(<ErrorImpl as serde::ser::Error>::custom(
                         "cannot serialize tagged newtype variant VariantType::Newtype containing a string"
-                    ).into()),
+                    ).into()),true,
                 );
             }
 
@@ -370,6 +401,7 @@ mod map_key {
                         value: String::from("STRUCT VALUE"),
                     },
                     key_must_be_a_string(),
+                    true,
                 );
             }
         }
@@ -391,7 +423,7 @@ mod map_key {
 
             #[test]
             fn unit_variant() {
-                map_key_round_trip(VariantType::Unit, key_must_be_a_string());
+                map_key_round_trip(VariantType::Unit, key_must_be_a_string(), true);
             }
 
             #[test]
@@ -399,6 +431,7 @@ mod map_key {
                 map_key_round_trip(
                     VariantType::Newtype(String::from("newtype")),
                     key_must_be_a_string(),
+                    true,
                 );
             }
 
@@ -409,6 +442,7 @@ mod map_key {
                         value: String::from("STRUCT VALUE"),
                     },
                     key_must_be_a_string(),
+                    true,
                 );
             }
 
@@ -417,6 +451,7 @@ mod map_key {
                 map_key_round_trip(
                     VariantType::Tuple(String::from("TUPLE.0"), String::from("TUPLE.1")),
                     key_must_be_a_string(),
+                    true,
                 );
             }
         }
@@ -438,12 +473,16 @@ mod map_key {
 
             #[test]
             fn unit_variant() {
-                map_key_round_trip(VariantType::Unit, key_must_be_a_string());
+                map_key_round_trip(VariantType::Unit, key_must_be_a_string(), true);
             }
 
             #[test]
             fn newtype_variant() {
-                map_key_round_trip(VariantType::Newtype(String::from("newtype")), Ok("newtype"));
+                map_key_round_trip(
+                    VariantType::Newtype(String::from("newtype")),
+                    Ok("newtype"),
+                    true,
+                );
             }
 
             #[test]
@@ -453,6 +492,7 @@ mod map_key {
                         value: String::from("STRUCT VALUE"),
                     },
                     key_must_be_a_string(),
+                    true,
                 );
             }
 
@@ -461,6 +501,7 @@ mod map_key {
                 map_key_round_trip(
                     VariantType::Tuple(String::from("TUPLE.0"), String::from("TUPLE.1")),
                     key_must_be_a_string(),
+                    true,
                 );
             }
         }
@@ -468,77 +509,85 @@ mod map_key {
 
     #[test]
     fn i8() {
-        map_key_round_trip(5_i8, Ok("5"));
+        map_key_round_trip(5_i8, Ok("5"), true);
     }
 
     #[test]
     fn u8() {
-        map_key_round_trip(5_u8, Ok("5"));
+        map_key_round_trip(5_u8, Ok("5"), true);
     }
 
     #[test]
     fn i16() {
-        map_key_round_trip(5_i16, Ok("5"));
+        map_key_round_trip(5_i16, Ok("5"), true);
     }
 
     #[test]
     fn u16() {
-        map_key_round_trip(5_u16, Ok("5"));
+        map_key_round_trip(5_u16, Ok("5"), true);
     }
 
     #[test]
     fn i32() {
-        map_key_round_trip(5_i32, Ok("5"));
+        map_key_round_trip(5_i32, Ok("5"), true);
     }
 
     #[test]
     fn u32() {
-        map_key_round_trip(5_u32, Ok("5"));
+        map_key_round_trip(5_u32, Ok("5"), true);
     }
 
     #[test]
     fn i64() {
-        map_key_round_trip(5_i64, Ok("5"));
+        map_key_round_trip(5_i64, Ok("5"), true);
     }
 
     #[test]
     fn u64() {
-        map_key_round_trip(5_u64, Ok("5"));
+        map_key_round_trip(5_u64, Ok("5"), true);
     }
 
     #[test]
     fn i128() {
-        map_key_round_trip(5_i128, Ok("5"));
+        // Once this issue is fixed, the last parameter of this call can be
+        // changed to `true`, and even removed from the function entirely.
+        // Last checked 2021-04-17.
+        // https://github.com/serde-rs/json/issues/625
+        map_key_round_trip(5_i128, Ok("5"), false);
     }
 
     #[test]
     fn u128() {
-        map_key_round_trip(5_u128, Ok("5"));
+        // Once this issue is fixed, the last parameter of this call can be
+        // changed to `true`, and even removed from the function entirely.
+        // Last checked 2021-04-17.
+        // https://github.com/serde-rs/json/issues/625
+        map_key_round_trip(5_u128, Ok("5"), false);
     }
 
     #[test]
     fn bool() {
-        map_key_round_trip(true, key_must_be_a_string());
+        map_key_round_trip(true, key_must_be_a_string(), true);
     }
 
     #[test]
     fn char() {
-        map_key_round_trip('a', Ok("a"));
+        map_key_round_trip('a', Ok("a"), true);
     }
 
     #[test]
     fn none() {
-        map_key_round_trip(Option::<()>::None, key_must_be_a_string());
+        map_key_round_trip(Option::<()>::None, key_must_be_a_string(), true);
     }
 
     #[test]
     fn some() {
-        map_key_round_trip(Some(String::from("a")), key_must_be_a_string());
+        map_key_round_trip(Some(String::from("a")), key_must_be_a_string(), true);
     }
 
     #[test]
     fn tuple() {
-        map_key_round_trip((), key_must_be_a_string());
+        map_key_round_trip((), key_must_be_a_string(), true);
     }
 
     #[test]
@@ -546,7 +595,7 @@ mod map_key {
         #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct {}
 
-        map_key_round_trip(Struct {}, key_must_be_a_string());
+        map_key_round_trip(Struct {}, key_must_be_a_string(), true);
     }
 
     #[test]
@@ -554,7 +603,7 @@ mod map_key {
         #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct;
 
-        map_key_round_trip(Struct {}, key_must_be_a_string());
+        map_key_round_trip(Struct {}, key_must_be_a_string(), true);
     }
 
     #[test]
@@ -565,6 +614,7 @@ mod map_key {
         map_key_round_trip(
             Struct(String::from("a"), String::from("b")),
             key_must_be_a_string(),
+            true,
         );
     }
 
@@ -573,6 +623,6 @@ mod map_key {
         #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct(i64);
 
-        map_key_round_trip(Struct(5), Ok("5"));
+        map_key_round_trip(Struct(5), Ok("5"), true);
     }
 }

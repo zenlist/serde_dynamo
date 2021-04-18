@@ -1,6 +1,8 @@
 use super::{AttributeValue, Deserializer, Error, ErrorImpl, Item, Result};
-use serde::de::{self, DeserializeSeed, MapAccess, Visitor};
-use serde::forward_to_deserialize_any;
+use serde::{
+    de::{self, DeserializeSeed, MapAccess, Visitor},
+    forward_to_deserialize_any, serde_if_integer128,
+};
 
 pub struct DeserializerMap<'a> {
     drain: std::collections::hash_map::Drain<'a, String, AttributeValue>,
@@ -136,12 +138,16 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     deserialize_integer_key!(deserialize_i16  => visit_i16);
     deserialize_integer_key!(deserialize_i32  => visit_i32);
     deserialize_integer_key!(deserialize_i64  => visit_i64);
-    deserialize_integer_key!(deserialize_i128 => visit_i128);
+    serde_if_integer128! {
+        deserialize_integer_key!(deserialize_i128 => visit_i128);
+    }
     deserialize_integer_key!(deserialize_u8   => visit_u8);
     deserialize_integer_key!(deserialize_u16  => visit_u16);
     deserialize_integer_key!(deserialize_u32  => visit_u32);
     deserialize_integer_key!(deserialize_u64  => visit_u64);
-    deserialize_integer_key!(deserialize_u128 => visit_u128);
+    serde_if_integer128! {
+        deserialize_integer_key!(deserialize_u128 => visit_u128);
+    }
 
     forward_to_deserialize_any! {
         bool f32 f64 char bytes byte_buf option unit
