@@ -21,6 +21,30 @@ where
     assert_eq!(direct_result, indirect_result);
 }
 
+macro_rules! assert_identical_json_with_error {
+    ($expr:expr) => {
+        assert_identical_json_with_error($expr, $expr);
+    };
+}
+
+fn assert_identical_json_with_error<T>(t1: T, t2: T)
+where
+    T: Serialize,
+{
+    let direct_result = to_attribute_value(t1);
+    let json_result = serde_json::to_value(t2);
+
+    match (direct_result, json_result) {
+        (Ok(direct_result), Ok(json_result)) => match to_attribute_value(json_result) {
+            Ok(indirect_result) => assert_eq!(direct_result, indirect_result),
+            Err(_) => panic!("dynamo, json succeeded, indirect failed"),
+        },
+        (Ok(_), Err(_)) => panic!("dynamo succeeded, json failed"),
+        (Err(_), Ok(_)) => panic!("dynamo failed, json succeeded"),
+        (Err(_), Err(_)) => { /* Both failing is OK. */ }
+    }
+}
+
 #[test]
 fn serialize_string() {
     let result = to_attribute_value(String::from("Value")).unwrap();
@@ -48,7 +72,7 @@ fn serialize_num() {
                 }
             );
         }};
-    };
+    }
 
     serialize_num!(i8, -1);
     serialize_num!(u8, 1);
@@ -321,6 +345,122 @@ fn serialize_map_with_strings() {
 }
 
 #[test]
+fn serialize_maps_with_various_types() {
+    let result =
+        to_attribute_value(hashmap! { 1 => String::from("1"), 2 => String::from("2") }).unwrap();
+
+    assert_eq!(
+        result,
+        AttributeValue {
+            m: Some(hashmap! {
+                String::from("1") => AttributeValue {
+                    s: Some(String::from("1")),
+                    ..AttributeValue::default()
+                },
+                String::from("2") => AttributeValue {
+                    s: Some(String::from("2")),
+                    ..AttributeValue::default()
+                },
+            }),
+            ..AttributeValue::default()
+        },
+    );
+
+    assert_identical_json!(hashmap! { 1 => String::from("1"), 2 => String::from("2") });
+
+    macro_rules! test_map {
+        ($($expr:expr),*) => {
+            assert_identical_json_with_error!(hashmap! {
+                $(
+                    $expr => String::from(stringify!($expr)),
+                )*
+            })
+        }
+    }
+
+    test_map!(1_u8, 2_u8);
+    test_map!(-1_i8, -2_i8);
+    test_map!('a', 'b');
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+    struct Struct(i64);
+    test_map!(Struct(1), Struct(2));
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        /// Externally tagged
+        enum VariantType {
+            Unit,
+            Newtype(String),
+            Struct { value: String },
+            Tuple(String, String),
+        }
+
+        test_map!(VariantType::Unit);
+        test_map!(VariantType::Newtype(String::from("one")));
+        test_map!(VariantType::Struct {
+            value: String::from("one")
+        });
+        test_map!(VariantType::Tuple(String::from("one"), String::from("two")));
+    }
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        #[serde(tag = "type")]
+        /// Internally tagged
+        enum VariantType {
+            Unit,
+            Newtype(String),
+            Struct { value: String },
+        }
+
+        test_map!(VariantType::Unit);
+        test_map!(VariantType::Newtype(String::from("one")));
+        test_map!(VariantType::Struct {
+            value: String::from("one")
+        });
+    }
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        #[serde(tag = "type", content = "content")]
+        /// Adjacently tagged
+        enum VariantType {
+            Unit,
+            Newtype(String),
+            Struct { value: String },
+            Tuple(String, String),
+        }
+
+        test_map!(VariantType::Unit);
+        test_map!(VariantType::Newtype(String::from("one")));
+        test_map!(VariantType::Struct {
+            value: String::from("one")
+        });
+        test_map!(VariantType::Tuple(String::from("one"), String::from("two")));
+    }
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        #[serde(untagged)]
+        /// Untagged
+        enum VariantType {
+            Unit,
+            Newtype(String),
+            Struct { value: String },
+            Tuple(String, String),
+        }
+
+        test_map!(VariantType::Unit);
+        test_map!(VariantType::Newtype(String::from("one")));
+        test_map!(VariantType::Struct {
+            value: String::from("one")
+        });
+        test_map!(VariantType::Tuple(String::from("one"), String::from("two")));
+    }
+}
+
+#[test]
 fn serialize_enum_unit() {
     #[derive(Serialize, Deserialize)]
     enum Subject {
@@ -438,7 +578,7 @@ fn internally_tagged_enum() {
     enum Enum {
         One { one: u8 },
         Two { one: u8, two: u8 },
-    };
+    }
 
     let result = to_attribute_value(Enum::Two { one: 1, two: 2 }).unwrap();
 

@@ -495,6 +495,89 @@ fn deserialize_map_with_strings() {
 }
 
 #[test]
+fn deserialize_maps_of_various_types() {
+    let attribute_value = AttributeValue {
+        m: Some(hashmap! {
+            String::from("1") => AttributeValue {
+                s: Some(String::from("one")),
+                ..AttributeValue::default()
+            },
+            String::from("2") => AttributeValue {
+                s: Some(String::from("two")),
+                ..AttributeValue::default()
+            },
+        }),
+        ..AttributeValue::default()
+    };
+
+    let s: HashMap<usize, String> = from_attribute_value(attribute_value.clone()).unwrap();
+    assert_eq!(
+        s,
+        hashmap! { 1 => String::from("one"), 2 => String::from("two") }
+    );
+
+    assert_identical_json!(HashMap<usize, String>, attribute_value.clone());
+
+    macro_rules! test_map {
+        ($ty:ty, $($s:literal => $r:expr),*) => {
+            let attribute_value = AttributeValue {
+                m: Some(hashmap! {
+                    $(
+                        String::from($s) => AttributeValue {
+                            s: Some(String::from($s)),
+                            ..AttributeValue::default()
+                        },
+                    )*
+                }),
+                ..AttributeValue::default()
+            };
+
+            let s: HashMap<$ty, String> = from_attribute_value(attribute_value.clone()).unwrap();
+            assert_eq!(
+                s,
+                hashmap! {
+                    $(
+                        $r => String::from($s),
+                    )*
+                }
+            );
+
+            assert_identical_json!(HashMap<$ty, String>, attribute_value.clone())
+        }
+    }
+
+    test_map!(usize, "1" => 1, "2" => 2);
+    test_map!(i8, "-1" => -1, "-2" => -2);
+    test_map!(char, "a" => 'a', "b" => 'b');
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+    struct Struct(i64);
+    test_map!(Struct, "1" => Struct(1), "2" => Struct(2));
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        /// Externally tagged
+        enum VariantType {
+            Unit1,
+            Unit2,
+        }
+
+        test_map!(VariantType, "Unit1" => VariantType::Unit1, "Unit2" => VariantType::Unit2);
+    }
+
+    {
+        #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+        #[serde(untagged)]
+        /// Untagged
+        enum VariantType {
+            Newtype(String),
+        }
+
+        test_map!(VariantType, "one" => VariantType::Newtype(String::from("one")));
+    }
+}
+
+#[test]
 fn deserialize_enum_unit() {
     #[derive(Debug, Deserialize, Eq, PartialEq)]
     enum Subject {

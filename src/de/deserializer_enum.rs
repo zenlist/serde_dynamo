@@ -48,9 +48,7 @@ impl<'de, 'a> VariantAccess<'de> for DeserializerVariant {
     type Error = Error;
 
     fn unit_variant(self) -> Result<()> {
-        // If the `Visitor` expected this variant to be a unit variant, the input should have been
-        // the plain string case handled in `deserialize_enum`.
-        unreachable!()
+        Ok(())
     }
 
     fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value>
