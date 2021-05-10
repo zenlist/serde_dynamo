@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "2.3.0"
+version = "3.0.0-alpha.0"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2018"
 license = "MIT"
@@ -13,6 +13,7 @@ keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
 rusoto_dynamodb = { version = "0.46", default-features = false }
+aws-sdk-dynamodb = { git = "https://github.com/awslabs/aws-sdk-rust", branch = "main" }
 serde = "1"
 
 [dev-dependencies]

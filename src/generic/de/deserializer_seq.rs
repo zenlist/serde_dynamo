@@ -1,26 +1,29 @@
+use super::deserializer_bytes::DeserializerBytes;
+use super::deserializer_number::DeserializerNumber;
 use super::{AttributeValue, Deserializer, Error, Result};
-use crate::de::deserializer_bytes::DeserializerBytes;
-use crate::de::deserializer_number::DeserializerNumber;
 use serde::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
-pub struct DeserializerSeq {
-    iter: std::vec::IntoIter<AttributeValue>,
+pub struct DeserializerSeq<T> {
+    iter: std::vec::IntoIter<T>,
 }
 
-impl DeserializerSeq {
-    pub fn from_vec(vec: Vec<AttributeValue>) -> Self {
+impl<T> DeserializerSeq<T> {
+    pub fn from_vec(vec: Vec<T>) -> Self {
         Self {
             iter: vec.into_iter(),
         }
     }
 }
 
-impl<'de, 'a> SeqAccess<'de> for DeserializerSeq {
+impl<'de, 'a, T> SeqAccess<'de> for DeserializerSeq<T>
+where
+    T: AttributeValue,
+{
     type Error = Error;
 
-    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    fn next_element_seed<S>(&mut self, seed: S) -> Result<Option<S::Value>, Self::Error>
     where
-        T: DeserializeSeed<'de>,
+        S: DeserializeSeed<'de>,
     {
         if let Some(value) = self.iter.next() {
             let de = Deserializer::from_attribute_value(value);

@@ -1,7 +1,8 @@
 #![allow(clippy::float_cmp, clippy::redundant_clone, clippy::unit_cmp)]
 
-use super::*;
+use crate::rusoto_dynamodb::from_attribute_value;
 use maplit::hashmap;
+use rusoto_dynamodb::AttributeValue;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 

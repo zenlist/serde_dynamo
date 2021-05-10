@@ -1,35 +1,39 @@
-use super::{AttributeValue, Error, ErrorImpl, Item, Result, Serializer};
+use super::{AttributeValue, Error, ErrorImpl, Result, Serializer};
 use serde::{ser, serde_if_integer128, Serialize};
+use std::collections::HashMap;
 
-pub struct SerializerMap {
-    item: Item,
+pub struct SerializerMap<T> {
+    item: HashMap<String, T>,
 }
 
-impl SerializerMap {
+impl<T> SerializerMap<T> {
     pub fn new(len: Option<usize>) -> Self {
         let item = if let Some(len) = len {
-            Item::with_capacity(len)
+            HashMap::with_capacity(len)
         } else {
-            Item::new()
+            HashMap::new()
         };
         SerializerMap { item }
     }
 }
 
-impl<'a> ser::SerializeMap for SerializerMap {
-    type Ok = AttributeValue;
+impl<'a, T> ser::SerializeMap for SerializerMap<T>
+where
+    T: AttributeValue,
+{
+    type Ok = T;
     type Error = Error;
 
-    fn serialize_key<T: ?Sized>(&mut self, _key: &T) -> Result<(), Self::Error>
+    fn serialize_key<K: ?Sized>(&mut self, _key: &K) -> Result<(), Self::Error>
     where
-        T: Serialize,
+        K: Serialize,
     {
         unreachable!()
     }
 
-    fn serialize_value<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_value<V: ?Sized>(&mut self, _value: &V) -> Result<(), Self::Error>
     where
-        T: Serialize,
+        V: Serialize,
     {
         unreachable!()
     }
@@ -44,16 +48,13 @@ impl<'a> ser::SerializeMap for SerializerMap {
         V: Serialize,
     {
         let key = key.serialize(MapKeySerializer)?;
-        let value = value.serialize(Serializer)?;
+        let value = value.serialize(Serializer::<T>::default())?;
         self.item.insert(key, value);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        Ok(AttributeValue {
-            m: Some(self.item),
-            ..AttributeValue::default()
-        })
+        Ok(T::construct_m(self.item))
     }
 }
 
