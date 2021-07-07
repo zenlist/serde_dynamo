@@ -76,7 +76,7 @@ fn deserialize_bool() {
         ..AttributeValue::default()
     };
     let result: bool = from_attribute_value(attribute_value.clone()).unwrap();
-    assert_eq!(result, true);
+    assert!(result);
     assert_identical_json!(bool, attribute_value.clone());
 
     let attribute_value = AttributeValue {
@@ -88,7 +88,7 @@ fn deserialize_bool() {
         ..AttributeValue::default()
     })
     .unwrap();
-    assert_eq!(result, false);
+    assert!(!result);
     assert_identical_json!(bool, attribute_value.clone());
 }
 
