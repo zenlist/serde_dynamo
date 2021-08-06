@@ -9,13 +9,10 @@ use std::collections::HashMap;
 
 /// An "Item" used in [aws-sdk-dynamodb]'s [get_item], [write_item], [put_item], etc.
 ///
-/// Nowhere in rusoto_dynamodb is this type named explicitely, so we name it here to be clear about
+/// Nowhere in aws_sdk_dynamodb is this type named explicitely, so we name it here to be clear about
 /// exactly what is being taken in and being returned.
 ///
 /// [aws-sdk-dynamodb]: https://github.com/awslabs/aws-sdk-rust
-/// [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-/// [write_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.write_item
-/// [put_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.put_item
 pub type Item = HashMap<String, AttributeValue>;
 
 impl crate::generic::AttributeValue for AttributeValue {
@@ -240,12 +237,11 @@ impl crate::generic::AttributeValue for AttributeValue {
     }
 }
 
-/// Interpret a [rusoto_dynamodb::AttributeValue] as an instance of type `T`.
+/// Interpret a [aws_sdk_dynamodb::model::AttributeValue] as an instance of type `T`.
 ///
 /// In most cases, you will want to be using [`from_item`] instead. This function is provided as a
 /// dual of [`to_attribute_value`] and may be useful in very narrow circumstances.
 ///
-/// [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
 pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
 where
     T: Deserialize<'a>,
@@ -256,29 +252,30 @@ where
 /// Interpret an [`Item`] as an instance of type `T`.
 ///
 /// ```
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-/// # use serde::{Serialize, Deserialize};
-/// # use serde_dynamo::rusoto_dynamodb::from_item;
+/// # use aws_sdk_dynamodb::{Client, model::AttributeValue};
+/// # use serde::{Deserialize};
+/// # use serde_dynamo::aws_sdk_dynamodb::{from_item};
 /// #
-/// # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-/// #[derive(Serialize, Deserialize)]
+/// # async fn get_item(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
+/// #[derive(Deserialize)]
 /// pub struct User {
 ///     id: String,
 ///     name: String,
 ///     age: u8,
 /// };
 ///
-/// // Get documents from DynamoDB
-/// let input = ScanInput {
-///     table_name: "users".to_string(),
-///     ..ScanInput::default()
-/// };
-/// let result = client.scan(input).await?;
+/// // Get a document from DynamoDB
+/// let result = client
+///     .get_item()
+///     .table_name("users")
+///     .key("name", AttributeValue::S("ferris".into()))
+///     .send()
+///     .await?;
 ///
-/// // And deserialize them as strongly-typed data structures
-/// for item in result.items.unwrap() {
-///     let user: User = from_item(item)?;
-///     println!("{} is {}", user.name, user.age);
+/// // And deserialize it as a strongly-typed data structure
+/// if let Some(item) = result.item {
+///    let user: User = from_item(item)?;
+///    println!("Deserialized User!");
 /// }
 /// # Ok(())
 /// # }
@@ -293,12 +290,12 @@ where
 /// Interpret an `Vec<Item>` as `Vec<T>`.
 ///
 /// ```
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-/// # use serde::{Serialize, Deserialize};
-/// # use serde_dynamo::rusoto_dynamodb::from_items;
+/// # use aws_sdk_dynamodb::{Client};
+/// # use serde::{Deserialize};
+/// # use serde_dynamo::aws_sdk_dynamodb::{from_items};
 /// #
-/// # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-/// #[derive(Serialize, Deserialize)]
+/// # async fn scan(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
+/// #[derive(Deserialize)]
 /// pub struct User {
 ///     id: String,
 ///     name: String,
@@ -306,11 +303,7 @@ where
 /// };
 ///
 /// // Get documents from DynamoDB
-/// let input = ScanInput {
-///     table_name: "users".to_string(),
-///     ..ScanInput::default()
-/// };
-/// let result = client.scan(input).await?;
+/// let result = client.scan().table_name("users").limit(10).send().await?;
 ///
 /// // And deserialize them as strongly-typed data structures
 /// if let Some(items) = result.items {
@@ -327,73 +320,7 @@ where
     crate::generic::from_items(items)
 }
 
-/// Convert a `T` into a [rusoto_dynamodb::AttributeValue] which is rusoto's representation of a
-/// DynamoDb value.
-///
-/// In some circumstances, building [rusoto_dynamodb::AttributeValue]s directly is required.
-///
-/// For example, when generating a key to supply to [get_item].
-///
-/// ```
-/// use maplit::hashmap;
-/// use serde_dynamo::rusoto_dynamodb::to_attribute_value;
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemInput};
-/// #
-/// # async fn get(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-/// #
-/// # struct User { id: String };
-/// # let user = User { id: "fSsgVtal8TpP".to_string() };
-///
-/// // Create the unique key of the record in DynamoDB in a way rusoto understands
-/// let key = hashmap! {
-///     "id".into() => to_attribute_value(&user.id)?,
-/// };
-///
-/// // And get the record
-/// let input = GetItemInput {
-///     table_name: "users".to_string(),
-///     key: key,
-///     ..GetItemInput::default()
-/// };
-/// client.get_item(input).await?;
-/// # Ok(())
-/// # }
-/// ```
-///
-/// Or when generating attribute values in a [query] call.
-///
-/// TODO
-/// ```no_check
-/// use maplit::hashmap;
-/// use serde_dynamo::to_attribute_value;
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, QueryInput};
-/// #
-/// # async fn query(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-/// # let user_type = "user";
-/// # let yesterday = "1985-04-21";
-///
-/// // Declare all of the expression inputs for a query call
-/// let expression_attribute_values = hashmap! {
-///     ":user_type".to_string() => to_attribute_value(user_type)?,
-///     ":last_login".to_string() => to_attribute_value(yesterday)?,
-/// };
-///
-/// // And execute the query
-/// let input = QueryInput {
-///     table_name: "users".to_string(),
-///     index_name: Some("by_type_and_last_login".to_string()),
-///     key_condition_expression: Some("user_type = :user_type AND last_login > :last_login".to_string()),
-///     expression_attribute_values: Some(expression_attribute_values),
-///     ..QueryInput::default()
-/// };
-/// client.query(input).await?;
-/// # Ok(())
-/// # }
-/// ```
-///
-/// [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
-/// [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-/// [query]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
+/// TODO!
 pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
 where
     T: Serialize,
@@ -401,45 +328,7 @@ where
     crate::generic::to_attribute_value(value)
 }
 
-/// Convert a `T` into an [`Item`] which is [rusoto_dynamodb]'s representation of a DynamoDb item.
-///
-/// This is frequently used when serializing an entire data structure to be sent to DynamoDB.
-///
-/// ```
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput};
-/// # use serde::{Serialize, Deserialize};
-/// # use serde_dynamo::rusoto_dynamodb::to_item;
-/// #
-/// # async fn put(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-/// #[derive(Serialize, Deserialize)]
-/// pub struct User {
-///     id: String,
-///     name: String,
-///     age: u8,
-/// };
-///
-/// // Create a user
-/// let user = User {
-///     id: "fSsgVtal8TpP".to_string(),
-///     name: "Arthur Dent".to_string(),
-///     age: 42,
-/// };
-///
-/// // Turn it into an item that rusoto understands
-/// let item = to_item(user)?;
-///
-/// // And write it!
-/// let input = PutItemInput {
-///     table_name: "users".to_string(),
-///     item: item,
-///     ..PutItemInput::default()
-/// };
-/// client.put_item(input).await?;
-/// # Ok(())
-/// # }
-/// ```
-///
-/// [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
+/// TODO!
 pub fn to_item<T>(value: T) -> Result<Item>
 where
     T: Serialize,

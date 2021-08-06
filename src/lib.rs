@@ -331,9 +331,10 @@ mod error;
 // mod ser;
 
 pub use error::{Error, Result};
-
+#[cfg(feature = "aws_sdk")]
 pub mod aws_sdk_dynamodb;
 pub mod generic;
+#[cfg(feature = "rusoto")]
 pub mod rusoto_dynamodb;
 
 // use error::ErrorImpl;
