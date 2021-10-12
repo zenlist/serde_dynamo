@@ -1,5 +1,8 @@
 //! TODO
 
+#[cfg(test)]
+mod tests;
+
 extern crate aws_sdk_dynamodb as ext_aws_sdk_dynamodb;
 
 use crate::Result;
@@ -9,7 +12,7 @@ use std::collections::HashMap;
 
 /// An "Item" used in [aws-sdk-dynamodb]'s [get_item], [write_item], [put_item], etc.
 ///
-/// Nowhere in aws_sdk_dynamodb is this type named explicitely, so we name it here to be clear about
+/// Nowhere in aws_sdk_dynamodb is this type named explicitly, so we name it here to be clear about
 /// exactly what is being taken in and being returned.
 ///
 /// [aws-sdk-dynamodb]: https://github.com/awslabs/aws-sdk-rust
@@ -154,7 +157,7 @@ impl crate::generic::AttributeValue for AttributeValue {
 
     fn into_b(self) -> Option<Vec<u8>> {
         if let AttributeValue::B(v) = self {
-            Some(v.as_ref().to_vec())
+            Some(v.into_inner())
         } else {
             None
         }
@@ -202,7 +205,7 @@ impl crate::generic::AttributeValue for AttributeValue {
 
     fn into_bs(self) -> Option<Vec<Vec<u8>>> {
         if let AttributeValue::Bs(v) = self {
-            Some(v.into_iter().map(|b| b.as_ref().to_vec()).collect())
+            Some(v.into_iter().map(|b| b.into_inner()).collect())
         } else {
             None
         }
