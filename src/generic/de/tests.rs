@@ -11,7 +11,7 @@ mod tests {
 
     macro_rules! assert_identical_json {
         ($ty:ty, $expr:expr) => {
-            assert_identical_json::<$ty>($expr, $expr);
+            assert_identical_json::<$ty>($expr, $expr)
         };
     }
     /// Assert that the expression is the same whether it is deserialized directly, or deserialized
