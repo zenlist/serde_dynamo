@@ -13,7 +13,7 @@ keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
 rusoto_dynamodb = { version = "0.47", default-features = false, optional = true }
-aws-sdk-dynamodb = { git = "https://github.com/awslabs/aws-sdk-rust", branch = "main", optional = true }
+aws-sdk-dynamodb = { version = "0.0.25-alpha", optional = true }
 serde = "1"
 
 [dev-dependencies]
