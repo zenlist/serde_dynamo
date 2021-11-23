@@ -311,7 +311,7 @@ macro_rules! aws_sdk_macro {
 
                 fn into_b(self) -> Option<Vec<u8>> {
                     if let AttributeValue::B(v) = self {
-                        Some(v.as_ref().to_vec())
+                        Some(v.into_inner())
                     } else {
                         None
                     }
@@ -359,7 +359,7 @@ macro_rules! aws_sdk_macro {
 
                 fn into_bs(self) -> Option<Vec<Vec<u8>>> {
                     if let AttributeValue::Bs(v) = self {
-                        Some(v.into_iter().map(|b| b.as_ref().to_vec()).collect())
+                        Some(v.into_iter().map(|b| b.into_inner()).collect())
                     } else {
                         None
                     }
