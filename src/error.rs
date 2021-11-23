@@ -74,7 +74,7 @@ impl Into<Error> for ErrorImpl {
 impl Display for ErrorImpl {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ErrorImpl::Message(s) => f.write_str(&s),
+            ErrorImpl::Message(ref s) => f.write_str(s),
             ErrorImpl::NotMaplike => f.write_str("Not a map-like object"),
             ErrorImpl::ExpectedString => f.write_str("Expected string"),
             ErrorImpl::ExpectedMap => f.write_str("Expected map"),

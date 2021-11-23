@@ -1,6 +1,7 @@
-use super::{Error, ErrorImpl, Item, Result};
-use rusoto_dynamodb::AttributeValue;
+use super::AttributeValue;
+use crate::{error::ErrorImpl, Error, Result};
 use serde::Deserialize;
+use std::collections::HashMap;
 
 mod deserializer;
 mod deserializer_bytes;
@@ -14,24 +15,24 @@ mod tests;
 
 pub use deserializer::Deserializer;
 
-/// Interpret a [rusoto_dynamodb::AttributeValue] as an instance of type `T`.
+/// Interpret an [`AttributeValue`] as an instance of type `T`.
 ///
 /// In most cases, you will want to be using [`from_item`] instead. This function is provided as a
-/// dual of [`to_attribute_value`](crate::to_attribute_value) and may be useful in very narrow circumstances.
-///
-/// [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
-pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
+/// dual of [`super::to_attribute_value`] and may be useful in very narrow circumstances.
+pub fn from_attribute_value<'a, Tin, Tout>(attribute_value: Tin) -> Result<Tout>
 where
-    T: Deserialize<'a>,
+    Tin: AttributeValue,
+    Tout: Deserialize<'a>,
 {
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = T::deserialize(deserializer)?;
+    let t = Tout::deserialize(deserializer)?;
     Ok(t)
 }
 
-/// Interpret an [`Item`] as an instance of type `T`.
+/// Interpret an Item – a hashmap from [`String`] to [`AttributeValue`] – as an instance of type `T`.
 ///
-/// ```
+/// TODO
+/// ```no_check
 /// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
 /// # use serde::{Serialize, Deserialize};
 /// # use serde_dynamo::from_item;
@@ -59,22 +60,21 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_item<'a, T>(item: Item) -> Result<T>
+pub fn from_item<'a, Tin, Tout>(item: HashMap<String, Tin>) -> Result<Tout>
 where
-    T: Deserialize<'a>,
+    Tin: AttributeValue,
+    Tout: Deserialize<'a>,
 {
-    let attribute_value = AttributeValue {
-        m: Some(item),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::construct_m(item);
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = T::deserialize(deserializer)?;
+    let t = Tout::deserialize(deserializer)?;
     Ok(t)
 }
 
-/// Interpret an `Vec<Item>` as `Vec<T>`.
+/// Interpret a `Vec<Item>` as `Vec<T>`.
 ///
-/// ```
+/// TODO
+/// ```no_check
 /// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
 /// # use serde::{Serialize, Deserialize};
 /// # use serde_dynamo::from_items;
@@ -102,23 +102,13 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_items<'a, T>(items: Vec<Item>) -> Result<Vec<T>>
+pub fn from_items<'a, Tin, Tout>(items: Vec<HashMap<String, Tin>>) -> Result<Vec<Tout>>
 where
-    T: Deserialize<'a>,
+    Tin: AttributeValue,
+    Tout: Deserialize<'a>,
 {
-    let attribute_value = AttributeValue {
-        l: Some(
-            items
-                .into_iter()
-                .map(|item| AttributeValue {
-                    m: Some(item),
-                    ..AttributeValue::default()
-                })
-                .collect(),
-        ),
-        ..AttributeValue::default()
-    };
+    let attribute_value = Tin::construct_l(items.into_iter().map(Tin::construct_m).collect());
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Vec::<T>::deserialize(deserializer)?;
+    let t = Vec::<Tout>::deserialize(deserializer)?;
     Ok(t)
 }

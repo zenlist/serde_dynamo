@@ -1,12 +1,11 @@
-#![deny(warnings, missing_docs)]
+#![deny(warnings)]
+#![deny(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 //! [DynamoDB] is an AWS database that stores key/value and document data.
 //!
-//! The most common way to access DynamoDB data from Rust is to use
-//! [rusoto_dynamodb]'s [get_item], [put_item], and related methods.
-//!
 //! **serde_dynamo** provides a way to serialize and deserialize between data stored in these
-//! [`Item`]s and strongly-typed Rust data structures.
+//! items and strongly-typed Rust data structures.
 //!
 //!
 //! ## The full power of serde
@@ -16,11 +15,15 @@
 //! Most uses of DynamoDB will involve simple structs mapping keys to values in type-safe ways.
 //!
 //! ```
-//! # use serde::{Serialize, Deserialize};
+//! # use serde_derive::{Serialize, Deserialize};
 //! #
 //! #[derive(Serialize, Deserialize)]
+//! #[serde(transparent)]
+//! pub struct UserId(String);
+//!
+//! #[derive(Serialize, Deserialize)]
 //! pub struct User {
-//!     id: String,
+//!     id: UserId,
 //!     name: String,
 //!     age: u8,
 //! }
@@ -31,8 +34,10 @@
 //!
 //! ```
 //! # use chrono::{DateTime, Utc};
-//! # use serde::{Serialize, Deserialize};
+//! # use serde_derive::{Serialize, Deserialize};
 //! # use serde_dynamo::to_item;
+//! # use serde_dynamo::TestAttributeValue;
+//! # use std::collections::HashMap;
 //! #
 //! #[derive(Serialize, Deserialize)]
 //! struct Message {
@@ -83,178 +88,39 @@
 //! "#;
 //! let message: Message = serde_json::from_str(input)?;
 //! let item = to_item(message)?;
+//! # let item: HashMap<String, TestAttributeValue> = item;
 //! # Ok(())
 //! # }
 //! # test().unwrap()
 //! ```
 //!
+//! ## aws-sdk support
 //!
-//! ## Parsing items as strongly-typed data structures.
+//! **serde_dynamo** works well with [aws-sdk-dynamodb].
 //!
-//! [`Item`]s received from a [rusoto_dynamodb] call can be run through [`from_items`].
+//! Add the following to your dependencies.
 //!
-//! ```
-//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-//! # use serde::{Serialize, Deserialize};
-//! # use serde_dynamo::from_items;
-//! #
-//! # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-//! #[derive(Serialize, Deserialize)]
-//! pub struct User {
-//!     id: String,
-//!     name: String,
-//!     age: u8,
-//! };
-//!
-//! // Get documents from DynamoDB
-//! let input = ScanInput {
-//!     table_name: "users".to_string(),
-//!     ..ScanInput::default()
-//! };
-//! let result = client.scan(input).await?;
-//!
-//! // And deserialize them as strongly-typed data structures
-//! if let Some(items) = result.items {
-//!     let users: Vec<User> = from_items(items)?;
-//!     println!("Got {} users", users.len());
-//! }
-//! # Ok(())
-//! # }
+//! ```toml
+//! [dependencies]
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0.0.25-alpha"] }
 //! ```
 //!
-//! Alternatively, to deserialize one item at a time, [`from_item`] can be used.
+//! See [`aws_sdk_dynamodb_0_0_25_alpha`] for examples and more information.
 //!
-//! ```
-//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-//! # use serde::{Serialize, Deserialize};
-//! # use serde_dynamo::from_item;
-//! #
-//! # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-//! #[derive(Serialize, Deserialize)]
-//! pub struct User {
-//!     id: String,
-//!     name: String,
-//!     age: u8,
-//! };
 //!
-//! // Get documents from DynamoDB
-//! let input = ScanInput {
-//!     table_name: "users".to_string(),
-//!     ..ScanInput::default()
-//! };
-//! let result = client.scan(input).await?;
+//! ## rusoto support
 //!
-//! // And deserialize them as strongly-typed data structures
-//! for item in result.items.unwrap() {
-//!     let user: User = from_item(item)?;
-//!     println!("{} is {}", user.name, user.age);
-//! }
-//! # Ok(())
-//! # }
+//! **serde_dynamo** works well with [rusoto_dynamodb].
+//!
+//! Add the following to your dependencies.
+//!
+//! ```toml
+//! [dependencies]
+//! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.47"] }
 //! ```
 //!
+//! See [`rusoto_dynamodb_0_47`] for examples and more information.
 //!
-//! ## Creating items by serializing data structures
-//!
-//! Writing an entire data structure to DynamoDB typically involves using [`to_item`] to serialize
-//! it.
-//!
-//! ```
-//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput};
-//! # use serde::{Serialize, Deserialize};
-//! # use serde_dynamo::to_item;
-//! #
-//! # async fn put(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-//! #[derive(Serialize, Deserialize)]
-//! pub struct User {
-//!     id: String,
-//!     name: String,
-//!     age: u8,
-//! };
-//!
-//! // Create a user
-//! let user = User {
-//!     id: "fSsgVtal8TpP".to_string(),
-//!     name: "Arthur Dent".to_string(),
-//!     age: 42,
-//! };
-//!
-//! // Turn it into an item that rusoto understands
-//! let item = to_item(user)?;
-//!
-//! // And write it!
-//! let input = PutItemInput {
-//!     table_name: "users".to_string(),
-//!     item: item,
-//!     ..PutItemInput::default()
-//! };
-//! client.put_item(input).await?;
-//! # Ok(())
-//! # }
-//! ```
-//!
-//!
-//! ## Using to_attribute_value for more control
-//!
-//! In some circumstances, building [rusoto_dynamodb::AttributeValue]s directly is required.
-//!
-//! For example, when generating a key to supply to [get_item].
-//!
-//! ```
-//! use maplit::hashmap;
-//! use serde_dynamo::to_attribute_value;
-//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemInput};
-//! #
-//! # async fn get(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-//! #
-//! # struct User { id: String };
-//! # let user = User { id: "fSsgVtal8TpP".to_string() };
-//!
-//! // Create the unique key of the record in DynamoDB in a way rusoto understands
-//! let key = hashmap! {
-//!     "id".into() => to_attribute_value(&user.id)?,
-//! };
-//!
-//! // And get the record
-//! let input = GetItemInput {
-//!     table_name: "users".to_string(),
-//!     key: key,
-//!     ..GetItemInput::default()
-//! };
-//! client.get_item(input).await?;
-//! # Ok(())
-//! # }
-//! ```
-//!
-//! Or when generating attribute values in a [query] call.
-//!
-//! ```
-//! use maplit::hashmap;
-//! use serde_dynamo::to_attribute_value;
-//! # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, QueryInput};
-//! #
-//! # async fn query(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
-//! # let user_type = "user";
-//! # let yesterday = "1985-04-21";
-//!
-//! // Declare all of the expression inputs for a query call
-//! let expression_attribute_values = hashmap! {
-//!     ":user_type".to_string() => to_attribute_value(user_type)?,
-//!     ":last_login".to_string() => to_attribute_value(yesterday)?,
-//! };
-//!
-//! // And execute the query
-//! let input = QueryInput {
-//!     table_name: "users".to_string(),
-//!     index_name: Some("by_type_and_last_login".to_string()),
-//!     key_condition_expression: Some("user_type = :user_type AND last_login > :last_login".to_string()),
-//!     expression_attribute_values: Some(expression_attribute_values),
-//!     ..QueryInput::default()
-//! };
-//! client.query(input).await?;
-//! # Ok(())
-//! # }
-//! ```
 //!
 //! ## JSON
 //!
@@ -265,7 +131,7 @@
 //! structure.
 //!
 //! ```
-//! # use serde::{Serialize, Deserialize};
+//! # use serde_derive::{Serialize, Deserialize};
 //! #
 //! #[derive(Serialize, Deserialize)]
 //! struct IncludesJson {
@@ -276,13 +142,15 @@
 //!
 //! In addition, **serde_dynamo** also maps strongly-typed data structures nearly identically as
 //! [serde_json]. This means that, in almost all cases, serializing to JSON first and then to an
-//! [`Item`] will result in the exact same representation as serializing directly to an `Item`.
-//! (The caveat here is for byte data, which loses fidelity because JSON doesn't support byte data
-//! natively, but DynamoDB does.)
+//! DynamoDb item will result in the exact same representation as serializing directly to a DynamoDb
+//! item. (The caveat here is for byte data, which loses fidelity because JSON doesn't support byte
+//! data natively, but DynamoDB does.)
 //!
 //! ```
 //! # use serde_dynamo::to_item;
-//! # use serde::{Serialize, Deserialize};
+//! # use serde_derive::{Serialize, Deserialize};
+//! # use std::collections::HashMap;
+//! # use serde_dynamo::TestAttributeValue;
 //! #
 //! # #[derive(Clone, Serialize, Deserialize)]
 //! # struct User {
@@ -298,10 +166,12 @@
 //!
 //! // Serialize directly from the data structure to an item
 //! let direct_item = to_item(user.clone())?;
+//! # let direct_item: HashMap<String, TestAttributeValue> = direct_item;
 //!
 //! // Serialize indirectly through JSON
 //! let json = serde_json::to_value(user.clone())?;
 //! let indirect_item = to_item(json)?;
+//! # let indirect_item: HashMap<String, TestAttributeValue> = indirect_item;
 //!
 //! // The result should be the same!
 //! assert_eq!(direct_item, indirect_item);
@@ -309,41 +179,75 @@
 //! # }
 //! ```
 //!
+//! ## Features
+//!
+//! **serde_dynamo** is a stable library ready to use in production. Because of that, it's major
+//! version is above 1.0.
+//!
+//! This creates problems when supporting dynamodb libraries that have version numbers less than
+//! 1.0.
+//!
+//! To avoid doing a major version bump for every release of `rusoto_dynamodb` and
+//! `aws-sdk-dynamodb`, **serde_dynamo** uses features to opt into the correct version of the
+//! dynamodb library.
+//!
+//! See the [modules](#modules) section for all possible features. Feature names are largely
+//! guessable: the library name, a plus, and the library version (with underscores instead of dots,
+//! because crates.io doesn't support feature names with dots). For example, support for
+//! `rusoto_dynamodb` version `0.47` is enabled with the feature `rusoto_dynamodb+0_47`.
+//!
 //! [DynamoDB]: https://aws.amazon.com/dynamodb/
-//! [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
-//! [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-//! [put_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.put_item
-//! [query]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.query
 //! [serde]: https://docs.rs/serde
 //! [serde_json]: https://docs.rs/serde_json
 //! [flattening]: https://serde.rs/attr-flatten.html
 //! [adjacently tagged enums]: https://serde.rs/enum-representations.html#adjacently-tagged
 //! [untagged enums]: https://serde.rs/enum-representations.html#untagged
-//! [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
+//! [aws-sdk-dynamodb]: https://docs.rs/aws-sdk-dynamodb
+//! [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
 
-use rusoto_dynamodb::AttributeValue;
-use std::collections::HashMap;
-
+mod attribute_value;
 mod de;
 mod error;
+mod macros;
 mod ser;
+mod test_attribute_value;
 
+pub use attribute_value::AttributeValue;
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
+use macros::{aws_sdk_macro, rusoto_macro, rusoto_streams_macro};
 pub use ser::{to_attribute_value, to_item, Serializer};
+pub use test_attribute_value::TestAttributeValue;
 
-use error::ErrorImpl;
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_0_25-alpha",
+    crate_name = aws_sdk_dynamodb_0_0_25_alpha,
+    aws_version = "0.0.25-alpha",
+);
 
-/// An "Item" used in [rusoto_dynamodb]'s [get_item], [write_item], [put_item], etc.
-///
-/// Nowhere in rusoto_dynamodb is this type named explicitely, so we name it here to be clear about
-/// exactly what is being taken in and being returned.
-///
-/// [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
-/// [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-/// [write_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.write_item
-/// [put_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.put_item
-pub type Item = HashMap<String, AttributeValue>;
+rusoto_macro!(
+    feature = "rusoto_dynamodb+0_46",
+    crate_name = rusoto_dynamodb_0_46,
+    rusoto_version = "0.46",
+);
+
+rusoto_macro!(
+    feature = "rusoto_dynamodb+0_47",
+    crate_name = rusoto_dynamodb_0_47,
+    rusoto_version = "0.47",
+);
+
+rusoto_streams_macro!(
+    feature = "rusoto_dynamodbstreams+0_46",
+    crate_name = rusoto_dynamodbstreams_0_46,
+    rusoto_version = "0.46",
+);
+
+rusoto_streams_macro!(
+    feature = "rusoto_dynamodbstreams+0_47",
+    crate_name = rusoto_dynamodbstreams_0_47,
+    rusoto_version = "0.47",
+);
 
 #[cfg(test)]
 mod tests;

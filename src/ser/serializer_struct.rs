@@ -1,40 +1,41 @@
-use super::{AttributeValue, Error, Item, Result, Serializer};
+use super::{AttributeValue, Error, Result, Serializer};
 use serde::{ser, Serialize};
+use std::collections::HashMap;
 
-pub struct SerializerStruct {
-    item: Item,
+pub struct SerializerStruct<T> {
+    item: HashMap<String, T>,
 }
 
-impl SerializerStruct {
+impl<T> SerializerStruct<T> {
     pub fn new(len: usize) -> Self {
         SerializerStruct {
-            item: Item::with_capacity(len),
+            item: HashMap::with_capacity(len),
         }
     }
 }
 
-impl<'a> ser::SerializeStruct for SerializerStruct {
-    type Ok = AttributeValue;
+impl<'a, T> ser::SerializeStruct for SerializerStruct<T>
+where
+    T: AttributeValue,
+{
+    type Ok = T;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(
+    fn serialize_field<F: ?Sized>(
         &mut self,
         key: &'static str,
-        value: &T,
+        value: &F,
     ) -> Result<(), Self::Error>
     where
-        T: Serialize,
+        F: Serialize,
     {
-        let serializer = Serializer;
+        let serializer = Serializer::<T>::default();
         let value = value.serialize(serializer)?;
         self.item.insert(key.to_string(), value);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        Ok(AttributeValue {
-            m: Some(self.item),
-            ..AttributeValue::default()
-        })
+        Ok(T::construct_m(self.item))
     }
 }

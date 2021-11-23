@@ -1,20 +1,24 @@
-use super::{AttributeValue, Deserializer, Error, ErrorImpl, Item, Result};
+use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
 use serde::de::{
     DeserializeSeed, Deserializer as _, EnumAccess, IntoDeserializer, VariantAccess, Visitor,
 };
+use std::collections::HashMap;
 
-pub struct DeserializerEnum {
-    input: Item,
+pub struct DeserializerEnum<T> {
+    input: HashMap<String, T>,
 }
 
-impl DeserializerEnum {
-    pub fn from_item(input: Item) -> Self {
+impl<T> DeserializerEnum<T> {
+    pub fn from_item(input: HashMap<String, T>) -> Self {
         Self { input }
     }
 }
 
-impl<'de, 'a> EnumAccess<'de> for DeserializerEnum {
-    type Variant = DeserializerVariant;
+impl<'de, 'a, T> EnumAccess<'de> for DeserializerEnum<T>
+where
+    T: AttributeValue,
+{
+    type Variant = DeserializerVariant<T>;
     type Error = Error;
 
     fn variant_seed<V>(mut self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
@@ -34,26 +38,29 @@ impl<'de, 'a> EnumAccess<'de> for DeserializerEnum {
     }
 }
 
-pub struct DeserializerVariant {
-    input: AttributeValue,
+pub struct DeserializerVariant<T> {
+    input: T,
 }
 
-impl DeserializerVariant {
-    pub fn from_attribute_value(input: AttributeValue) -> Self {
+impl<T> DeserializerVariant<T> {
+    pub fn from_attribute_value(input: T) -> Self {
         Self { input }
     }
 }
 
-impl<'de, 'a> VariantAccess<'de> for DeserializerVariant {
+impl<'de, 'a, T> VariantAccess<'de> for DeserializerVariant<T>
+where
+    T: AttributeValue,
+{
     type Error = Error;
 
     fn unit_variant(self) -> Result<()> {
         Ok(())
     }
 
-    fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value>
+    fn newtype_variant_seed<S>(self, seed: S) -> Result<S::Value>
     where
-        T: DeserializeSeed<'de>,
+        S: DeserializeSeed<'de>,
     {
         let deserializer = Deserializer::from_attribute_value(self.input);
         seed.deserialize(deserializer)

@@ -1,8 +1,8 @@
 [package]
 name = "serde_dynamo"
-version = "2.4.0"
+version = "3.0.0-alpha.1"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 description = "serde serializer/deserializer for DynamoDB items"
 readme = "README.md"
@@ -12,13 +12,31 @@ repository = "https://github.com/zenlist/serde_dynamo"
 keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
-rusoto_dynamodb = { version = "0.47", default-features = false }
+aws_sdk_dynamodb_0_0_25_alpha = { package = "aws-sdk-dynamodb", version = "0.0.25-alpha", default-features = false, optional = true }
+rusoto_dynamodb_0_46 = { package = "rusoto_dynamodb", version = "0.46", default-features = false, optional = true }
+rusoto_dynamodb_0_47 = { package = "rusoto_dynamodb", version = "0.47", default-features = false, optional = true }
+rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = "0.46", default-features = false, optional = true }
+rusoto_dynamodbstreams_0_47 = { package = "rusoto_dynamodbstreams", version = "0.47", default-features = false, optional = true }
 serde = "1"
+
+rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-features = false, features = ["rustls"], optional = true }
+rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-features = false, features = ["rustls"], optional = true }
+
+[features]
+"aws-sdk-dynamodb+0_0_25-alpha" = ["aws_sdk_dynamodb_0_0_25_alpha"]
+"rusoto_dynamodb+0_46" = ["rusoto_dynamodb_0_46"]
+"rusoto_dynamodb+0_47" = ["rusoto_dynamodb_0_47"]
+"rusoto_dynamodbstreams+0_46" = ["rusoto_dynamodbstreams_0_46"]
+"rusoto_dynamodbstreams+0_47" = ["rusoto_dynamodbstreams_0_47"]
+
+__doc = ["rusoto_core_0_46_crate", "rusoto_core_0_47_crate", "aws_sdk_dynamodb_0_0_25_alpha/client"]
 
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
-maplit = "1"
-rusoto_core = { version = "0.47", default-features = false, features = ["rustls"] }
 serde_bytes = "0.11"
 serde_derive = "1"
 serde_json = "1"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

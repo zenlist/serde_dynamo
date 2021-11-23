@@ -1,13 +1,13 @@
 #![allow(clippy::float_cmp, clippy::redundant_clone, clippy::unit_cmp)]
 
-use super::*;
-use maplit::hashmap;
+use crate::from_attribute_value;
+use crate::test_attribute_value::TestAttributeValue as AttributeValue;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 macro_rules! assert_identical_json {
     ($ty:ty, $expr:expr) => {
-        assert_identical_json::<$ty>($expr, $expr);
+        assert_identical_json::<$ty>($expr, $expr)
     };
 }
 
@@ -27,10 +27,7 @@ where
 
 #[test]
 fn deserialize_string() {
-    let attribute_value = AttributeValue {
-        s: Some(String::from("Value")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::S(String::from("Value"));
 
     let result: String = from_attribute_value(attribute_value.clone()).unwrap();
 
@@ -43,13 +40,10 @@ fn deserialize_string() {
 fn deserialize_num() {
     macro_rules! deserialize_num {
         ($ty:ty, $n:expr) => {
-            let attribute_value = AttributeValue {
-                n: Some(String::from(stringify!($n))),
-                ..AttributeValue::default()
-            };
+            let attribute_value = AttributeValue::N(String::from(stringify!($n)));
 
             assert_eq!(
-                from_attribute_value::<$ty>(attribute_value.clone()).unwrap(),
+                from_attribute_value::<AttributeValue, $ty>(attribute_value.clone()).unwrap(),
                 $n
             );
 
@@ -71,33 +65,20 @@ fn deserialize_num() {
 
 #[test]
 fn deserialize_bool() {
-    let attribute_value = AttributeValue {
-        bool: Some(true),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::Bool(true);
     let result: bool = from_attribute_value(attribute_value.clone()).unwrap();
     assert!(result);
     assert_identical_json!(bool, attribute_value.clone());
 
-    let attribute_value = AttributeValue {
-        bool: Some(false),
-        ..AttributeValue::default()
-    };
-    let result: bool = from_attribute_value(AttributeValue {
-        bool: Some(false),
-        ..AttributeValue::default()
-    })
-    .unwrap();
+    let attribute_value = AttributeValue::Bool(false);
+    let result: bool = from_attribute_value(AttributeValue::Bool(false)).unwrap();
     assert!(!result);
     assert_identical_json!(bool, attribute_value.clone());
 }
 
 #[test]
 fn deserialize_char() {
-    let attribute_value = AttributeValue {
-        s: Some(String::from("🥳")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::S(String::from("🥳"));
     let result: char = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, '🥳');
     assert_identical_json!(char, attribute_value.clone());
@@ -105,10 +86,7 @@ fn deserialize_char() {
 
 #[test]
 fn deserialize_unit() {
-    let attribute_value = AttributeValue {
-        null: Some(true),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::Null;
     let result: () = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, ());
     assert_identical_json!((), attribute_value.clone());
@@ -116,18 +94,12 @@ fn deserialize_unit() {
 
 #[test]
 fn deserialize_option() {
-    let attribute_value = AttributeValue {
-        null: Some(true),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::Null;
     let result: Option<u8> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, None);
     assert_identical_json!(Option<u8>, attribute_value.clone());
 
-    let attribute_value = AttributeValue {
-        n: Some(String::from("1")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::N(String::from("1"));
     let result: Option<u8> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, Some(1));
     assert_identical_json!(Option<u8>, attribute_value.clone());
@@ -140,15 +112,10 @@ fn deserialize_struct_with_string() {
         value: String,
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("value") => AttributeValue {
-                s: Some(String::from("Value")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("value"),
+        AttributeValue::S(String::from("Value")),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(
@@ -168,15 +135,10 @@ fn deserialize_bytes() {
         value: Vec<u8>,
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("value") => AttributeValue {
-                b: Some(vec![116, 101, 115, 116, 0, 0, 0, 0].into()),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("value"),
+        AttributeValue::B(vec![116, 101, 115, 116, 0, 0, 0, 0]),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value).unwrap();
     assert_eq!(
@@ -194,19 +156,14 @@ fn deserialize_byte_arrays() {
         value: Vec<serde_bytes::ByteBuf>,
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("value") => AttributeValue {
-                bs: Some(vec![
-                    vec![116, 101, 115, 116, 0, 0, 0, 0].into(),
-                    vec![2].into(),
-                    vec![0, 0, 0, 0].into(),
-                ]),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("value"),
+        AttributeValue::BS(vec![
+            vec![116, 101, 115, 116, 0, 0, 0, 0],
+            vec![2],
+            vec![0, 0, 0, 0],
+        ]),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value).unwrap();
     assert_eq!(
@@ -229,31 +186,25 @@ fn deserialize_struct_with_aws_extra_data() {
         value: u64,
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("id") => AttributeValue {
-                s: Some(String::from("test-4")),
-                ..AttributeValue::default()
-            },
-            String::from("value") => AttributeValue {
-                n: Some(String::from("42")),
-                ..AttributeValue::default()
-            },
-            String::from("aws:rep:deleting") => AttributeValue {
-                bool: Some(false),
-                ..AttributeValue::default()
-            },
-            String::from("aws:rep:updateregion") => AttributeValue {
-                s: Some(String::from("us-west-2")),
-                ..AttributeValue::default()
-            },
-            String::from("aws:rep:updatetime") => AttributeValue {
-                n: Some(String::from("1565723640.315001")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (
+            String::from("id"),
+            AttributeValue::S(String::from("test-4")),
+        ),
+        (String::from("value"), AttributeValue::N(String::from("42"))),
+        (
+            String::from("aws:rep:deleting"),
+            AttributeValue::Bool(false),
+        ),
+        (
+            String::from("aws:rep:updateregion"),
+            AttributeValue::S(String::from("us-west-2")),
+        ),
+        (
+            String::from("aws:rep:updatetime"),
+            AttributeValue::N(String::from("1565723640.315001")),
+        ),
+    ]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(
@@ -273,29 +224,20 @@ fn deserialize_array_of_struct_with_string() {
         value: String,
     }
 
-    let attribute_value = AttributeValue {
-        l: Some(vec![
-            AttributeValue {
-                m: Some(hashmap! {
-                    String::from("value") => AttributeValue { s: Some(String::from("1")), ..AttributeValue::default() },
-                }),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                m: Some(hashmap! {
-                    String::from("value") => AttributeValue { s: Some(String::from("2")), ..AttributeValue::default() },
-                }),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                m: Some(hashmap! {
-                    String::from("value") => AttributeValue { s: Some(String::from("3")), ..AttributeValue::default() },
-                }),
-                ..AttributeValue::default()
-            },
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::L(vec![
+        AttributeValue::M(HashMap::from([(
+            String::from("value"),
+            AttributeValue::S(String::from("1")),
+        )])),
+        AttributeValue::M(HashMap::from([(
+            String::from("value"),
+            AttributeValue::S(String::from("2")),
+        )])),
+        AttributeValue::M(HashMap::from([(
+            String::from("value"),
+            AttributeValue::S(String::from("3")),
+        )])),
+    ]);
 
     let s: Vec<Subject> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(
@@ -317,23 +259,11 @@ fn deserialize_array_of_struct_with_string() {
 
 #[test]
 fn deserialize_list() {
-    let attribute_value = AttributeValue {
-        l: Some(vec![
-            AttributeValue {
-                s: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                s: Some(String::from("2")),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                s: Some(String::from("3")),
-                ..AttributeValue::default()
-            },
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::L(vec![
+        AttributeValue::S(String::from("1")),
+        AttributeValue::S(String::from("2")),
+        AttributeValue::S(String::from("3")),
+    ]);
 
     let s: Vec<String> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, vec!["1", "2", "3"]);
@@ -342,14 +272,11 @@ fn deserialize_list() {
 
 #[test]
 fn deserialize_string_list() {
-    let attribute_value = AttributeValue {
-        ss: Some(vec![
-            String::from("1"),
-            String::from("2"),
-            String::from("3"),
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::SS(vec![
+        String::from("1"),
+        String::from("2"),
+        String::from("3"),
+    ]);
 
     let v: Vec<String> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(v, vec!["1", "2", "3"]);
@@ -358,14 +285,11 @@ fn deserialize_string_list() {
 
 #[test]
 fn deserialize_int_list() {
-    let attribute_value = AttributeValue {
-        ns: Some(vec![
-            String::from("1"),
-            String::from("2"),
-            String::from("3"),
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::NS(vec![
+        String::from("1"),
+        String::from("2"),
+        String::from("3"),
+    ]);
 
     let v: Vec<u64> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(v, vec![1, 2, 3]);
@@ -374,14 +298,11 @@ fn deserialize_int_list() {
 
 #[test]
 fn deserialize_float_list() {
-    let attribute_value = AttributeValue {
-        ns: Some(vec![
-            String::from("1"),
-            String::from("2"),
-            String::from("0.5"),
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::NS(vec![
+        String::from("1"),
+        String::from("2"),
+        String::from("0.5"),
+    ]);
 
     let v: Vec<f64> = from_attribute_value(attribute_value).unwrap();
     assert_eq!(v.len(), 3);
@@ -395,10 +316,7 @@ fn deserialize_unit_struct() {
     #[derive(Debug, Deserialize, Eq, PartialEq)]
     struct Subject;
 
-    let attribute_value = AttributeValue {
-        null: Some(true),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::Null;
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject);
@@ -411,10 +329,7 @@ fn deserialize_newtype_struct() {
     #[derive(Debug, Deserialize, Eq, PartialEq)]
     struct Subject(u8);
 
-    let attribute_value = AttributeValue {
-        n: Some(String::from("1")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::N(String::from("1"));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject(1));
@@ -427,19 +342,10 @@ fn deserialize_tuple_struct() {
     #[derive(Debug, Deserialize, Eq, PartialEq)]
     struct Subject(u8, u8);
 
-    let attribute_value = AttributeValue {
-        l: Some(vec![
-            AttributeValue {
-                n: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                n: Some(String::from("2")),
-                ..AttributeValue::default()
-            },
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::L(vec![
+        AttributeValue::N(String::from("1")),
+        AttributeValue::N(String::from("2")),
+    ]);
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject(1, 2));
@@ -449,19 +355,10 @@ fn deserialize_tuple_struct() {
 
 #[test]
 fn deserialize_tuple() {
-    let attribute_value = AttributeValue {
-        l: Some(vec![
-            AttributeValue {
-                n: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-            AttributeValue {
-                n: Some(String::from("2")),
-                ..AttributeValue::default()
-            },
-        ]),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::L(vec![
+        AttributeValue::N(String::from("1")),
+        AttributeValue::N(String::from("2")),
+    ]);
 
     let s: (usize, usize) = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, (1, 2));
@@ -471,24 +368,15 @@ fn deserialize_tuple() {
 
 #[test]
 fn deserialize_map_with_strings() {
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("one") => AttributeValue {
-                n: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-            String::from("two") => AttributeValue {
-                n: Some(String::from("2")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (String::from("one"), AttributeValue::N(String::from("1"))),
+        (String::from("two"), AttributeValue::N(String::from("2"))),
+    ]));
 
     let s: HashMap<String, usize> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(
         s,
-        hashmap! { String::from("one") => 1, String::from("two") => 2 }
+        HashMap::from([(String::from("one"), 1), (String::from("two"), 2)])
     );
 
     assert_identical_json!(HashMap<String, usize>, attribute_value.clone())
@@ -496,50 +384,36 @@ fn deserialize_map_with_strings() {
 
 #[test]
 fn deserialize_maps_of_various_types() {
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("1") => AttributeValue {
-                s: Some(String::from("one")),
-                ..AttributeValue::default()
-            },
-            String::from("2") => AttributeValue {
-                s: Some(String::from("two")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (String::from("1"), AttributeValue::S(String::from("one"))),
+        (String::from("2"), AttributeValue::S(String::from("two"))),
+    ]));
 
     let s: HashMap<usize, String> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(
         s,
-        hashmap! { 1 => String::from("one"), 2 => String::from("two") }
+        HashMap::from([(1, String::from("one")), (2, String::from("two"))]),
     );
 
     assert_identical_json!(HashMap<usize, String>, attribute_value.clone());
 
     macro_rules! test_map {
         ($ty:ty, $($s:literal => $r:expr),*) => {
-            let attribute_value = AttributeValue {
-                m: Some(hashmap! {
+            let attribute_value = AttributeValue::M(
+                HashMap::from([
                     $(
-                        String::from($s) => AttributeValue {
-                            s: Some(String::from($s)),
-                            ..AttributeValue::default()
-                        },
+                        (String::from($s), AttributeValue::S(String::from($s))),
                     )*
-                }),
-                ..AttributeValue::default()
-            };
+                ]));
 
             let s: HashMap<$ty, String> = from_attribute_value(attribute_value.clone()).unwrap();
             assert_eq!(
                 s,
-                hashmap! {
+                HashMap::from([
                     $(
-                        $r => String::from($s),
+                        ($r, String::from($s)),
                     )*
-                }
+                ])
             );
 
             assert_identical_json!(HashMap<$ty, String>, attribute_value.clone())
@@ -584,10 +458,7 @@ fn deserialize_enum_unit() {
         Unit,
     }
 
-    let attribute_value = AttributeValue {
-        s: Some(String::from("Unit")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::S(String::from("Unit"));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject::Unit);
@@ -602,15 +473,10 @@ fn deserialize_enum_newtype() {
         Newtype(u8),
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("Newtype") => AttributeValue {
-                n: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("Newtype"),
+        AttributeValue::N(String::from("1")),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject::Newtype(1));
@@ -625,24 +491,13 @@ fn deserialize_enum_tuple() {
         Tuple(u8, u8),
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("Tuple") => AttributeValue {
-                l: Some(vec![
-                    AttributeValue {
-                        n: Some(String::from("1")),
-                        ..AttributeValue::default()
-                    },
-                    AttributeValue {
-                        n: Some(String::from("2")),
-                        ..AttributeValue::default()
-                    },
-                ]),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("Tuple"),
+        AttributeValue::L(vec![
+            AttributeValue::N(String::from("1")),
+            AttributeValue::N(String::from("2")),
+        ]),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject::Tuple(1, 2));
@@ -657,24 +512,13 @@ fn deserialize_enum_struct_variant() {
         Structy { one: u8, two: u8 },
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("Structy") => AttributeValue {
-                m: Some(hashmap! {
-                    String::from("one") => AttributeValue {
-                        n: Some(String::from("1")),
-                        ..AttributeValue::default()
-                    },
-                    String::from("two") => AttributeValue {
-                        n: Some(String::from("2")),
-                        ..AttributeValue::default()
-                    },
-                }),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([(
+        String::from("Structy"),
+        AttributeValue::M(HashMap::from([
+            (String::from("one"), AttributeValue::N(String::from("1"))),
+            (String::from("two"), AttributeValue::N(String::from("2"))),
+        ])),
+    )]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject::Structy { one: 1, two: 2 });
@@ -691,19 +535,10 @@ fn deserialize_internally_tagged_enum() {
         Two { two: u8 },
     }
 
-    let attribute_value = AttributeValue {
-        m: Some(hashmap! {
-            String::from("type") => AttributeValue {
-                s: Some(String::from("One")),
-                ..AttributeValue::default()
-            },
-            String::from("one") => AttributeValue {
-                n: Some(String::from("1")),
-                ..AttributeValue::default()
-            },
-        }),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (String::from("type"), AttributeValue::S(String::from("One"))),
+        (String::from("one"), AttributeValue::N(String::from("1"))),
+    ]));
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject::One { one: 1 });
@@ -715,10 +550,7 @@ fn deserialize_internally_tagged_enum() {
 fn deserialize_chrono_datetime() {
     use chrono::{DateTime, Utc};
 
-    let attribute_value = AttributeValue {
-        s: Some(String::from("1985-04-21T18:34:13.449057039Z")),
-        ..AttributeValue::default()
-    };
+    let attribute_value = AttributeValue::S(String::from("1985-04-21T18:34:13.449057039Z"));
 
     let s: DateTime<Utc> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(

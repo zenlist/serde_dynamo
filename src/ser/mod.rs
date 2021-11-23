@@ -1,6 +1,7 @@
-use super::{error::ErrorImpl, Error, Item, Result};
-use rusoto_dynamodb::AttributeValue;
+use super::AttributeValue;
+use crate::{error::ErrorImpl, Error, Result};
 use serde::Serialize;
+use std::collections::HashMap;
 
 mod serializer;
 mod serializer_map;
@@ -19,14 +20,15 @@ use serializer_struct::SerializerStruct;
 use serializer_struct_variant::SerializerStructVariant;
 use serializer_tuple_variant::SerializerTupleVariant;
 
-/// Convert a `T` into a [rusoto_dynamodb::AttributeValue] which is rusoto's representation of a
+/// Convert a `T` into an [`AttributeValue`] which is rusoto's representation of a
 /// DynamoDb value.
 ///
-/// In some circumstances, building [rusoto_dynamodb::AttributeValue]s directly is required.
+/// In some circumstances, building [`AttributeValue`]s directly is required.
 ///
 /// For example, when generating a key to supply to [get_item].
 ///
-/// ```
+/// TODO
+/// ```no_check
 /// use maplit::hashmap;
 /// use serde_dynamo::to_attribute_value;
 /// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemInput};
@@ -54,7 +56,8 @@ use serializer_tuple_variant::SerializerTupleVariant;
 ///
 /// Or when generating attribute values in a [query] call.
 ///
-/// ```
+/// TODO
+/// ```no_check
 /// use maplit::hashmap;
 /// use serde_dynamo::to_attribute_value;
 /// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, QueryInput};
@@ -85,20 +88,22 @@ use serializer_tuple_variant::SerializerTupleVariant;
 /// [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
 /// [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
 /// [query]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
+pub fn to_attribute_value<Tin, Tout>(value: Tin) -> Result<Tout>
 where
-    T: Serialize,
+    Tin: Serialize,
+    Tout: AttributeValue,
 {
-    let serializer = Serializer;
+    let serializer = Serializer::<Tout>::default();
     let attribute_value = value.serialize(serializer)?;
     Ok(attribute_value)
 }
 
-/// Convert a `T` into an [`Item`] which is [rusoto_dynamodb]'s representation of a DynamoDb item.
+/// Convert a `T` into an `Item`.
 ///
 /// This is frequently used when serializing an entire data structure to be sent to DynamoDB.
 ///
-/// ```
+/// TODO
+/// ```no_check
 /// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput};
 /// # use serde::{Serialize, Deserialize};
 /// # use serde_dynamo::to_item;
@@ -133,13 +138,14 @@ where
 /// ```
 ///
 /// [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
-pub fn to_item<T>(value: T) -> Result<Item>
+pub fn to_item<Tin, Tout>(value: Tin) -> Result<HashMap<String, Tout>>
 where
-    T: Serialize,
+    Tin: Serialize,
+    Tout: AttributeValue,
 {
-    let attribute_value = to_attribute_value(value)?;
+    let attribute_value: Tout = to_attribute_value(value)?;
     let item = attribute_value
-        .m
+        .into_m()
         .ok_or_else(|| ErrorImpl::NotMaplike.into())?;
     Ok(item)
 }

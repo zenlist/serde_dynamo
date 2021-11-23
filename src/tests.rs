@@ -1,12 +1,12 @@
-use super::*;
+use super::{from_item, to_item, TestAttributeValue};
 use serde_derive::{Deserialize, Serialize};
 
 fn round_trip<T>(value: T)
 where
     T: serde::Serialize + serde::de::DeserializeOwned + Eq + Clone + std::fmt::Debug,
 {
-    let serialized = to_item(value.clone()).unwrap();
-    let deserialized: T = from_item(serialized).unwrap();
+    let serialized = to_item::<T, TestAttributeValue>(value.clone()).unwrap();
+    let deserialized = from_item::<TestAttributeValue, T>(serialized).unwrap();
     assert_eq!(deserialized, value);
 }
 
@@ -88,7 +88,7 @@ fn subsequent_flattened() {
 
 #[test]
 fn error_eq() {
-    use super::{Error, ErrorImpl};
+    use crate::{error::ErrorImpl, Error};
 
     assert_eq!(
         Into::<Error>::into(ErrorImpl::Message(String::from("one"))),
@@ -103,10 +103,9 @@ fn error_eq() {
 
 #[cfg(test)]
 mod from_items {
-    use maplit::hashmap;
+    use crate::{error::ErrorImpl, from_items, to_attribute_value, Error, TestAttributeValue};
     use serde_derive::{Deserialize, Serialize};
-
-    use crate::*;
+    use std::collections::HashMap;
 
     #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
     struct User {
@@ -117,17 +116,17 @@ mod from_items {
 
     #[test]
     fn same_types() {
-        let items = vec![
-            hashmap! {
-                String::from("id") => to_attribute_value("one").unwrap(),
-                String::from("name") => to_attribute_value("Jane").unwrap(),
-                String::from("age") => to_attribute_value(20).unwrap(),
-            },
-            hashmap! {
-                String::from("id") => to_attribute_value("two").unwrap(),
-                String::from("name") => to_attribute_value("John").unwrap(),
-                String::from("age") => to_attribute_value(7).unwrap(),
-            },
+        let items: Vec<HashMap<String, TestAttributeValue>> = vec![
+            HashMap::from([
+                (String::from("id"), to_attribute_value("one").unwrap()),
+                (String::from("name"), to_attribute_value("Jane").unwrap()),
+                (String::from("age"), to_attribute_value(20).unwrap()),
+            ]),
+            HashMap::from([
+                (String::from("id"), to_attribute_value("two").unwrap()),
+                (String::from("name"), to_attribute_value("John").unwrap()),
+                (String::from("age"), to_attribute_value(7).unwrap()),
+            ]),
         ];
 
         let users = from_items(items).unwrap();
@@ -151,20 +150,23 @@ mod from_items {
 
     #[test]
     fn wrong_types() {
-        let items = vec![
-            hashmap! {
-                String::from("id") => to_attribute_value("one").unwrap(),
-                String::from("name") => to_attribute_value("Jane").unwrap(),
-                String::from("age") => to_attribute_value(20).unwrap(),
-            },
-            hashmap! {
-                String::from("id") => to_attribute_value(42).unwrap(),
-                String::from("name") => to_attribute_value("John").unwrap(),
-                String::from("age") => to_attribute_value("not a number").unwrap(),
-            },
+        let items: Vec<HashMap<String, TestAttributeValue>> = vec![
+            HashMap::from([
+                (String::from("id"), to_attribute_value("one").unwrap()),
+                (String::from("name"), to_attribute_value("Jane").unwrap()),
+                (String::from("age"), to_attribute_value(20).unwrap()),
+            ]),
+            HashMap::from([
+                (String::from("id"), to_attribute_value(42).unwrap()),
+                (String::from("name"), to_attribute_value("John").unwrap()),
+                (
+                    String::from("age"),
+                    to_attribute_value("not a number").unwrap(),
+                ),
+            ]),
         ];
 
-        let err = from_items::<Vec<User>>(items).unwrap_err();
+        let err = from_items::<_, Vec<User>>(items).unwrap_err();
         assert_eq!(Into::<Error>::into(ErrorImpl::ExpectedSeq), err);
     }
 }
@@ -172,13 +174,13 @@ mod from_items {
 // Tests for various types being used as map keys
 #[cfg(test)]
 mod map_key {
-    use std::{fmt::Debug, hash::Hash};
-
-    use maplit::btreemap;
+    use crate::{
+        error::ErrorImpl, from_attribute_value, to_attribute_value, Result, TestAttributeValue,
+    };
     use serde::de::DeserializeOwned;
-    use serde::{Deserialize, Serialize};
-
-    use crate::{error::ErrorImpl, from_attribute_value, to_attribute_value, Result};
+    use serde_derive::{Deserialize, Serialize};
+    use std::collections::BTreeMap;
+    use std::{fmt::Debug, hash::Hash};
 
     /// The provided `key` value is used as a map key that gets serialized, then deserialized.
     /// The provided `Result` indicates whether serializing should be able to be successful or not.
@@ -198,11 +200,11 @@ mod map_key {
     /// If `Err(E)` is provided and there is no error, this panics.
     fn map_key_round_trip<K>(key: K, expect_serialized_key: Result<&str>, json_should_match: bool)
     where
-        K: Debug + Clone + Ord + Serialize + DeserializeOwned,
+        K: Debug + Clone + Ord + serde::Serialize + DeserializeOwned,
     {
         use serde_json::{json, Value};
 
-        let original = btreemap! { key => String::from("value") };
+        let original = BTreeMap::from([(key, String::from("value"))]);
 
         let (as_json, json_key) = match serde_json::to_value(&original) {
             Ok(original_as_json) => {
@@ -248,7 +250,7 @@ mod map_key {
             }
         };
 
-        let actual_serialized = to_attribute_value(original.clone());
+        let actual_serialized = to_attribute_value::<_, TestAttributeValue>(original.clone());
 
         let (expected_serialized_key, actual_serialized) = match expect_serialized_key {
             Ok(expected_serialized) => (
@@ -271,14 +273,14 @@ mod map_key {
             }
         };
 
-        let actual_serialized_key = actual_serialized
-            .m
-            .as_ref()
-            .expect("Should have serialized to a map")
-            .keys()
-            .next()
-            .expect("The map should have one key")
-            .to_owned();
+        let actual_serialized_key = match actual_serialized {
+            TestAttributeValue::M(ref m) => m
+                .keys()
+                .next()
+                .expect("The map should have one key")
+                .to_owned(),
+            _ => panic!("Should have serialized to a map"),
+        };
 
         assert_eq!(
             expected_serialized_key, actual_serialized_key,
@@ -313,11 +315,12 @@ mod map_key {
     // Tests using different types of enum variants as map keys.
     // See: https://serde.rs/enum-representations.html
     mod enum_variant {
-        use super::*;
+        use super::{key_must_be_a_string, map_key_round_trip};
 
         // https://serde.rs/enum-representations.html#externally-tagged
         mod externally_tagged {
-            use super::*;
+            use super::{key_must_be_a_string, map_key_round_trip};
+            use serde_derive::{Deserialize, Serialize};
 
             #[derive(
                 Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
@@ -366,7 +369,9 @@ mod map_key {
 
         // https://serde.rs/enum-representations.html#internally-tagged
         mod internally_tagged {
-            use super::*;
+            use super::{key_must_be_a_string, map_key_round_trip};
+            use crate::error::ErrorImpl;
+            use serde_derive::{Deserialize, Serialize};
 
             #[derive(
                 Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
@@ -408,7 +413,8 @@ mod map_key {
 
         // https://serde.rs/enum-representations.html#adjacently-tagged
         mod adjacently_tagged {
-            use super::*;
+            use super::{key_must_be_a_string, map_key_round_trip};
+            use serde_derive::{Deserialize, Serialize};
 
             #[derive(
                 Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
@@ -458,7 +464,8 @@ mod map_key {
 
         // https://serde.rs/enum-representations.html#untagged
         mod untagged {
-            use super::*;
+            use super::{key_must_be_a_string, map_key_round_trip};
+            use serde_derive::{Deserialize, Serialize};
 
             #[derive(
                 Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,

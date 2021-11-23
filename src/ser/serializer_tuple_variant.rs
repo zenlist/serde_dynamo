@@ -1,12 +1,13 @@
-use super::{AttributeValue, Error, Item, Result, Serializer};
+use super::{AttributeValue, Error, Result, Serializer};
 use serde::{ser, Serialize};
+use std::collections::HashMap;
 
-pub struct SerializerTupleVariant {
+pub struct SerializerTupleVariant<T> {
     key: &'static str,
-    vec: Vec<AttributeValue>,
+    vec: Vec<T>,
 }
 
-impl SerializerTupleVariant {
+impl<T> SerializerTupleVariant<T> {
     pub fn new(key: &'static str, len: usize) -> Self {
         Self {
             key,
@@ -15,33 +16,27 @@ impl SerializerTupleVariant {
     }
 }
 
-impl<'a> ser::SerializeTupleVariant for SerializerTupleVariant {
-    type Ok = AttributeValue;
+impl<'a, T> ser::SerializeTupleVariant for SerializerTupleVariant<T>
+where
+    T: AttributeValue,
+{
+    type Ok = T;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    fn serialize_field<F: ?Sized>(&mut self, value: &F) -> Result<(), Self::Error>
     where
-        T: Serialize,
+        F: Serialize,
     {
-        let serializer = Serializer;
+        let serializer = Serializer::<T>::default();
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        let mut hashmap = Item::with_capacity(1);
-        hashmap.insert(
-            self.key.to_string(),
-            AttributeValue {
-                l: Some(self.vec),
-                ..AttributeValue::default()
-            },
-        );
+        let mut hashmap = HashMap::with_capacity(1);
+        hashmap.insert(self.key.to_string(), T::construct_l(self.vec));
 
-        Ok(AttributeValue {
-            m: Some(hashmap),
-            ..AttributeValue::default()
-        })
+        Ok(T::construct_m(hashmap))
     }
 }
