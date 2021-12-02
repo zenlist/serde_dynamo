@@ -105,7 +105,7 @@
 //! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0.0.25-alpha"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_0_25_alpha`] for examples and more information.
+//! See [`aws_sdk_dynamodb_0_2`] for examples and more information.
 //!
 //!
 //! ## rusoto support
@@ -223,6 +223,12 @@ aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_0_25-alpha",
     crate_name = aws_sdk_dynamodb_0_0_25_alpha,
     aws_version = "0.0.25-alpha",
+);
+
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_2",
+    crate_name = aws_sdk_dynamodb_0_2,
+    aws_version = "0.2",
 );
 
 rusoto_macro!(
