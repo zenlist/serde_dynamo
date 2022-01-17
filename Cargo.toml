@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "3.0.0-alpha.2"
+version = "3.0.0-alpha.3"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2021"
 license = "MIT"
@@ -14,6 +14,8 @@ keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 [dependencies]
 aws_sdk_dynamodb_0_0_25_alpha = { package = "aws-sdk-dynamodb", version = "0.0.25-alpha", default-features = false, optional = true }
 aws_sdk_dynamodb_0_2 = { package = "aws-sdk-dynamodb", version = "0.2", default-features = false, optional = true }
+aws_sdk_dynamodb_0_3 = { package = "aws-sdk-dynamodb", version = "0.3", default-features = false, optional = true }
+aws_sdk_dynamodb_0_4 = { package = "aws-sdk-dynamodb", version = "0.4", default-features = false, optional = true }
 rusoto_dynamodb_0_46 = { package = "rusoto_dynamodb", version = "0.46", default-features = false, optional = true }
 rusoto_dynamodb_0_47 = { package = "rusoto_dynamodb", version = "0.47", default-features = false, optional = true }
 rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = "0.46", default-features = false, optional = true }
@@ -26,12 +28,14 @@ rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-fe
 [features]
 "aws-sdk-dynamodb+0_0_25-alpha" = ["aws_sdk_dynamodb_0_0_25_alpha"]
 "aws-sdk-dynamodb+0_2" = ["aws_sdk_dynamodb_0_2"]
+"aws-sdk-dynamodb+0_3" = ["aws_sdk_dynamodb_0_3"]
+"aws-sdk-dynamodb+0_4" = ["aws_sdk_dynamodb_0_4"]
 "rusoto_dynamodb+0_46" = ["rusoto_dynamodb_0_46"]
 "rusoto_dynamodb+0_47" = ["rusoto_dynamodb_0_47"]
 "rusoto_dynamodbstreams+0_46" = ["rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["rusoto_dynamodbstreams_0_47"]
 
-__doc = ["rusoto_core_0_46_crate", "rusoto_core_0_47_crate", "aws_sdk_dynamodb_0_0_25_alpha/client", "aws_sdk_dynamodb_0_2/client"]
+__doc = ["rusoto_core_0_46_crate", "rusoto_core_0_47_crate", "aws_sdk_dynamodb_0_0_25_alpha/client", "aws_sdk_dynamodb_0_2/client", "aws_sdk_dynamodb_0_3", "aws_sdk_dynamodb_0_4"]
 
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
