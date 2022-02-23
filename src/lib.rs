@@ -102,10 +102,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_6"] }
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_7"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_6`] for examples and more information.
+//! See [`aws_sdk_dynamodb_0_7`] for examples and more information.
 //!
 //!
 //! ## rusoto support
@@ -223,36 +223,49 @@ aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_0_25-alpha",
     crate_name = aws_sdk_dynamodb_0_0_25_alpha,
     aws_version = "0.0.25-alpha",
+    blob_path = ::aws_sdk_dynamodb_0_0_25_alpha::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_2",
     crate_name = aws_sdk_dynamodb_0_2,
     aws_version = "0.2",
+    blob_path = ::aws_sdk_dynamodb_0_2::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_3",
     crate_name = aws_sdk_dynamodb_0_3,
     aws_version = "0.3",
+    blob_path = ::aws_sdk_dynamodb_0_3::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_4",
     crate_name = aws_sdk_dynamodb_0_4,
     aws_version = "0.4",
+    blob_path = ::aws_sdk_dynamodb_0_4::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_5",
     crate_name = aws_sdk_dynamodb_0_5,
     aws_version = "0.5",
+    blob_path = ::aws_sdk_dynamodb_0_5::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_6",
     crate_name = aws_sdk_dynamodb_0_6,
     aws_version = "0.6",
+    blob_path = ::aws_sdk_dynamodb_0_6::Blob,
+);
+
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_7",
+    crate_name = aws_sdk_dynamodb_0_7,
+    aws_version = "0.7",
+    blob_path = ::aws_sdk_dynamodb_0_7::types::Blob,
 );
 
 rusoto_macro!(
