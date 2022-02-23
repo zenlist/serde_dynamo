@@ -1,5 +1,5 @@
 macro_rules! aws_sdk_macro {
-    (feature = $feature:literal, crate_name = $mod_name:ident, aws_version = $version:literal,) => {
+    (feature = $feature:literal, crate_name = $mod_name:ident, aws_version = $version:literal, blob_path = $blob_path:path,) => {
         #[cfg(feature = $feature)]
         #[cfg_attr(docsrs, doc(cfg(feature = $feature)))]
         pub mod $mod_name {
@@ -171,6 +171,8 @@ macro_rules! aws_sdk_macro {
             use crate::Result;
             use ::$mod_name::model::AttributeValue;
             use std::collections::HashMap;
+
+            type Blob = $blob_path;
 
             impl crate::AttributeValue for AttributeValue {
                 fn is_n(&self) -> bool {
@@ -378,7 +380,7 @@ macro_rules! aws_sdk_macro {
                 }
 
                 fn construct_b(input: &[u8]) -> Self {
-                    AttributeValue::B(::$mod_name::Blob::new(input))
+                    AttributeValue::B(Blob::new(input))
                 }
 
                 fn construct_null(input: bool) -> Self {
@@ -402,7 +404,7 @@ macro_rules! aws_sdk_macro {
                 }
 
                 fn construct_bs(input: Vec<Vec<u8>>) -> Self {
-                    let input = input.into_iter().map(::$mod_name::Blob::new).collect();
+                    let input = input.into_iter().map(Blob::new).collect();
                     AttributeValue::Bs(input)
                 }
             }
