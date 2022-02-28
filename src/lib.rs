@@ -102,10 +102,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_7"] }
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_8"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_7`] for examples and more information.
+//! See [`aws_sdk_dynamodb_0_8`] for examples and more information.
 //!
 //!
 //! ## rusoto support
@@ -266,6 +266,13 @@ aws_sdk_macro!(
     crate_name = aws_sdk_dynamodb_0_7,
     aws_version = "0.7",
     blob_path = ::aws_sdk_dynamodb_0_7::types::Blob,
+);
+
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_8",
+    crate_name = aws_sdk_dynamodb_0_8,
+    aws_version = "0.8",
+    blob_path = ::aws_sdk_dynamodb_0_8::types::Blob,
 );
 
 rusoto_macro!(
