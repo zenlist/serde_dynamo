@@ -227,34 +227,6 @@ aws_sdk_macro!(
 );
 
 aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_2",
-    crate_name = aws_sdk_dynamodb_0_2,
-    aws_version = "0.2",
-    blob_path = ::aws_sdk_dynamodb_0_2::Blob,
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_3",
-    crate_name = aws_sdk_dynamodb_0_3,
-    aws_version = "0.3",
-    blob_path = ::aws_sdk_dynamodb_0_3::Blob,
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_4",
-    crate_name = aws_sdk_dynamodb_0_4,
-    aws_version = "0.4",
-    blob_path = ::aws_sdk_dynamodb_0_4::Blob,
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_5",
-    crate_name = aws_sdk_dynamodb_0_5,
-    aws_version = "0.5",
-    blob_path = ::aws_sdk_dynamodb_0_5::Blob,
-);
-
-aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_6",
     crate_name = aws_sdk_dynamodb_0_6,
     aws_version = "0.6",

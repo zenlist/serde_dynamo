@@ -13,10 +13,6 @@ keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
 aws_sdk_dynamodb_0_0_25_alpha = { package = "aws-sdk-dynamodb", version = "0.0.25-alpha", default-features = false, optional = true }
-aws_sdk_dynamodb_0_2 = { package = "aws-sdk-dynamodb", version = "0.2", default-features = false, optional = true }
-aws_sdk_dynamodb_0_3 = { package = "aws-sdk-dynamodb", version = "0.3", default-features = false, optional = true }
-aws_sdk_dynamodb_0_4 = { package = "aws-sdk-dynamodb", version = "0.4", default-features = false, optional = true }
-aws_sdk_dynamodb_0_5 = { package = "aws-sdk-dynamodb", version = "0.5", default-features = false, optional = true }
 aws_sdk_dynamodb_0_6 = { package = "aws-sdk-dynamodb", version = "0.6", default-features = false, optional = true }
 aws_sdk_dynamodb_0_7 = { package = "aws-sdk-dynamodb", version = "0.7", default-features = false, optional = true }
 aws_sdk_dynamodb_0_8 = { package = "aws-sdk-dynamodb", version = "0.8", default-features = false, optional = true }
@@ -31,10 +27,6 @@ rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-fe
 
 [features]
 "aws-sdk-dynamodb+0_0_25-alpha" = ["aws_sdk_dynamodb_0_0_25_alpha"]
-"aws-sdk-dynamodb+0_2" = ["aws_sdk_dynamodb_0_2"]
-"aws-sdk-dynamodb+0_3" = ["aws_sdk_dynamodb_0_3"]
-"aws-sdk-dynamodb+0_4" = ["aws_sdk_dynamodb_0_4"]
-"aws-sdk-dynamodb+0_5" = ["aws_sdk_dynamodb_0_5"]
 "aws-sdk-dynamodb+0_6" = ["aws_sdk_dynamodb_0_6"]
 "aws-sdk-dynamodb+0_7" = ["aws_sdk_dynamodb_0_7"]
 "aws-sdk-dynamodb+0_8" = ["aws_sdk_dynamodb_0_8"]
@@ -43,7 +35,7 @@ rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-fe
 "rusoto_dynamodbstreams+0_46" = ["rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["rusoto_dynamodbstreams_0_47"]
 
-__doc = ["rusoto_core_0_46_crate", "rusoto_core_0_47_crate", "aws_sdk_dynamodb_0_0_25_alpha/client", "aws_sdk_dynamodb_0_2/client", "aws_sdk_dynamodb_0_3", "aws_sdk_dynamodb_0_4", "aws-sdk-dynamodb+0_5", "aws-sdk-dynamodb+0_6", "aws-sdk-dynamodb+0_7", "aws-sdk-dynamodb+0_8"]
+__doc = ["rusoto_core_0_46_crate", "rusoto_core_0_47_crate", "aws_sdk_dynamodb_0_0_25_alpha/client", "aws-sdk-dynamodb+0_6", "aws-sdk-dynamodb+0_7", "aws-sdk-dynamodb+0_8"]
 
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
