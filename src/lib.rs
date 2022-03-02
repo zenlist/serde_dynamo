@@ -105,7 +105,7 @@
 //! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_8"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_8`] for examples and more information.
+//! See [`__aws_sdk_dynamodb_0_8`] for examples and more information.
 //!
 //!
 //! ## rusoto support
@@ -119,7 +119,7 @@
 //! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.47"] }
 //! ```
 //!
-//! See [`rusoto_dynamodb_0_47`] for examples and more information.
+//! See [`__rusoto_dynamodb_0_47`] for examples and more information.
 //!
 //!
 //! ## JSON
@@ -220,54 +220,38 @@ pub use ser::{to_attribute_value, to_item, Serializer};
 pub use test_attribute_value::TestAttributeValue;
 
 aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_0_25-alpha",
-    crate_name = aws_sdk_dynamodb_0_0_25_alpha,
-    aws_version = "0.0.25-alpha",
-    blob_path = ::aws_sdk_dynamodb_0_0_25_alpha::Blob,
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_6",
-    crate_name = aws_sdk_dynamodb_0_6,
-    aws_version = "0.6",
-    blob_path = ::aws_sdk_dynamodb_0_6::Blob,
-);
-
-aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_7",
-    crate_name = aws_sdk_dynamodb_0_7,
+    crate_name = __aws_sdk_dynamodb_0_7,
     aws_version = "0.7",
-    blob_path = ::aws_sdk_dynamodb_0_7::types::Blob,
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_8",
-    crate_name = aws_sdk_dynamodb_0_8,
+    crate_name = __aws_sdk_dynamodb_0_8,
     aws_version = "0.8",
-    blob_path = ::aws_sdk_dynamodb_0_8::types::Blob,
 );
 
 rusoto_macro!(
     feature = "rusoto_dynamodb+0_46",
-    crate_name = rusoto_dynamodb_0_46,
+    crate_name = __rusoto_dynamodb_0_46,
     rusoto_version = "0.46",
 );
 
 rusoto_macro!(
     feature = "rusoto_dynamodb+0_47",
-    crate_name = rusoto_dynamodb_0_47,
+    crate_name = __rusoto_dynamodb_0_47,
     rusoto_version = "0.47",
 );
 
 rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_46",
-    crate_name = rusoto_dynamodbstreams_0_46,
+    crate_name = __rusoto_dynamodbstreams_0_46,
     rusoto_version = "0.46",
 );
 
 rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_47",
-    crate_name = rusoto_dynamodbstreams_0_47,
+    crate_name = __rusoto_dynamodbstreams_0_47,
     rusoto_version = "0.47",
 );
 

@@ -3,7 +3,7 @@ macro_rules! rusoto_macro {
         #[cfg(feature = $feature)]
         #[cfg_attr(docsrs, doc(cfg(feature = $feature)))]
         pub mod $mod_name {
-            #![doc = concat!("Support for [rusoto_dynamodb](https://docs.rs/rusoto_dynamodb) version ", stringify!($version))]
+            #![doc = concat!("Support for [rusoto_dynamodb](https://docs.rs/rusoto_dynamodb/", $version, ") version ", $version)]
             //!
             //! Because [rusoto_dynamodb] has not yet reached version 1.0, a feature is required to
             //! enable support. Add the following to your dependencies.

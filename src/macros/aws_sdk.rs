@@ -1,9 +1,9 @@
 macro_rules! aws_sdk_macro {
-    (feature = $feature:literal, crate_name = $mod_name:ident, aws_version = $version:literal, blob_path = $blob_path:path,) => {
+    (feature = $feature:literal, crate_name = $mod_name:ident, aws_version = $version:literal,) => {
         #[cfg(feature = $feature)]
         #[cfg_attr(docsrs, doc(cfg(feature = $feature)))]
         pub mod $mod_name {
-            #![doc = concat!("Support for [aws-sdk-dynamodb](https://docs.rs/aws-sdk-dynamodb) version ", stringify!($version))]
+            #![doc = concat!("Support for [aws-sdk-dynamodb](https://docs.rs/aws-sdk-dynamodb/", $version, ") version ", $version)]
             //!
             //! Because [aws-sdk-dynamodb] has not yet reached version 1.0, a feature is required to
             //! enable support. Add the following to your dependencies.
@@ -171,8 +171,6 @@ macro_rules! aws_sdk_macro {
             use crate::Result;
             use ::$mod_name::model::AttributeValue;
             use std::collections::HashMap;
-
-            type Blob = $blob_path;
 
             impl crate::AttributeValue for AttributeValue {
                 fn is_n(&self) -> bool {
@@ -380,7 +378,7 @@ macro_rules! aws_sdk_macro {
                 }
 
                 fn construct_b(input: &[u8]) -> Self {
-                    AttributeValue::B(Blob::new(input))
+                    AttributeValue::B($mod_name::types::Blob::new(input))
                 }
 
                 fn construct_null(input: bool) -> Self {
@@ -404,7 +402,7 @@ macro_rules! aws_sdk_macro {
                 }
 
                 fn construct_bs(input: Vec<Vec<u8>>) -> Self {
-                    let input = input.into_iter().map(Blob::new).collect();
+                    let input = input.into_iter().map($mod_name::types::Blob::new).collect();
                     AttributeValue::Bs(input)
                 }
             }
