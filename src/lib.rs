@@ -228,7 +228,7 @@ mod test_attribute_value;
 pub use attribute_value::AttributeValue;
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
-use macros::{aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro, rusoto_streams_macro};
+use macros::{aws_lambda_events_macro, aws_sdk_streams_macro, aws_sdk_macro, rusoto_macro, rusoto_streams_macro};
 pub use ser::{to_attribute_value, to_item, Serializer};
 pub use test_attribute_value::TestAttributeValue;
 
@@ -272,6 +272,12 @@ aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_10",
     crate_name = __aws_sdk_dynamodbstreams_0_10,
     aws_version = "0.10",
+);
+
+aws_lambda_events_macro!(
+    feature = "aws-lambda-events-dynamodb+0.6",
+    crate_name = __aws_lambda_events_dynamodb_0_6,
+    aws_lambda_events_version = "0.6",
 );
 
 rusoto_macro!(
