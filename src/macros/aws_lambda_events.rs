@@ -295,93 +295,84 @@ macro_rules! aws_lambda_events_macro {
                 }
 
                 fn into_n(self) -> Option<String> {
-                    None
-                    // if let AttributeValue::N(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Number(v) = self {
+                        Some(v.to_string())
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_s(self) -> Option<String> {
-                    None
-                    // if let AttributeValue::S(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::String(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_bool(self) -> Option<bool> {
-                    None
-                    // if let AttributeValue::Bool(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Boolean(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_b(self) -> Option<Vec<u8>> {
-                    None
-                    // if let AttributeValue::B(v) = self {
-                    //     Some(v.into_inner())
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Binary(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_null(self) -> Option<bool> {
-                    None
-                    // if let AttributeValue::Null(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Null = self {
+                        Some(true)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_m(self) -> Option<HashMap<String, Self>> {
-                    None
-                    // if let AttributeValue::M(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::AttributeMap(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_l(self) -> Option<Vec<Self>> {
-                    None
-                    // if let AttributeValue::L(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::AttributeList(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_ss(self) -> Option<Vec<String>> {
-                    None
-                    // if let AttributeValue::Ss(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::StringSet(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_ns(self) -> Option<Vec<String>> {
-                    None
-                    // if let AttributeValue::Ns(v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::NumberSet(v) = self {
+                        let v = v.iter().map(|v| v.to_string()).collect();
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn into_bs(self) -> Option<Vec<Vec<u8>>> {
-                    None
-                    // if let AttributeValue::Bs(v) = self {
-                    //     Some(v.into_iter().map(|b| b.into_inner()).collect())
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::BinarySet(v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn construct_n(input: String) -> Self {
