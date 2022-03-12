@@ -169,241 +169,260 @@ macro_rules! aws_lambda_events_macro {
             //! [aws_sdk_dynamodb::model::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.47.0/rusoto_dynamodb/struct.AttributeValue.html
 
             use crate::Result;
-            use ::$mod_name::model::AttributeValue;
+            use ::$mod_name::dynamodb::attributes::AttributeValue;
             use std::collections::HashMap;
 
             impl crate::AttributeValue for AttributeValue {
                 fn is_n(&self) -> bool {
-                    matches!(self, AttributeValue::N(..))
+                    matches!(self, AttributeValue::Number(..))
                 }
 
                 fn is_s(&self) -> bool {
-                    matches!(self, AttributeValue::S(..))
+                    matches!(self, AttributeValue::String(..))
                 }
 
                 fn is_bool(&self) -> bool {
-                    matches!(self, AttributeValue::Bool(..))
+                    matches!(self, AttributeValue::Boolean(..))
                 }
 
                 fn is_b(&self) -> bool {
-                    matches!(self, AttributeValue::B(..))
+                    matches!(self, AttributeValue::Binary(..))
                 }
 
                 fn is_null(&self) -> bool {
-                    matches!(self, AttributeValue::Null(..))
+                    matches!(self, AttributeValue::Null)
                 }
 
                 fn is_m(&self) -> bool {
-                    matches!(self, AttributeValue::M(..))
+                    matches!(self, AttributeValue::AttributeMap(..))
                 }
 
                 fn is_l(&self) -> bool {
-                    matches!(self, AttributeValue::L(..))
+                    matches!(self, AttributeValue::AttributeList(..))
                 }
 
                 fn is_ss(&self) -> bool {
-                    matches!(self, AttributeValue::Ss(..))
+                    matches!(self, AttributeValue::StringSet(..))
                 }
 
                 fn is_ns(&self) -> bool {
-                    matches!(self, AttributeValue::Ns(..))
+                    matches!(self, AttributeValue::NumberSet(..))
                 }
 
                 fn is_bs(&self) -> bool {
-                    matches!(self, AttributeValue::Bs(..))
+                    matches!(self, AttributeValue::BinarySet(..))
                 }
 
                 fn as_n(&self) -> Option<&str> {
-                    if let AttributeValue::N(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::N(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_s(&self) -> Option<&str> {
-                    if let AttributeValue::S(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::S(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_bool(&self) -> Option<bool> {
-                    if let AttributeValue::Bool(v) = self {
-                        Some(*v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Bool(v) = self {
+                    //     Some(*v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_b(&self) -> Option<&[u8]> {
-                    if let AttributeValue::B(ref v) = self {
-                        Some(v.as_ref())
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::B(ref v) = self {
+                    //     Some(v.as_ref())
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_null(&self) -> Option<bool> {
-                    if let AttributeValue::Null(v) = self {
-                        Some(*v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Null = self {
+                    //     Some(())
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_m(&self) -> Option<&HashMap<String, Self>> {
-                    if let AttributeValue::M(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::M(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_l(&self) -> Option<&[Self]> {
-                    if let AttributeValue::L(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::L(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_ss(&self) -> Option<&[String]> {
-                    if let AttributeValue::Ss(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Ss(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn as_ns(&self) -> Option<&[String]> {
-                    if let AttributeValue::Ns(ref v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Ns(ref v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_n(self) -> Option<String> {
-                    if let AttributeValue::N(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::N(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_s(self) -> Option<String> {
-                    if let AttributeValue::S(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::S(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_bool(self) -> Option<bool> {
-                    if let AttributeValue::Bool(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Bool(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_b(self) -> Option<Vec<u8>> {
-                    if let AttributeValue::B(v) = self {
-                        Some(v.into_inner())
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::B(v) = self {
+                    //     Some(v.into_inner())
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_null(self) -> Option<bool> {
-                    if let AttributeValue::Null(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Null(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_m(self) -> Option<HashMap<String, Self>> {
-                    if let AttributeValue::M(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::M(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_l(self) -> Option<Vec<Self>> {
-                    if let AttributeValue::L(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::L(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_ss(self) -> Option<Vec<String>> {
-                    if let AttributeValue::Ss(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Ss(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_ns(self) -> Option<Vec<String>> {
-                    if let AttributeValue::Ns(v) = self {
-                        Some(v)
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Ns(v) = self {
+                    //     Some(v)
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn into_bs(self) -> Option<Vec<Vec<u8>>> {
-                    if let AttributeValue::Bs(v) = self {
-                        Some(v.into_iter().map(|b| b.into_inner()).collect())
-                    } else {
-                        None
-                    }
+                    None
+                    // if let AttributeValue::Bs(v) = self {
+                    //     Some(v.into_iter().map(|b| b.into_inner()).collect())
+                    // } else {
+                    //     None
+                    // }
                 }
 
                 fn construct_n(input: String) -> Self {
-                    AttributeValue::N(input)
+                    AttributeValue::Number(input.parse().unwrap())
                 }
 
                 fn construct_s(input: String) -> Self {
-                    AttributeValue::S(input)
+                    AttributeValue::String(input)
                 }
 
                 fn construct_bool(input: bool) -> Self {
-                    AttributeValue::Bool(input)
+                    AttributeValue::Boolean(input)
                 }
 
                 fn construct_b(input: &[u8]) -> Self {
-                    AttributeValue::B($mod_name::types::Blob::new(input))
+                    AttributeValue::Binary(input.to_vec())
                 }
 
-                fn construct_null(input: bool) -> Self {
-                    AttributeValue::Null(input)
+                fn construct_null(_input: bool) -> Self {
+                    AttributeValue::Null
                 }
 
                 fn construct_m(input: HashMap<String, Self>) -> Self {
-                    AttributeValue::M(input)
+                    AttributeValue::AttributeMap(input)
                 }
 
                 fn construct_l(input: Vec<Self>) -> Self {
-                    AttributeValue::L(input)
+                    AttributeValue::AttributeList(input)
                 }
 
                 fn construct_ss(input: Vec<String>) -> Self {
-                    AttributeValue::Ss(input)
+                    AttributeValue::StringSet(input)
                 }
 
                 fn construct_ns(input: Vec<String>) -> Self {
-                    AttributeValue::Ns(input)
+                    let input = input.iter().map(|n|n.parse().expect("parsing value to number")).collect();
+                    AttributeValue::NumberSet(input)
                 }
 
                 fn construct_bs(input: Vec<Vec<u8>>) -> Self {
-                    let input = input.into_iter().map($mod_name::types::Blob::new).collect();
-                    AttributeValue::Bs(input)
+                    AttributeValue::BinarySet(input)
                 }
             }
 
