@@ -223,66 +223,59 @@ macro_rules! aws_lambda_events_macro {
                 }
 
                 fn as_s(&self) -> Option<&str> {
-                    None
-                    // if let AttributeValue::S(ref v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::String(ref v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_bool(&self) -> Option<bool> {
-                    None
-                    // if let AttributeValue::Bool(v) = self {
-                    //     Some(*v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Boolean(v) = self {
+                        Some(*v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_b(&self) -> Option<&[u8]> {
-                    None
-                    // if let AttributeValue::B(ref v) = self {
-                    //     Some(v.as_ref())
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Binary(ref v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_null(&self) -> Option<bool> {
-                    None
-                    // if let AttributeValue::Null = self {
-                    //     Some(())
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::Null = self {
+                        Some(true)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_m(&self) -> Option<&HashMap<String, Self>> {
-                    None
-                    // if let AttributeValue::M(ref v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::AttributeMap(ref v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_l(&self) -> Option<&[Self]> {
-                    None
-                    // if let AttributeValue::L(ref v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::AttributeList(ref v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_ss(&self) -> Option<&[String]> {
-                    None
-                    // if let AttributeValue::Ss(ref v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    if let AttributeValue::StringSet(ref v) = self {
+                        Some(v)
+                    } else {
+                        None
+                    }
                 }
 
                 fn as_ns(&self) -> Option<&[String]> {
