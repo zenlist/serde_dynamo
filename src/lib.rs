@@ -108,6 +108,18 @@
 //! See [`__aws_sdk_dynamodb_0_8`] for examples and more information.
 //!
 //!
+//! **serde_dynamo** works well with [aws-sdk-dynamodbstreams].
+//!
+//! Add the following to your dependencies.
+//!
+//! ```toml
+//! [dependencies]
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodbstreams+0_8"] }
+//! ```
+//!
+//! See [`__aws_sdk_dynamodbstreams_0_8`] for examples and more information.
+//!
+//!
 //! ## rusoto support
 //!
 //! **serde_dynamo** works well with [rusoto_dynamodb].
@@ -203,6 +215,7 @@
 //! [adjacently tagged enums]: https://serde.rs/enum-representations.html#adjacently-tagged
 //! [untagged enums]: https://serde.rs/enum-representations.html#untagged
 //! [aws-sdk-dynamodb]: https://docs.rs/aws-sdk-dynamodb
+//! [aws-sdk-dynamodbstreams]: https://docs.rs/aws-sdk-dynamodbstreams
 //! [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
 
 mod attribute_value;
@@ -215,7 +228,7 @@ mod test_attribute_value;
 pub use attribute_value::AttributeValue;
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
-use macros::{aws_sdk_macro, rusoto_macro, rusoto_streams_macro};
+use macros::{aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro, rusoto_streams_macro};
 pub use ser::{to_attribute_value, to_item, Serializer};
 pub use test_attribute_value::TestAttributeValue;
 
@@ -228,6 +241,12 @@ aws_sdk_macro!(
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_8",
     crate_name = __aws_sdk_dynamodb_0_8,
+    aws_version = "0.8",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_8",
+    crate_name = __aws_sdk_dynamodbstreams_0_8,
     aws_version = "0.8",
 );
 
