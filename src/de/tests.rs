@@ -562,3 +562,38 @@ fn deserialize_chrono_datetime() {
 
     assert_identical_json!(DateTime<Utc>, attribute_value.clone())
 }
+
+#[test]
+fn issue_27() {
+    #[derive(Debug, Deserialize, Eq, PartialEq)]
+    struct Subject {
+        id: String,
+        #[serde(flatten)]
+        data: Data,
+    }
+
+    #[derive(Debug, Deserialize, Eq, PartialEq)]
+    enum Data {
+        String(String),
+        Boolean(bool),
+    }
+
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (String::from("id"), AttributeValue::S(String::from("test"))),
+        (
+            String::from("String"),
+            AttributeValue::S(String::from("the data")),
+        ),
+    ]));
+
+    let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
+    assert_eq!(
+        s,
+        Subject {
+            id: String::from("test"),
+            data: Data::String(String::from("the data"))
+        }
+    );
+
+    assert_identical_json!(Subject, attribute_value.clone());
+}

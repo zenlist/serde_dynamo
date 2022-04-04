@@ -482,3 +482,45 @@ fn internally_tagged_enum() {
     assert_identical_json!(Enum::One { one: 1 });
     assert_identical_json!(Enum::Two { one: 1, two: 2 });
 }
+
+#[test]
+fn issue_27() {
+    #[derive(Serialize)]
+    struct Subject {
+        id: String,
+        #[serde(flatten)]
+        data: Data,
+    }
+
+    #[derive(Serialize)]
+    enum Data {
+        String(String),
+        Boolean(bool),
+    }
+
+    let result = to_attribute_value::<_, AttributeValue>(Subject {
+        id: String::from("test"),
+        data: Data::String(String::from("the data")),
+    })
+    .unwrap();
+
+    assert_eq!(
+        result,
+        AttributeValue::M(HashMap::from([
+            (String::from("id"), AttributeValue::S(String::from("test"))),
+            (
+                String::from("String"),
+                AttributeValue::S(String::from("the data"))
+            ),
+        ]))
+    );
+
+    assert_identical_json!(Subject {
+        id: String::from("test"),
+        data: Data::String(String::from("the data")),
+    });
+    assert_identical_json!(Subject {
+        id: String::from("test"),
+        data: Data::Boolean(true),
+    });
+}
