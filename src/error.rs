@@ -62,6 +62,10 @@ pub enum ErrorImpl {
     FailedToParseFloat(String, std::num::ParseFloatError),
     /// Key must be a string
     KeyMustBeAString,
+    /// SerializeMap's serialize_key called twice!
+    SerializeMapKeyCalledTwice,
+    /// SerializeMap's serialize_value called before serialize_key!
+    SerializeMapValueBeforeKey,
 }
 
 #[allow(clippy::from_over_into)]
@@ -94,6 +98,12 @@ impl Display for ErrorImpl {
                 write!(f, "Failed to parse '{0}' as a float: {1}", s, err)
             }
             ErrorImpl::KeyMustBeAString => f.write_str("Key must be a string"),
+            ErrorImpl::SerializeMapKeyCalledTwice => {
+                f.write_str("SerializeMap::serialize_key called twice")
+            }
+            ErrorImpl::SerializeMapValueBeforeKey => f.write_str(
+                "SerializeMap::serialize_value called before SerializeMap::serialize_key",
+            ),
         }
     }
 }

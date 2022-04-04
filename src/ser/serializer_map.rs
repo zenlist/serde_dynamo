@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 pub struct SerializerMap<T> {
     item: HashMap<String, T>,
+    next_key: Option<String>,
 }
 
 impl<T> SerializerMap<T> {
@@ -13,7 +14,10 @@ impl<T> SerializerMap<T> {
         } else {
             HashMap::new()
         };
-        SerializerMap { item }
+        SerializerMap {
+            item,
+            next_key: None,
+        }
     }
 }
 
@@ -24,18 +28,31 @@ where
     type Ok = T;
     type Error = Error;
 
-    fn serialize_key<K: ?Sized>(&mut self, _key: &K) -> Result<(), Self::Error>
+    fn serialize_key<K: ?Sized>(&mut self, key: &K) -> Result<(), Self::Error>
     where
         K: Serialize,
     {
-        unreachable!()
+        if self.next_key.is_some() {
+            return Err(ErrorImpl::SerializeMapKeyCalledTwice.into());
+        }
+
+        let key = key.serialize(MapKeySerializer)?;
+        self.next_key = Some(key);
+        Ok(())
     }
 
-    fn serialize_value<V: ?Sized>(&mut self, _value: &V) -> Result<(), Self::Error>
+    fn serialize_value<V: ?Sized>(&mut self, value: &V) -> Result<(), Self::Error>
     where
         V: Serialize,
     {
-        unreachable!()
+        let key = self
+            .next_key
+            .take()
+            .ok_or_else(|| ErrorImpl::SerializeMapValueBeforeKey.into())?;
+
+        let value = value.serialize(Serializer::<T>::default())?;
+        self.item.insert(key, value);
+        Ok(())
     }
 
     fn serialize_entry<K: ?Sized, V: ?Sized>(
