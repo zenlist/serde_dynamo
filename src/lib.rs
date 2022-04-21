@@ -233,6 +233,12 @@ pub use ser::{to_attribute_value, to_item, Serializer};
 pub use test_attribute_value::TestAttributeValue;
 
 aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_7",
+    crate_name = __aws_sdk_dynamodb_0_7,
+    aws_version = "0.7",
+);
+
+aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_8",
     crate_name = __aws_sdk_dynamodb_0_8,
     aws_version = "0.8",
