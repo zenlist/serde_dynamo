@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "3.0.3"
+version = "3.0.2"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2021"
 license = "MIT"
@@ -12,6 +12,7 @@ repository = "https://github.com/zenlist/serde_dynamo"
 keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
+__aws_sdk_dynamodb_0_7 = { package = "aws-sdk-dynamodb", version = "0.7", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_8 = { package = "aws-sdk-dynamodb", version = "0.8", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_9 = { package = "aws-sdk-dynamodb", version = "0.9", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_10 = { package = "aws-sdk-dynamodb", version = "0.10", default-features = false, optional = true }
@@ -27,6 +28,7 @@ __rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-
 __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-features = false, features = ["rustls"], optional = true }
 
 [features]
+"aws-sdk-dynamodb+0_7" = ["__aws_sdk_dynamodb_0_7"]
 "aws-sdk-dynamodb+0_8" = ["__aws_sdk_dynamodb_0_8"]
 "aws-sdk-dynamodb+0_9" = ["__aws_sdk_dynamodb_0_9"]
 "aws-sdk-dynamodb+0_10" = ["__aws_sdk_dynamodb_0_10"]
@@ -37,7 +39,7 @@ __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-
 "rusoto_dynamodbstreams+0_46" = ["__rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["__rusoto_dynamodbstreams_0_47"]
 
-__doc = ["__rusoto_core_0_46_crate", "__rusoto_core_0_47_crate", "aws-sdk-dynamodb+0_8", "aws-sdk-dynamodb+0_9", "aws-sdk-dynamodb+0_10", "aws-sdk-dynamodbstreams+0_8", "aws-sdk-dynamodbstreams+0_9"]
+__doc = ["__rusoto_core_0_46_crate", "__rusoto_core_0_47_crate", "aws-sdk-dynamodb+0_7", "aws-sdk-dynamodb+0_8", "aws-sdk-dynamodb+0_9", "aws-sdk-dynamodb+0_10", "aws-sdk-dynamodbstreams+0_8", "aws-sdk-dynamodbstreams+0_9"]
 
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
