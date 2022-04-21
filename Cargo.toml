@@ -39,7 +39,16 @@ __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-
 "rusoto_dynamodbstreams+0_46" = ["__rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["__rusoto_dynamodbstreams_0_47"]
 
-__doc = ["__rusoto_core_0_46_crate", "__rusoto_core_0_47_crate", "aws-sdk-dynamodb+0_7", "aws-sdk-dynamodb+0_8", "aws-sdk-dynamodb+0_9", "aws-sdk-dynamodb+0_10", "aws-sdk-dynamodbstreams+0_8", "aws-sdk-dynamodbstreams+0_9"]
+__doc = [
+	"__rusoto_core_0_46_crate",
+	"__rusoto_core_0_47_crate",
+	"aws-sdk-dynamodb+0_7",
+	"aws-sdk-dynamodb+0_8",
+	"aws-sdk-dynamodb+0_9",
+	"aws-sdk-dynamodb+0_10",
+	"aws-sdk-dynamodbstreams+0_8",
+	"aws-sdk-dynamodbstreams+0_9",
+]
 
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
