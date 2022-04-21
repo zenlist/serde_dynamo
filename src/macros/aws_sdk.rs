@@ -22,7 +22,7 @@ macro_rules! aws_sdk_macro {
             //!
             //! ```
             #![doc = concat!("# use ", stringify!($mod_name), "::client::Client;")]
-            //! # use serde::{Serialize, Deserialize};
+            //! # use serde_derive::{Serialize, Deserialize};
             //! # use serde_dynamo::from_items;
             //! #
             //! # async fn scan(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
@@ -49,7 +49,7 @@ macro_rules! aws_sdk_macro {
             //!
             //! ```
             #![doc = concat!("# use ", stringify!($mod_name), "::client::Client;")]
-            //! # use serde::{Serialize, Deserialize};
+            //! # use serde_derive::{Serialize, Deserialize};
             //! # use serde_dynamo::from_item;
             //! #
             //! # async fn scan(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
@@ -80,7 +80,7 @@ macro_rules! aws_sdk_macro {
             //!
             //! ```
             #![doc = concat!("# use ", stringify!($mod_name), "::client::Client;")]
-            //! # use serde::{Serialize, Deserialize};
+            //! # use serde_derive::{Serialize, Deserialize};
             //! # use serde_dynamo::to_item;
             //! #
             //! # async fn put(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
