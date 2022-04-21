@@ -102,10 +102,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_9"] }
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_10"] }
 //! ```
 //!
-//! See [`__aws_sdk_dynamodb_0_9`] for examples and more information.
+//! See [`__aws_sdk_dynamodb_0_10`] for examples and more information.
 //!
 //!
 //! **serde_dynamo** works well with [aws-sdk-dynamodbstreams].
@@ -233,12 +233,6 @@ pub use ser::{to_attribute_value, to_item, Serializer};
 pub use test_attribute_value::TestAttributeValue;
 
 aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_7",
-    crate_name = __aws_sdk_dynamodb_0_7,
-    aws_version = "0.7",
-);
-
-aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_8",
     crate_name = __aws_sdk_dynamodb_0_8,
     aws_version = "0.8",
@@ -248,6 +242,12 @@ aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_9",
     crate_name = __aws_sdk_dynamodb_0_9,
     aws_version = "0.9",
+);
+
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_10",
+    crate_name = __aws_sdk_dynamodb_0_10,
+    aws_version = "0.10",
 );
 
 aws_sdk_streams_macro!(
