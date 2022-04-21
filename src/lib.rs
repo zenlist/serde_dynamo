@@ -265,7 +265,13 @@ aws_sdk_streams_macro!(
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_9",
     crate_name = __aws_sdk_dynamodbstreams_0_9,
-    aws_version = "0.8",
+    aws_version = "0.9",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_10",
+    crate_name = __aws_sdk_dynamodbstreams_0_10,
+    aws_version = "0.10",
 );
 
 rusoto_macro!(
