@@ -1,5 +1,5 @@
-use super::AttributeValue;
 use crate::{error::ErrorImpl, Error, Result};
+use aws_sdk_dynamodb::model::AttributeValue;
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -88,12 +88,11 @@ use serializer_tuple_variant::SerializerTupleVariant;
 /// [rusoto_dynamodb::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/struct.AttributeValue.html
 /// [get_item]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
 /// [query]: https://docs.rs/rusoto_dynamodb/0.45.0/rusoto_dynamodb/trait.DynamoDb.html#tymethod.get_item
-pub fn to_attribute_value<Tin, Tout>(value: Tin) -> Result<Tout>
+pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
 where
-    Tin: Serialize,
-    Tout: AttributeValue,
+    T: Serialize,
 {
-    let serializer = Serializer::<Tout>::default();
+    let serializer = Serializer::default();
     let attribute_value = value.serialize(serializer)?;
     Ok(attribute_value)
 }
@@ -138,14 +137,14 @@ where
 /// ```
 ///
 /// [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
-pub fn to_item<Tin, Tout>(value: Tin) -> Result<HashMap<String, Tout>>
+pub fn to_item<T>(value: T) -> Result<HashMap<String, AttributeValue>>
 where
-    Tin: Serialize,
-    Tout: AttributeValue,
+    T: Serialize,
 {
-    let attribute_value: Tout = to_attribute_value(value)?;
-    let item = attribute_value
-        .into_m()
-        .ok_or_else(|| ErrorImpl::NotMaplike.into())?;
-    Ok(item)
+    let attribute_value = to_attribute_value(value)?;
+    if let AttributeValue::M(m) = attribute_value {
+        Ok(m)
+    } else {
+        Err(ErrorImpl::NotMaplike.into())
+    }
 }

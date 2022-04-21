@@ -1,17 +1,18 @@
-use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
+use super::{Deserializer, Error, ErrorImpl, Result};
+use aws_sdk_dynamodb::model::AttributeValue;
 use serde::{
     de::{self, DeserializeSeed, MapAccess, Visitor},
     forward_to_deserialize_any, serde_if_integer128,
 };
-use std::{collections::HashMap, marker::PhantomData};
+use std::collections::HashMap;
 
-pub struct DeserializerMap<'a, T> {
-    drain: std::collections::hash_map::Drain<'a, String, T>,
-    remaining_value: Option<T>,
+pub struct DeserializerMap<'a> {
+    drain: std::collections::hash_map::Drain<'a, String, AttributeValue>,
+    remaining_value: Option<AttributeValue>,
 }
 
-impl<'a, T> DeserializerMap<'a, T> {
-    pub fn from_item(item: &'a mut HashMap<String, T>) -> Self {
+impl<'a> DeserializerMap<'a> {
+    pub fn from_item(item: &'a mut HashMap<String, AttributeValue>) -> Self {
         Self {
             drain: item.drain(),
             remaining_value: None,
@@ -19,10 +20,7 @@ impl<'a, T> DeserializerMap<'a, T> {
     }
 }
 
-impl<'de, 'a, T> MapAccess<'de> for DeserializerMap<'a, T>
-where
-    T: AttributeValue,
-{
+impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
     type Error = Error;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>>
@@ -31,7 +29,7 @@ where
     {
         if let Some((key, value)) = self.drain.next() {
             self.remaining_value = Some(value);
-            let de = DeserializerMapKey::<T>::from_string(key);
+            let de = DeserializerMapKey::from_string(key);
             seed.deserialize(de).map(Some)
         } else {
             Ok(None)
@@ -51,17 +49,13 @@ where
     }
 }
 
-struct DeserializerMapKey<T> {
+struct DeserializerMapKey {
     input: String,
-    _phantom: PhantomData<T>,
 }
 
-impl<T> DeserializerMapKey<T> {
+impl DeserializerMapKey {
     fn from_string(input: String) -> Self {
-        Self {
-            input,
-            _phantom: PhantomData,
-        }
+        Self { input }
     }
 }
 
@@ -81,10 +75,7 @@ macro_rules! deserialize_integer_key {
     };
 }
 
-impl<'de, T> de::Deserializer<'de> for DeserializerMapKey<T>
-where
-    T: AttributeValue,
-{
+impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
@@ -127,7 +118,7 @@ where
     where
         V: de::Visitor<'de>,
     {
-        let de = Deserializer::<T>::from_attribute_value(AttributeValue::construct_s(self.input));
+        let de = Deserializer::from_attribute_value(AttributeValue::S(self.input));
         de.deserialize_enum(name, variants, visitor)
     }
 

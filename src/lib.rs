@@ -36,7 +36,6 @@
 //! # use chrono::{DateTime, Utc};
 //! # use serde_derive::{Serialize, Deserialize};
 //! # use serde_dynamo::to_item;
-//! # use serde_dynamo::TestAttributeValue;
 //! # use std::collections::HashMap;
 //! #
 //! #[derive(Serialize, Deserialize)]
@@ -88,7 +87,6 @@
 //! "#;
 //! let message: Message = serde_json::from_str(input)?;
 //! let item = to_item(message)?;
-//! # let item: HashMap<String, TestAttributeValue> = item;
 //! # Ok(())
 //! # }
 //! # test().unwrap()
@@ -162,7 +160,6 @@
 //! # use serde_dynamo::to_item;
 //! # use serde_derive::{Serialize, Deserialize};
 //! # use std::collections::HashMap;
-//! # use serde_dynamo::TestAttributeValue;
 //! #
 //! # #[derive(Clone, Serialize, Deserialize)]
 //! # struct User {
@@ -178,35 +175,16 @@
 //!
 //! // Serialize directly from the data structure to an item
 //! let direct_item = to_item(user.clone())?;
-//! # let direct_item: HashMap<String, TestAttributeValue> = direct_item;
 //!
 //! // Serialize indirectly through JSON
 //! let json = serde_json::to_value(user.clone())?;
 //! let indirect_item = to_item(json)?;
-//! # let indirect_item: HashMap<String, TestAttributeValue> = indirect_item;
 //!
 //! // The result should be the same!
 //! assert_eq!(direct_item, indirect_item);
 //! # Ok(())
 //! # }
 //! ```
-//!
-//! ## Features
-//!
-//! **serde_dynamo** is a stable library ready to use in production. Because of that, it's major
-//! version is above 1.0.
-//!
-//! This creates problems when supporting dynamodb libraries that have version numbers less than
-//! 1.0.
-//!
-//! To avoid doing a major version bump for every release of `rusoto_dynamodb` and
-//! `aws-sdk-dynamodb`, **serde_dynamo** uses features to opt into the correct version of the
-//! dynamodb library.
-//!
-//! See the [modules](#modules) section for all possible features. Feature names are largely
-//! guessable: the library name, a plus, and the library version (with underscores instead of dots,
-//! because crates.io doesn't support feature names with dots). For example, support for
-//! `rusoto_dynamodb` version `0.47` is enabled with the feature `rusoto_dynamodb+0_47`.
 //!
 //! [DynamoDB]: https://aws.amazon.com/dynamodb/
 //! [serde]: https://docs.rs/serde
@@ -218,85 +196,12 @@
 //! [aws-sdk-dynamodbstreams]: https://docs.rs/aws-sdk-dynamodbstreams
 //! [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
 
-mod attribute_value;
 mod de;
 mod error;
-mod macros;
 mod ser;
-mod test_attribute_value;
 
-pub use attribute_value::AttributeValue;
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
-use macros::{aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro, rusoto_streams_macro};
 pub use ser::{to_attribute_value, to_item, Serializer};
-pub use test_attribute_value::TestAttributeValue;
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_7",
-    crate_name = __aws_sdk_dynamodb_0_7,
-    aws_version = "0.7",
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_8",
-    crate_name = __aws_sdk_dynamodb_0_8,
-    aws_version = "0.8",
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_9",
-    crate_name = __aws_sdk_dynamodb_0_9,
-    aws_version = "0.9",
-);
-
-aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+0_10",
-    crate_name = __aws_sdk_dynamodb_0_10,
-    aws_version = "0.10",
-);
-
-aws_sdk_streams_macro!(
-    feature = "aws-sdk-dynamodbstreams+0_8",
-    crate_name = __aws_sdk_dynamodbstreams_0_8,
-    aws_version = "0.8",
-);
-
-aws_sdk_streams_macro!(
-    feature = "aws-sdk-dynamodbstreams+0_9",
-    crate_name = __aws_sdk_dynamodbstreams_0_9,
-    aws_version = "0.9",
-);
-
-aws_sdk_streams_macro!(
-    feature = "aws-sdk-dynamodbstreams+0_10",
-    crate_name = __aws_sdk_dynamodbstreams_0_10,
-    aws_version = "0.10",
-);
-
-rusoto_macro!(
-    feature = "rusoto_dynamodb+0_46",
-    crate_name = __rusoto_dynamodb_0_46,
-    rusoto_version = "0.46",
-);
-
-rusoto_macro!(
-    feature = "rusoto_dynamodb+0_47",
-    crate_name = __rusoto_dynamodb_0_47,
-    rusoto_version = "0.47",
-);
-
-rusoto_streams_macro!(
-    feature = "rusoto_dynamodbstreams+0_46",
-    crate_name = __rusoto_dynamodbstreams_0_46,
-    rusoto_version = "0.46",
-);
-
-rusoto_streams_macro!(
-    feature = "rusoto_dynamodbstreams+0_47",
-    crate_name = __rusoto_dynamodbstreams_0_47,
-    rusoto_version = "0.47",
-);
-
 #[cfg(test)]
 mod tests;

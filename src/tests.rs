@@ -1,12 +1,12 @@
-use super::{from_item, to_item, TestAttributeValue};
+use super::{from_item, to_item};
 use serde_derive::{Deserialize, Serialize};
 
 fn round_trip<T>(value: T)
 where
     T: serde::Serialize + serde::de::DeserializeOwned + Eq + Clone + std::fmt::Debug,
 {
-    let serialized = to_item::<T, TestAttributeValue>(value.clone()).unwrap();
-    let deserialized = from_item::<TestAttributeValue, T>(serialized).unwrap();
+    let serialized = to_item::<T>(value.clone()).unwrap();
+    let deserialized = from_item::<T>(serialized).unwrap();
     assert_eq!(deserialized, value);
 }
 
@@ -103,7 +103,8 @@ fn error_eq() {
 
 #[cfg(test)]
 mod from_items {
-    use crate::{error::ErrorImpl, from_items, to_attribute_value, Error, TestAttributeValue};
+    use crate::{error::ErrorImpl, from_items, to_attribute_value, Error};
+    use aws_sdk_dynamodb::model::AttributeValue;
     use serde_derive::{Deserialize, Serialize};
     use std::collections::HashMap;
 
@@ -116,7 +117,7 @@ mod from_items {
 
     #[test]
     fn same_types() {
-        let items: Vec<HashMap<String, TestAttributeValue>> = vec![
+        let items: Vec<HashMap<String, AttributeValue>> = vec![
             HashMap::from([
                 (String::from("id"), to_attribute_value("one").unwrap()),
                 (String::from("name"), to_attribute_value("Jane").unwrap()),
@@ -150,7 +151,7 @@ mod from_items {
 
     #[test]
     fn wrong_types() {
-        let items: Vec<HashMap<String, TestAttributeValue>> = vec![
+        let items: Vec<HashMap<String, AttributeValue>> = vec![
             HashMap::from([
                 (String::from("id"), to_attribute_value("one").unwrap()),
                 (String::from("name"), to_attribute_value("Jane").unwrap()),
@@ -166,7 +167,7 @@ mod from_items {
             ]),
         ];
 
-        let err = from_items::<_, Vec<User>>(items).unwrap_err();
+        let err = from_items::<Vec<User>>(items).unwrap_err();
         assert_eq!(Into::<Error>::into(ErrorImpl::ExpectedSeq), err);
     }
 }
@@ -174,9 +175,8 @@ mod from_items {
 // Tests for various types being used as map keys
 #[cfg(test)]
 mod map_key {
-    use crate::{
-        error::ErrorImpl, from_attribute_value, to_attribute_value, Result, TestAttributeValue,
-    };
+    use crate::{error::ErrorImpl, from_attribute_value, to_attribute_value, Result};
+    use aws_sdk_dynamodb::model::AttributeValue;
     use serde::de::DeserializeOwned;
     use serde_derive::{Deserialize, Serialize};
     use std::collections::BTreeMap;
@@ -250,7 +250,7 @@ mod map_key {
             }
         };
 
-        let actual_serialized = to_attribute_value::<_, TestAttributeValue>(original.clone());
+        let actual_serialized = to_attribute_value(original.clone());
 
         let (expected_serialized_key, actual_serialized) = match expect_serialized_key {
             Ok(expected_serialized) => (
@@ -274,7 +274,7 @@ mod map_key {
         };
 
         let actual_serialized_key = match actual_serialized {
-            TestAttributeValue::M(ref m) => m
+            AttributeValue::M(ref m) => m
                 .keys()
                 .next()
                 .expect("The map should have one key")

@@ -1,5 +1,5 @@
-use super::AttributeValue;
 use crate::{error::ErrorImpl, Error, Result};
+use aws_sdk_dynamodb::model::AttributeValue;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -19,13 +19,12 @@ pub use deserializer::Deserializer;
 ///
 /// In most cases, you will want to be using [`from_item`] instead. This function is provided as a
 /// dual of [`super::to_attribute_value`] and may be useful in very narrow circumstances.
-pub fn from_attribute_value<'a, Tin, Tout>(attribute_value: Tin) -> Result<Tout>
+pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Tout::deserialize(deserializer)?;
+    let t = T::deserialize(deserializer)?;
     Ok(t)
 }
 
@@ -60,14 +59,13 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_item<'a, Tin, Tout>(item: HashMap<String, Tin>) -> Result<Tout>
+pub fn from_item<'a, T>(item: HashMap<String, AttributeValue>) -> Result<T>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
-    let attribute_value = AttributeValue::construct_m(item);
+    let attribute_value = AttributeValue::M(item);
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Tout::deserialize(deserializer)?;
+    let t = T::deserialize(deserializer)?;
     Ok(t)
 }
 
@@ -102,13 +100,12 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_items<'a, Tin, Tout>(items: Vec<HashMap<String, Tin>>) -> Result<Vec<Tout>>
+pub fn from_items<'a, T>(items: Vec<HashMap<String, AttributeValue>>) -> Result<Vec<T>>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
-    let attribute_value = Tin::construct_l(items.into_iter().map(Tin::construct_m).collect());
+    let attribute_value = AttributeValue::L(items.into_iter().map(AttributeValue::M).collect());
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Vec::<Tout>::deserialize(deserializer)?;
+    let t = Vec::<T>::deserialize(deserializer)?;
     Ok(t)
 }

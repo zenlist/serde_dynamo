@@ -1,24 +1,23 @@
 use super::deserializer_bytes::DeserializerBytes;
 use super::deserializer_number::DeserializerNumber;
-use super::{AttributeValue, Deserializer, Error, Result};
+use super::{Deserializer, Error, Result};
+use aws_sdk_dynamodb::model::AttributeValue;
+use aws_sdk_dynamodb::types::Blob;
 use serde::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
-pub struct DeserializerSeq<T> {
-    iter: std::vec::IntoIter<T>,
+pub struct DeserializerSeq {
+    iter: std::vec::IntoIter<AttributeValue>,
 }
 
-impl<T> DeserializerSeq<T> {
-    pub fn from_vec(vec: Vec<T>) -> Self {
+impl DeserializerSeq {
+    pub fn from_vec(vec: Vec<AttributeValue>) -> Self {
         Self {
             iter: vec.into_iter(),
         }
     }
 }
 
-impl<'de, 'a, T> SeqAccess<'de> for DeserializerSeq<T>
-where
-    T: AttributeValue,
-{
+impl<'de, 'a> SeqAccess<'de> for DeserializerSeq {
     type Error = Error;
 
     fn next_element_seed<S>(&mut self, seed: S) -> Result<Option<S::Value>, Self::Error>
@@ -90,22 +89,19 @@ impl<'de, 'a> SeqAccess<'de> for DeserializerSeqNumbers {
     }
 }
 
-pub struct DeserializerSeqBytes<T> {
-    iter: std::vec::IntoIter<T>,
+pub struct DeserializerSeqBytes {
+    iter: std::vec::IntoIter<Blob>,
 }
 
-impl<T> DeserializerSeqBytes<T> {
-    pub fn from_vec(vec: Vec<T>) -> Self {
+impl DeserializerSeqBytes {
+    pub fn from_vec(vec: Vec<Blob>) -> Self {
         Self {
             iter: vec.into_iter(),
         }
     }
 }
 
-impl<'de, 'a, B> SeqAccess<'de> for DeserializerSeqBytes<B>
-where
-    B: AsRef<[u8]>,
-{
+impl<'de, 'a> SeqAccess<'de> for DeserializerSeqBytes {
     type Error = Error;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>

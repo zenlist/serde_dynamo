@@ -1,21 +1,19 @@
 use super::{Error, Result};
+use aws_sdk_dynamodb::types::Blob;
 use serde::de::{self, Visitor};
 use serde::forward_to_deserialize_any;
 
-pub struct DeserializerBytes<T> {
-    input: T,
+pub struct DeserializerBytes {
+    input: Blob,
 }
 
-impl<T> DeserializerBytes<T> {
-    pub fn from_bytes(input: T) -> Self {
+impl DeserializerBytes {
+    pub fn from_bytes(input: Blob) -> Self {
         DeserializerBytes { input }
     }
 }
 
-impl<'de, 'a, T> de::Deserializer<'de> for DeserializerBytes<T>
-where
-    T: AsRef<[u8]>,
-{
+impl<'de, 'a> de::Deserializer<'de> for DeserializerBytes {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
