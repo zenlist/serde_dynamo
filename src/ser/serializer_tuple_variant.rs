@@ -2,12 +2,12 @@ use super::{AttributeValue, Error, Result, Serializer};
 use serde::{ser, Serialize};
 use std::collections::HashMap;
 
-pub struct SerializerTupleVariant<T> {
+pub struct SerializerTupleVariant {
     key: &'static str,
-    vec: Vec<T>,
+    vec: Vec<AttributeValue>,
 }
 
-impl<T> SerializerTupleVariant<T> {
+impl SerializerTupleVariant {
     pub fn new(key: &'static str, len: usize) -> Self {
         Self {
             key,
@@ -16,18 +16,15 @@ impl<T> SerializerTupleVariant<T> {
     }
 }
 
-impl<'a, T> ser::SerializeTupleVariant for SerializerTupleVariant<T>
-where
-    T: AttributeValue,
-{
-    type Ok = T;
+impl<'a> ser::SerializeTupleVariant for SerializerTupleVariant {
+    type Ok = AttributeValue;
     type Error = Error;
 
     fn serialize_field<F: ?Sized>(&mut self, value: &F) -> Result<(), Self::Error>
     where
         F: Serialize,
     {
-        let serializer = Serializer::<T>::default();
+        let serializer = Serializer::default();
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())
@@ -35,8 +32,8 @@ where
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
         let mut hashmap = HashMap::with_capacity(1);
-        hashmap.insert(self.key.to_string(), T::construct_l(self.vec));
+        hashmap.insert(self.key.to_string(), AttributeValue::L(self.vec));
 
-        Ok(T::construct_m(hashmap))
+        Ok(AttributeValue::M(hashmap))
     }
 }

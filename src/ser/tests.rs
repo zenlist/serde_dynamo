@@ -1,7 +1,7 @@
 #![allow(clippy::float_cmp, clippy::redundant_clone)]
 
-use crate::test_attribute_value::TestAttributeValue as AttributeValue;
 use crate::{to_attribute_value, to_item};
+use crate::{AttributeValue, Item};
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -33,7 +33,7 @@ fn assert_identical_json_with_error<T>(t1: T, t2: T)
 where
     T: serde::Serialize,
 {
-    let direct_result = to_attribute_value::<_, AttributeValue>(t1);
+    let direct_result = to_attribute_value(t1);
     let json_result = serde_json::to_value(t2);
 
     match (direct_result, json_result) {
@@ -49,7 +49,7 @@ where
 
 #[test]
 fn serialize_string() {
-    let result = to_attribute_value::<_, AttributeValue>(String::from("Value")).unwrap();
+    let result = to_attribute_value(String::from("Value")).unwrap();
     assert_eq!(result, AttributeValue::S(String::from("Value")));
     assert_identical_json!(String::from("Value"));
 }
@@ -59,7 +59,7 @@ fn serialize_num() {
     macro_rules! serialize_num {
         ($ty:ty, $n:expr) => {{
             let v: $ty = $n;
-            let result = to_attribute_value::<_, AttributeValue>(v).unwrap();
+            let result = to_attribute_value(v).unwrap();
             assert_eq!(result, AttributeValue::N(String::from(stringify!($n))));
         }};
     }
@@ -78,33 +78,33 @@ fn serialize_num() {
 
 #[test]
 fn serialize_bool() {
-    let result = to_attribute_value::<_, AttributeValue>(true).unwrap();
+    let result = to_attribute_value(true).unwrap();
     assert_eq!(result, AttributeValue::Bool(true));
     assert_identical_json!(true);
 }
 
 #[test]
 fn serialize_char() {
-    let result = to_attribute_value::<_, AttributeValue>('🥳').unwrap();
+    let result = to_attribute_value('🥳').unwrap();
     assert_eq!(result, AttributeValue::S(String::from("🥳")));
     assert_identical_json!('🥳');
 }
 
 #[test]
 fn serialize_unit() {
-    let result = to_attribute_value::<_, AttributeValue>(()).unwrap();
-    assert_eq!(result, AttributeValue::Null);
+    let result = to_attribute_value(()).unwrap();
+    assert_eq!(result, AttributeValue::Null(true));
     assert_identical_json!(());
 }
 
 #[test]
 fn serialize_option() {
-    let result = to_attribute_value::<_, AttributeValue>(Some(1_u8)).unwrap();
+    let result = to_attribute_value(Some(1_u8)).unwrap();
     assert_eq!(result, AttributeValue::N(String::from("1")));
     assert_identical_json!(Some(1_u8));
 
-    let result = to_attribute_value::<_, AttributeValue>(Option::<u8>::None).unwrap();
-    assert_eq!(result, AttributeValue::Null);
+    let result = to_attribute_value(Option::<u8>::None).unwrap();
+    assert_eq!(result, AttributeValue::Null(true));
     assert_identical_json!(Option::<u8>::None);
 }
 
@@ -122,10 +122,10 @@ fn serialize_struct() {
     let result = to_item(source.clone()).unwrap();
     assert_eq!(
         result,
-        HashMap::from([(
+        Item::from(HashMap::from([(
             String::from("value"),
             AttributeValue::S(String::from("Value"))
-        ),])
+        )]))
     );
     assert_identical_json!(source.clone());
 }
@@ -145,10 +145,10 @@ fn serialize_bytes() {
     let result = to_item(source.clone()).unwrap();
     assert_eq!(
         result,
-        HashMap::from([(
+        Item::from(HashMap::from([(
             String::from("value"),
             AttributeValue::B(vec![116, 101, 115, 116, 0, 0, 0, 0])
-        )])
+        )]))
     );
 }
 
@@ -167,7 +167,7 @@ fn serialize_array_of_structs() {
         source.push(s);
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(source.clone()).unwrap();
+    let result = to_attribute_value(source.clone()).unwrap();
     assert_eq!(
         result,
         AttributeValue::L(vec![
@@ -193,8 +193,8 @@ fn serialize_unit_struct() {
     #[derive(Serialize, Deserialize)]
     struct Subject;
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject).unwrap();
-    assert_eq!(result, AttributeValue::Null);
+    let result = to_attribute_value(Subject).unwrap();
+    assert_eq!(result, AttributeValue::Null(true));
 
     assert_identical_json!(Subject);
 }
@@ -204,7 +204,7 @@ fn serialize_newtype_struct() {
     #[derive(Serialize, Deserialize)]
     struct Subject(String);
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject(String::from("one"))).unwrap();
+    let result = to_attribute_value(Subject(String::from("one"))).unwrap();
     assert_eq!(result, AttributeValue::S(String::from("one")));
 
     assert_identical_json!(Subject(String::from("one")));
@@ -215,9 +215,7 @@ fn serialize_tuple_struct() {
     #[derive(Serialize, Deserialize)]
     struct Subject(String, String);
 
-    let result =
-        to_attribute_value::<_, AttributeValue>(Subject(String::from("one"), String::from("two")))
-            .unwrap();
+    let result = to_attribute_value(Subject(String::from("one"), String::from("two"))).unwrap();
     assert_eq!(
         result,
         AttributeValue::L(vec![
@@ -231,9 +229,7 @@ fn serialize_tuple_struct() {
 
 #[test]
 fn serialize_tuple() {
-    let result =
-        to_attribute_value::<_, AttributeValue>((String::from("one"), String::from("two")))
-            .unwrap();
+    let result = to_attribute_value((String::from("one"), String::from("two"))).unwrap();
     assert_eq!(
         result,
         AttributeValue::L(vec![
@@ -247,7 +243,7 @@ fn serialize_tuple() {
 
 #[test]
 fn serialize_map_with_strings() {
-    let result = to_attribute_value::<_, AttributeValue>(HashMap::from([
+    let result = to_attribute_value(HashMap::from([
         (String::from("one"), 1),
         (String::from("two"), 2),
     ]))
@@ -269,7 +265,7 @@ fn serialize_map_with_strings() {
 
 #[test]
 fn serialize_maps_with_various_types() {
-    let result = to_attribute_value::<_, AttributeValue>(HashMap::from([
+    let result = to_attribute_value(HashMap::from([
         (1, String::from("1")),
         (2, String::from("2")),
     ]))
@@ -387,7 +383,7 @@ fn serialize_enum_unit() {
         Unit,
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject::Unit).unwrap();
+    let result = to_attribute_value(Subject::Unit).unwrap();
     assert_eq!(result, AttributeValue::S(String::from("Unit")));
 
     assert_identical_json!(Subject::Unit);
@@ -400,7 +396,7 @@ fn serialize_enum_newtype() {
         Newtype(u8),
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject::Newtype(1)).unwrap();
+    let result = to_attribute_value(Subject::Newtype(1)).unwrap();
     assert_eq!(
         result,
         AttributeValue::M(HashMap::from([(
@@ -419,7 +415,7 @@ fn serialize_enum_tuple() {
         Tuple(u8, u8),
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject::Tuple(1, 2)).unwrap();
+    let result = to_attribute_value(Subject::Tuple(1, 2)).unwrap();
 
     assert_eq!(
         result,
@@ -442,8 +438,7 @@ fn serialize_enum_struct_variant() {
         Structy { one: u8, two: u8 },
     }
 
-    let result =
-        to_attribute_value::<_, AttributeValue>(Subject::Structy { one: 1, two: 2 }).unwrap();
+    let result = to_attribute_value(Subject::Structy { one: 1, two: 2 }).unwrap();
 
     assert_eq!(
         result,
@@ -468,7 +463,7 @@ fn internally_tagged_enum() {
         Two { one: u8, two: u8 },
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(Enum::Two { one: 1, two: 2 }).unwrap();
+    let result = to_attribute_value(Enum::Two { one: 1, two: 2 }).unwrap();
 
     assert_eq!(
         result,
@@ -498,7 +493,7 @@ fn issue_27() {
         Boolean(bool),
     }
 
-    let result = to_attribute_value::<_, AttributeValue>(Subject {
+    let result = to_attribute_value(Subject {
         id: String::from("test"),
         data: Data::String(String::from("the data")),
     })

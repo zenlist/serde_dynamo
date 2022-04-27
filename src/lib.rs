@@ -36,7 +36,7 @@
 //! # use chrono::{DateTime, Utc};
 //! # use serde_derive::{Serialize, Deserialize};
 //! # use serde_dynamo::to_item;
-//! # use serde_dynamo::TestAttributeValue;
+//! # use serde_dynamo::AttributeValue;
 //! # use std::collections::HashMap;
 //! #
 //! #[derive(Serialize, Deserialize)]
@@ -88,7 +88,6 @@
 //! "#;
 //! let message: Message = serde_json::from_str(input)?;
 //! let item = to_item(message)?;
-//! # let item: HashMap<String, TestAttributeValue> = item;
 //! # Ok(())
 //! # }
 //! # test().unwrap()
@@ -105,20 +104,21 @@
 //! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_10"] }
 //! ```
 //!
-//! See [`__aws_sdk_dynamodb_0_10`] for examples and more information.
+//! See [`aws_sdk_dynamodb_0_10`] for examples and more information. See
+//! [`aws_sdk_dynamodbstreams_0_10`] for DynamoDb streams support.
 //!
+//! ## aws_lambda_events support
 //!
-//! **serde_dynamo** works well with [aws-sdk-dynamodbstreams].
+//! **serde_dynamo** works well with [aws_lambda_events].
 //!
 //! Add the following to your dependencies.
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodbstreams+0_8"] }
+//! serde_dynamo = { version = "3", features = ["aws_lambda_events+0.6"] }
 //! ```
 //!
-//! See [`__aws_sdk_dynamodbstreams_0_8`] for examples and more information.
-//!
+//! See [`aws_lambda_events_0_6`] for examples and more information.
 //!
 //! ## rusoto support
 //!
@@ -131,7 +131,7 @@
 //! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.47"] }
 //! ```
 //!
-//! See [`__rusoto_dynamodb_0_47`] for examples and more information.
+//! See [`rusoto_dynamodb_0_47`] for examples and more information.
 //!
 //!
 //! ## JSON
@@ -162,7 +162,7 @@
 //! # use serde_dynamo::to_item;
 //! # use serde_derive::{Serialize, Deserialize};
 //! # use std::collections::HashMap;
-//! # use serde_dynamo::TestAttributeValue;
+//! # use serde_dynamo::AttributeValue;
 //! #
 //! # #[derive(Clone, Serialize, Deserialize)]
 //! # struct User {
@@ -178,12 +178,10 @@
 //!
 //! // Serialize directly from the data structure to an item
 //! let direct_item = to_item(user.clone())?;
-//! # let direct_item: HashMap<String, TestAttributeValue> = direct_item;
 //!
 //! // Serialize indirectly through JSON
 //! let json = serde_json::to_value(user.clone())?;
 //! let indirect_item = to_item(json)?;
-//! # let indirect_item: HashMap<String, TestAttributeValue> = indirect_item;
 //!
 //! // The result should be the same!
 //! assert_eq!(direct_item, indirect_item);
@@ -215,7 +213,7 @@
 //! [adjacently tagged enums]: https://serde.rs/enum-representations.html#adjacently-tagged
 //! [untagged enums]: https://serde.rs/enum-representations.html#untagged
 //! [aws-sdk-dynamodb]: https://docs.rs/aws-sdk-dynamodb
-//! [aws-sdk-dynamodbstreams]: https://docs.rs/aws-sdk-dynamodbstreams
+//! [aws_lambda_events]: https://docs.rs/aws_lambda_events
 //! [rusoto_dynamodb]: https://docs.rs/rusoto_dynamodb
 
 mod attribute_value;
@@ -223,79 +221,98 @@ mod de;
 mod error;
 mod macros;
 mod ser;
-mod test_attribute_value;
 
-pub use attribute_value::AttributeValue;
+pub use attribute_value::{AttributeValue, Item, Items};
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
-use macros::{aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro, rusoto_streams_macro};
+use macros::{
+    aws_lambda_events_macro, aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro,
+    rusoto_streams_macro,
+};
 pub use ser::{to_attribute_value, to_item, Serializer};
-pub use test_attribute_value::TestAttributeValue;
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_7",
     crate_name = __aws_sdk_dynamodb_0_7,
+    mod_name = aws_sdk_dynamodb_0_7,
     aws_version = "0.7",
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_8",
     crate_name = __aws_sdk_dynamodb_0_8,
+    mod_name = aws_sdk_dynamodb_0_8,
     aws_version = "0.8",
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_9",
     crate_name = __aws_sdk_dynamodb_0_9,
+    mod_name = aws_sdk_dynamodb_0_9,
     aws_version = "0.9",
 );
 
 aws_sdk_macro!(
     feature = "aws-sdk-dynamodb+0_10",
     crate_name = __aws_sdk_dynamodb_0_10,
+    mod_name = aws_sdk_dynamodb_0_10,
     aws_version = "0.10",
 );
 
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
+    mod_name = aws_sdk_dynamodbstreams_0_8,
     aws_version = "0.8",
 );
 
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_9",
     crate_name = __aws_sdk_dynamodbstreams_0_9,
+    mod_name = aws_sdk_dynamodbstreams_0_9,
     aws_version = "0.9",
 );
 
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_10",
     crate_name = __aws_sdk_dynamodbstreams_0_10,
+    mod_name = aws_sdk_dynamodbstreams_0_10,
     aws_version = "0.10",
 );
 
 rusoto_macro!(
     feature = "rusoto_dynamodb+0_46",
     crate_name = __rusoto_dynamodb_0_46,
+    mod_name = rusoto_dynamodb_0_46,
     rusoto_version = "0.46",
 );
 
 rusoto_macro!(
     feature = "rusoto_dynamodb+0_47",
     crate_name = __rusoto_dynamodb_0_47,
+    mod_name = rusoto_dynamodb_0_47,
     rusoto_version = "0.47",
 );
 
 rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_46",
     crate_name = __rusoto_dynamodbstreams_0_46,
+    mod_name = rusoto_dynamodbstreams_0_46,
     rusoto_version = "0.46",
 );
 
 rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_47",
     crate_name = __rusoto_dynamodbstreams_0_47,
+    mod_name = rusoto_dynamodbstreams_0_47,
     rusoto_version = "0.47",
+);
+
+aws_lambda_events_macro!(
+    feature = "aws_lambda_events+0_6",
+    crate_name = __aws_lambda_events_0_6,
+    mod_name = aws_lambda_events_0_6,
+    aws_lambda_events_version = "0.6",
 );
 
 #[cfg(test)]

@@ -1,7 +1,7 @@
 #![allow(clippy::float_cmp, clippy::redundant_clone, clippy::unit_cmp)]
 
 use crate::from_attribute_value;
-use crate::test_attribute_value::TestAttributeValue as AttributeValue;
+use crate::AttributeValue;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -43,7 +43,7 @@ fn deserialize_num() {
             let attribute_value = AttributeValue::N(String::from(stringify!($n)));
 
             assert_eq!(
-                from_attribute_value::<AttributeValue, $ty>(attribute_value.clone()).unwrap(),
+                from_attribute_value::<$ty>(attribute_value.clone()).unwrap(),
                 $n
             );
 
@@ -86,7 +86,7 @@ fn deserialize_char() {
 
 #[test]
 fn deserialize_unit() {
-    let attribute_value = AttributeValue::Null;
+    let attribute_value = AttributeValue::Null(true);
     let result: () = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, ());
     assert_identical_json!((), attribute_value.clone());
@@ -94,7 +94,7 @@ fn deserialize_unit() {
 
 #[test]
 fn deserialize_option() {
-    let attribute_value = AttributeValue::Null;
+    let attribute_value = AttributeValue::Null(true);
     let result: Option<u8> = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(result, None);
     assert_identical_json!(Option<u8>, attribute_value.clone());
@@ -158,7 +158,7 @@ fn deserialize_byte_arrays() {
 
     let attribute_value = AttributeValue::M(HashMap::from([(
         String::from("value"),
-        AttributeValue::BS(vec![
+        AttributeValue::Bs(vec![
             vec![116, 101, 115, 116, 0, 0, 0, 0],
             vec![2],
             vec![0, 0, 0, 0],
@@ -272,7 +272,7 @@ fn deserialize_list() {
 
 #[test]
 fn deserialize_string_list() {
-    let attribute_value = AttributeValue::SS(vec![
+    let attribute_value = AttributeValue::Ss(vec![
         String::from("1"),
         String::from("2"),
         String::from("3"),
@@ -285,7 +285,7 @@ fn deserialize_string_list() {
 
 #[test]
 fn deserialize_int_list() {
-    let attribute_value = AttributeValue::NS(vec![
+    let attribute_value = AttributeValue::Ns(vec![
         String::from("1"),
         String::from("2"),
         String::from("3"),
@@ -298,7 +298,7 @@ fn deserialize_int_list() {
 
 #[test]
 fn deserialize_float_list() {
-    let attribute_value = AttributeValue::NS(vec![
+    let attribute_value = AttributeValue::Ns(vec![
         String::from("1"),
         String::from("2"),
         String::from("0.5"),
@@ -316,7 +316,7 @@ fn deserialize_unit_struct() {
     #[derive(Debug, Deserialize, Eq, PartialEq)]
     struct Subject;
 
-    let attribute_value = AttributeValue::Null;
+    let attribute_value = AttributeValue::Null(true);
 
     let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
     assert_eq!(s, Subject);

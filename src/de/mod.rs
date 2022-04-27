@@ -1,7 +1,8 @@
-use super::AttributeValue;
-use crate::{error::ErrorImpl, Error, Result};
-use serde::Deserialize;
 use std::collections::HashMap;
+
+use super::AttributeValue;
+use crate::{error::ErrorImpl, Error, Item, Items, Result};
+use serde::Deserialize;
 
 mod deserializer;
 mod deserializer_bytes;
@@ -19,25 +20,22 @@ pub use deserializer::Deserializer;
 ///
 /// In most cases, you will want to be using [`from_item`] instead. This function is provided as a
 /// dual of [`super::to_attribute_value`] and may be useful in very narrow circumstances.
-pub fn from_attribute_value<'a, Tin, Tout>(attribute_value: Tin) -> Result<Tout>
+pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Tout::deserialize(deserializer)?;
-    Ok(t)
+    T::deserialize(deserializer)
 }
 
-/// Interpret an Item – a hashmap from [`String`] to [`AttributeValue`] – as an instance of type `T`.
+/// Interpret an [`Item`] as an instance of type `T`.
 ///
-/// TODO
-/// ```no_check
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-/// # use serde::{Serialize, Deserialize};
+/// ```
+/// # use __aws_sdk_dynamodb_0_10::client::Client;
+/// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_item;
 /// #
-/// # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
+/// # async fn scan(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
 /// #[derive(Serialize, Deserialize)]
 /// pub struct User {
 ///     id: String,
@@ -46,40 +44,32 @@ where
 /// };
 ///
 /// // Get documents from DynamoDB
-/// let input = ScanInput {
-///     table_name: "users".to_string(),
-///     ..ScanInput::default()
-/// };
-/// let result = client.scan(input).await?;
+/// let result = client.scan().table_name("user").send().await?;
 ///
 /// // And deserialize them as strongly-typed data structures
 /// for item in result.items.unwrap() {
-///     let user: User = from_item(item)?;
+///     let user: User = from_item(item.into())?;
 ///     println!("{} is {}", user.name, user.age);
 /// }
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_item<'a, Tin, Tout>(item: HashMap<String, Tin>) -> Result<Tout>
+pub fn from_item<'a, T>(item: Item) -> Result<T>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
-    let attribute_value = AttributeValue::construct_m(item);
-    let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Tout::deserialize(deserializer)?;
-    Ok(t)
+    let deserializer = Deserializer::from_attribute_value(AttributeValue::M(item.into()));
+    T::deserialize(deserializer)
 }
 
-/// Interpret a `Vec<Item>` as `Vec<T>`.
+/// Interpret a [`Items`] as a `Vec<T>`.
 ///
-/// TODO
-/// ```no_check
-/// # use rusoto_dynamodb::{DynamoDb, DynamoDbClient, ScanInput};
-/// # use serde::{Serialize, Deserialize};
+/// ```
+/// # use __aws_sdk_dynamodb_0_10::client::Client;
+/// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_items;
 /// #
-/// # async fn scan(client: &DynamoDbClient) -> Result<(), Box<dyn std::error::Error>> {
+/// # async fn scan(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
 /// #[derive(Serialize, Deserialize)]
 /// pub struct User {
 ///     id: String,
@@ -88,27 +78,22 @@ where
 /// };
 ///
 /// // Get documents from DynamoDB
-/// let input = ScanInput {
-///     table_name: "users".to_string(),
-///     ..ScanInput::default()
-/// };
-/// let result = client.scan(input).await?;
+/// let result = client.scan().table_name("user").send().await?;
 ///
 /// // And deserialize them as strongly-typed data structures
 /// if let Some(items) = result.items {
-///     let users: Vec<User> = from_items(items)?;
+///     let users: Vec<User> = from_items(items.into())?;
 ///     println!("Got {} users", users.len());
 /// }
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_items<'a, Tin, Tout>(items: Vec<HashMap<String, Tin>>) -> Result<Vec<Tout>>
+pub fn from_items<'a, T>(items: Items) -> Result<Vec<T>>
 where
-    Tin: AttributeValue,
-    Tout: Deserialize<'a>,
+    T: Deserialize<'a>,
 {
-    let attribute_value = Tin::construct_l(items.into_iter().map(Tin::construct_m).collect());
+    let items = Vec::<HashMap<String, AttributeValue>>::from(items);
+    let attribute_value = AttributeValue::L(items.into_iter().map(AttributeValue::M).collect());
     let deserializer = Deserializer::from_attribute_value(attribute_value);
-    let t = Vec::<Tout>::deserialize(deserializer)?;
-    Ok(t)
+    Vec::<T>::deserialize(deserializer)
 }
