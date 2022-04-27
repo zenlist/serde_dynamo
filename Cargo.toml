@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "3.0.4"
+version = "4.0.0-alpha.1"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2021"
 license = "MIT"
@@ -25,6 +25,7 @@ __rusoto_dynamodb_0_48 = { package = "rusoto_dynamodb", version = "0.48", defaul
 __rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = "0.46", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_47 = { package = "rusoto_dynamodbstreams", version = "0.47", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_48 = { package = "rusoto_dynamodbstreams", version = "0.48", default-features = false, optional = true }
+__aws_lambda_events_0_6 = { package = "aws_lambda_events", version = "0.6", optional = true }
 serde = "1"
 
 __rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-features = false, features = ["rustls"], optional = true }
@@ -45,6 +46,7 @@ __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-
 "rusoto_dynamodbstreams+0_46" = ["__rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["__rusoto_dynamodbstreams_0_47"]
 "rusoto_dynamodbstreams+0_48" = ["__rusoto_dynamodbstreams_0_48"]
+"aws_lambda_events+0_6" = ["__aws_lambda_events_0_6"]
 
 __doc = [
 	"__rusoto_core_0_46_crate",
@@ -57,6 +59,7 @@ __doc = [
 	"aws-sdk-dynamodbstreams+0_8",
 	"aws-sdk-dynamodbstreams+0_9",
 	"aws-sdk-dynamodbstreams+0_10",
+	"aws_lambda_events+0_6",
 ]
 
 [dev-dependencies]

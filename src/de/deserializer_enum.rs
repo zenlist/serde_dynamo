@@ -4,21 +4,18 @@ use serde::de::{
 };
 use std::collections::HashMap;
 
-pub struct DeserializerEnum<T> {
-    input: HashMap<String, T>,
+pub struct DeserializerEnum {
+    input: HashMap<String, AttributeValue>,
 }
 
-impl<T> DeserializerEnum<T> {
-    pub fn from_item(input: HashMap<String, T>) -> Self {
+impl DeserializerEnum {
+    pub fn from_item(input: HashMap<String, AttributeValue>) -> Self {
         Self { input }
     }
 }
 
-impl<'de, 'a, T> EnumAccess<'de> for DeserializerEnum<T>
-where
-    T: AttributeValue,
-{
-    type Variant = DeserializerVariant<T>;
+impl<'de, 'a> EnumAccess<'de> for DeserializerEnum {
+    type Variant = DeserializerVariant;
     type Error = Error;
 
     fn variant_seed<V>(mut self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
@@ -38,20 +35,17 @@ where
     }
 }
 
-pub struct DeserializerVariant<T> {
-    input: T,
+pub struct DeserializerVariant {
+    input: AttributeValue,
 }
 
-impl<T> DeserializerVariant<T> {
-    pub fn from_attribute_value(input: T) -> Self {
+impl DeserializerVariant {
+    pub fn from_attribute_value(input: AttributeValue) -> Self {
         Self { input }
     }
 }
 
-impl<'de, 'a, T> VariantAccess<'de> for DeserializerVariant<T>
-where
-    T: AttributeValue,
-{
+impl<'de, 'a> VariantAccess<'de> for DeserializerVariant {
     type Error = Error;
 
     fn unit_variant(self) -> Result<()> {

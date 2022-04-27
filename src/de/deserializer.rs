@@ -12,20 +12,20 @@ use serde::de::{self, IntoDeserializer, Visitor};
 
 /// A structure that deserializes [`AttributeValue`]s into Rust values.
 #[derive(Debug)]
-pub struct Deserializer<T> {
-    input: T,
+pub struct Deserializer {
+    input: AttributeValue,
 }
 
-impl<T> Deserializer<T> {
+impl Deserializer {
     /// Create a Deserializer from an AttributeValue
-    pub fn from_attribute_value(input: T) -> Self {
+    pub fn from_attribute_value(input: AttributeValue) -> Self {
         Deserializer { input }
     }
 }
 
 macro_rules! deserialize_number {
     ($self:expr, $visitor:expr, $ty:ty, $fn:ident) => {
-        if let Some(n) = $self.input.into_n() {
+        if let AttributeValue::N(n) = $self.input {
             let de = DeserializerNumber::from_string(n);
             de.$fn($visitor)
         } else {
@@ -34,10 +34,7 @@ macro_rules! deserialize_number {
     };
 }
 
-impl<'de, 'a, T> de::Deserializer<'de> for Deserializer<T>
-where
-    T: AttributeValue,
-{
+impl<'de, 'a> de::Deserializer<'de> for Deserializer {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
@@ -47,26 +44,21 @@ where
     where
         V: Visitor<'de>,
     {
-        if self.input.is_n() {
-            DeserializerNumber::from_string(self.input.into_n().unwrap()).deserialize_any(visitor)
-        } else if self.input.is_s() {
-            self.deserialize_string(visitor)
-        } else if self.input.is_bool() {
-            self.deserialize_bool(visitor)
-        } else if self.input.is_b() {
-            self.deserialize_bytes(visitor)
-        } else if self.input.is_null() {
-            self.deserialize_unit(visitor)
-        } else if self.input.is_m() {
-            self.deserialize_map(visitor)
-        } else if self.input.is_l()
-            || self.input.is_ss()
-            || self.input.is_ns()
-            || self.input.is_bs()
-        {
-            self.deserialize_seq(visitor)
+        if let AttributeValue::N(s) = self.input {
+            DeserializerNumber::from_string(s).deserialize_any(visitor)
         } else {
-            unreachable!()
+            match self.input {
+                AttributeValue::S(_) => self.deserialize_string(visitor),
+                AttributeValue::Bool(_) => self.deserialize_bool(visitor),
+                AttributeValue::B(_) => self.deserialize_bytes(visitor),
+                AttributeValue::Null(_) => self.deserialize_unit(visitor),
+                AttributeValue::M(_) => self.deserialize_map(visitor),
+                AttributeValue::L(_)
+                | AttributeValue::Ss(_)
+                | AttributeValue::Ns(_)
+                | AttributeValue::Bs(_) => self.deserialize_seq(visitor),
+                _ => unreachable!(),
+            }
         }
     }
 
@@ -144,7 +136,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(s) = self.input.into_s() {
+        if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
             Err(ErrorImpl::ExpectedString.into())
@@ -155,7 +147,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(s) = self.input.into_s() {
+        if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
             Err(ErrorImpl::ExpectedString.into())
@@ -166,24 +158,24 @@ where
     where
         V: Visitor<'de>,
     {
-        if self.input.is_l() {
-            let l = self.input.into_l().unwrap();
-            let deserializer_seq = DeserializerSeq::from_vec(l);
-            visitor.visit_seq(deserializer_seq)
-        } else if self.input.is_ss() {
-            let ss = self.input.into_ss().unwrap();
-            let deserializer_seq = DeserializerSeqStrings::from_vec(ss);
-            visitor.visit_seq(deserializer_seq)
-        } else if self.input.is_ns() {
-            let ns = self.input.into_ns().unwrap();
-            let deserializer_seq = DeserializerSeqNumbers::from_vec(ns);
-            visitor.visit_seq(deserializer_seq)
-        } else if self.input.is_bs() {
-            let bs = self.input.into_bs().unwrap();
-            let deserializer_seq = DeserializerSeqBytes::from_vec(bs);
-            visitor.visit_seq(deserializer_seq)
-        } else {
-            Err(ErrorImpl::ExpectedSeq.into())
+        match self.input {
+            AttributeValue::L(l) => {
+                let deserializer_seq = DeserializerSeq::from_vec(l);
+                visitor.visit_seq(deserializer_seq)
+            }
+            AttributeValue::Ss(ss) => {
+                let deserializer_seq = DeserializerSeqStrings::from_vec(ss);
+                visitor.visit_seq(deserializer_seq)
+            }
+            AttributeValue::Ns(ns) => {
+                let deserializer_seq = DeserializerSeqNumbers::from_vec(ns);
+                visitor.visit_seq(deserializer_seq)
+            }
+            AttributeValue::Bs(bs) => {
+                let deserializer_seq = DeserializerSeqBytes::from_vec(bs);
+                visitor.visit_seq(deserializer_seq)
+            }
+            _ => Err(ErrorImpl::ExpectedSeq.into()),
         }
     }
 
@@ -191,7 +183,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(mut m) = self.input.into_m() {
+        if let AttributeValue::M(mut m) = self.input {
             let deserializer_map = DeserializerMap::from_item(&mut m);
             visitor.visit_map(deserializer_map)
         } else {
@@ -203,7 +195,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(b) = self.input.into_bool() {
+        if let AttributeValue::Bool(b) = self.input {
             visitor.visit_bool(b)
         } else {
             Err(ErrorImpl::ExpectedBool.into())
@@ -214,7 +206,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(s) = self.input.into_s() {
+        if let AttributeValue::S(s) = self.input {
             let mut chars = s.chars();
             if let Some(ch) = chars.next() {
                 let result = visitor.visit_char(ch)?;
@@ -235,7 +227,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(true) = self.input.into_null() {
+        if let AttributeValue::Null(true) = self.input {
             visitor.visit_unit()
         } else {
             Err(ErrorImpl::ExpectedUnit.into())
@@ -251,14 +243,10 @@ where
     where
         V: Visitor<'de>,
     {
-        if self.input.is_s() {
-            let s = self.input.into_s().unwrap();
-            visitor.visit_enum(s.into_deserializer())
-        } else if self.input.is_m() {
-            let m = self.input.into_m().unwrap();
-            visitor.visit_enum(DeserializerEnum::from_item(m))
-        } else {
-            Err(ErrorImpl::ExpectedEnum.into())
+        match self.input {
+            AttributeValue::S(s) => visitor.visit_enum(s.into_deserializer()),
+            AttributeValue::M(m) => visitor.visit_enum(DeserializerEnum::from_item(m)),
+            _ => Err(ErrorImpl::ExpectedEnum.into()),
         }
     }
 
@@ -266,7 +254,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(b) = self.input.into_b() {
+        if let AttributeValue::B(b) = self.input {
             let de = DeserializerBytes::from_bytes(b);
             de.deserialize_bytes(visitor)
         } else {
@@ -285,7 +273,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(true) = self.input.as_null() {
+        if let AttributeValue::Null(true) = self.input {
             visitor.visit_none()
         } else {
             visitor.visit_some(self)
@@ -315,7 +303,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(s) = self.input.into_s() {
+        if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
             Err(ErrorImpl::ExpectedString.into())
@@ -330,7 +318,7 @@ where
     where
         V: Visitor<'de>,
     {
-        if let Some(true) = self.input.into_null() {
+        if let AttributeValue::Null(true) = self.input {
             visitor.visit_unit()
         } else {
             Err(ErrorImpl::ExpectedUnitStruct.into())

@@ -2,12 +2,12 @@ use super::{AttributeValue, Error, Result, Serializer};
 use serde::{ser, Serialize};
 use std::collections::HashMap;
 
-pub struct SerializerStructVariant<T> {
+pub struct SerializerStructVariant {
     key: &'static str,
-    item: HashMap<String, T>,
+    item: HashMap<String, AttributeValue>,
 }
 
-impl<T> SerializerStructVariant<T> {
+impl SerializerStructVariant {
     pub fn new(key: &'static str, len: usize) -> Self {
         Self {
             key,
@@ -16,11 +16,8 @@ impl<T> SerializerStructVariant<T> {
     }
 }
 
-impl<'a, T> ser::SerializeStructVariant for SerializerStructVariant<T>
-where
-    T: AttributeValue,
-{
-    type Ok = T;
+impl<'a> ser::SerializeStructVariant for SerializerStructVariant {
+    type Ok = AttributeValue;
     type Error = Error;
 
     fn serialize_field<F: ?Sized>(
@@ -31,7 +28,7 @@ where
     where
         F: Serialize,
     {
-        let serializer = Serializer::<T>::default();
+        let serializer = Serializer::default();
         let value = value.serialize(serializer)?;
         self.item.insert(key.to_string(), value);
         Ok(())
@@ -39,8 +36,8 @@ where
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
         let mut hashmap = HashMap::with_capacity(1);
-        hashmap.insert(self.key.to_string(), T::construct_m(self.item));
+        hashmap.insert(self.key.to_string(), AttributeValue::M(self.item));
 
-        Ok(T::construct_m(hashmap))
+        Ok(AttributeValue::M(hashmap))
     }
 }

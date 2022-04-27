@@ -3,22 +3,19 @@ use super::deserializer_number::DeserializerNumber;
 use super::{AttributeValue, Deserializer, Error, Result};
 use serde::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
-pub struct DeserializerSeq<T> {
-    iter: std::vec::IntoIter<T>,
+pub struct DeserializerSeq {
+    iter: std::vec::IntoIter<AttributeValue>,
 }
 
-impl<T> DeserializerSeq<T> {
-    pub fn from_vec(vec: Vec<T>) -> Self {
+impl DeserializerSeq {
+    pub fn from_vec(vec: Vec<AttributeValue>) -> Self {
         Self {
             iter: vec.into_iter(),
         }
     }
 }
 
-impl<'de, 'a, T> SeqAccess<'de> for DeserializerSeq<T>
-where
-    T: AttributeValue,
-{
+impl<'de, 'a> SeqAccess<'de> for DeserializerSeq {
     type Error = Error;
 
     fn next_element_seed<S>(&mut self, seed: S) -> Result<Option<S::Value>, Self::Error>
