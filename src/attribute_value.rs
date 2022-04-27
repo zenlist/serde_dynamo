@@ -1,90 +1,130 @@
 use std::collections::HashMap;
 
-/// A type that can be used as a DynamoDb attribute value
-///
-/// This trait will not typically be used by user code. It exists to abstract over the
-/// `AttributeValue` definitions in different libraries: `aws-sdk-dynamodb`, `rusoto_dynamodb`, and
-/// `rusoto_dynamodbstreams`.
-pub trait AttributeValue: Sized {
-    /// Determine if the attribute value represents a number
-    fn is_n(&self) -> bool;
-    /// Determine if the attribute value represents a string
-    fn is_s(&self) -> bool;
-    /// Determine if the attribute value represents a boolean
-    fn is_bool(&self) -> bool;
-    /// Determine if the attribute value represents bytes
-    fn is_b(&self) -> bool;
-    /// Determine if the attribute value represents a null
-    fn is_null(&self) -> bool;
-    /// Determine if the attribute value represents a map of string/attribute value pairs
-    fn is_m(&self) -> bool;
-    /// Determine if the attribute value represents a list of attribute values
-    fn is_l(&self) -> bool;
-    /// Determine if the attribute value represents a list of strings
-    fn is_ss(&self) -> bool;
-    /// Determine if the attribute value represents a list of numbers
-    fn is_ns(&self) -> bool;
-    /// Determine if the attribute value represents a list of byte strings
-    fn is_bs(&self) -> bool;
+/// The value for an attribute that comes from DynamoDb.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum AttributeValue {
+    /// An attribute of type Number. For example:
+    ///
+    /// ```text
+    /// "N": "123.45"
+    /// ```
+    ///
+    /// Numbers are sent across the network to DynamoDB as strings, to maximize compatibility across
+    /// languages and libraries. However, DynamoDB treats them as number type attributes for
+    /// mathematical operations.
+    N(String),
+    /// An attribute of type String. For example:
+    ///
+    /// ```text
+    /// "S": "Hello"
+    /// ```
+    S(String),
+    /// An attribute of type Boolean. For example:
+    ///
+    /// ```text
+    /// "BOOL": true
+    /// ```
+    Bool(bool),
+    /// An attribute of type Binary. For example:
+    ///
+    /// ```text
+    /// "B": "dGhpcyB0ZXh0IGlzIGJhc2U2NC1lbmNvZGVk"
+    /// ```
+    ///
+    /// Type: Base64-encoded binary data object
+    B(Vec<u8>),
+    /// An attribute of type Null. For example:
+    ///
+    /// ```text
+    /// "NULL": true
+    /// ```
+    Null(bool),
+    /// An attribute of type Map. For example:
+    ///
+    /// ```text
+    /// "M": {"Name": {"S": "Joe"}, "Age": {"N": "35"}}
+    /// ```
+    ///
+    /// Key Length Constraints: Maximum length of 65535.
+    M(HashMap<String, AttributeValue>),
+    /// An attribute of type List. For example:
+    ///
+    /// ```text
+    /// "L": [ {"S": "Cookies"} , {"S": "Coffee"}, {"N": "3.14159"}]
+    /// ```
+    L(Vec<AttributeValue>),
+    /// An attribute of type String Set. For example:
+    ///
+    /// ```text
+    /// "SS": ["Giraffe", "Hippo" ,"Zebra"]
+    /// ```
+    Ss(Vec<String>),
+    /// An attribute of type Number Set. For example:
+    ///
+    /// ```text
+    /// "NS": ["42.2", "-19", "7.5", "3.14"]
+    /// ```
+    ///
+    /// Numbers are sent across the network to DynamoDB as strings, to maximize compatibility across
+    /// languages and libraries. However, DynamoDB treats them as number type attributes for
+    /// mathematical operations.
+    Ns(Vec<String>),
+    /// An attribute of type Binary Set. For example:
+    ///
+    /// ```text
+    /// "BS": ["U3Vubnk=", "UmFpbnk=", "U25vd3k="]
+    /// ```
+    ///
+    /// Type: Array of Base64-encoded binary data objects
+    Bs(Vec<Vec<u8>>),
+}
 
-    /// Get the number without consuming the attribute value
-    fn as_n(&self) -> Option<&str>;
-    /// Get the string without consuming the attribute value
-    fn as_s(&self) -> Option<&str>;
-    /// Get the bool without consuming the attribute value
-    fn as_bool(&self) -> Option<bool>;
-    /// Get the bytes without consuming the attribute value
-    fn as_b(&self) -> Option<&[u8]>;
-    /// Get the bool without consuming the attribute value
-    fn as_null(&self) -> Option<bool>;
-    /// Get the map without consuming the attribute value
-    fn as_m(&self) -> Option<&HashMap<String, Self>>;
-    /// Get the list without consuming the attribute value
-    fn as_l(&self) -> Option<&[Self]>;
-    /// Get the string list without consuming the attribute value
-    fn as_ss(&self) -> Option<&[String]>;
-    /// Get the number list without consuming the attribute value
-    fn as_ns(&self) -> Option<&[String]>;
+/// An item that comes from DynamoDb.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct Item(HashMap<String, AttributeValue>);
 
-    /// Consume the attribute value and return the number
-    fn into_n(self) -> Option<String>;
-    /// Consume the attribute value and return the string
-    fn into_s(self) -> Option<String>;
-    /// Consume the attribute value and return the boolan
-    fn into_bool(self) -> Option<bool>;
-    /// Consume the attribute value and return the bytes
-    fn into_b(self) -> Option<Vec<u8>>;
-    /// Consume the attribute value and return the null
-    fn into_null(self) -> Option<bool>;
-    /// Consume the attribute value and return the map
-    fn into_m(self) -> Option<HashMap<String, Self>>;
-    /// Consume the attribute value and return the list
-    fn into_l(self) -> Option<Vec<Self>>;
-    /// Consume the attribute value and return the string list
-    fn into_ss(self) -> Option<Vec<String>>;
-    /// Consume the attribute value and return the number list
-    fn into_ns(self) -> Option<Vec<String>>;
-    /// Consume the attribute value and return the byte string list
-    fn into_bs(self) -> Option<Vec<Vec<u8>>>;
+impl<T> From<Item> for HashMap<String, T>
+where
+    T: From<AttributeValue>,
+{
+    fn from(Item(m): Item) -> Self {
+        m.into_iter()
+            .map(|(key, value)| (key, T::from(value)))
+            .collect()
+    }
+}
 
-    /// Create a new attribute value from a number
-    fn construct_n(input: String) -> Self;
-    /// Create a new attribute value from a string
-    fn construct_s(input: String) -> Self;
-    /// Create a new attribute value from a bool
-    fn construct_bool(input: bool) -> Self;
-    /// Create a new attribute value from bytes
-    fn construct_b(input: &[u8]) -> Self;
-    /// Create a new attribute value from a null
-    fn construct_null(input: bool) -> Self;
-    /// Create a new attribute value from a map
-    fn construct_m(input: HashMap<String, Self>) -> Self;
-    /// Create a new attribute value from a list
-    fn construct_l(input: Vec<Self>) -> Self;
-    /// Create a new attribute value from a string list
-    fn construct_ss(input: Vec<String>) -> Self;
-    /// Create a new attribute value from a number list
-    fn construct_ns(input: Vec<String>) -> Self;
-    /// Create a new attribute value from a byte string list
-    fn construct_bs(input: Vec<Vec<u8>>) -> Self;
+impl<T> From<HashMap<String, T>> for Item
+where
+    AttributeValue: From<T>,
+{
+    fn from(m: HashMap<String, T>) -> Self {
+        Item(
+            m.into_iter()
+                .map(|(key, value)| (key, AttributeValue::from(value)))
+                .collect(),
+        )
+    }
+}
+
+/// Multiple items that come from DynamoDb.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct Items(Vec<Item>);
+
+impl<T> From<Items> for Vec<HashMap<String, T>>
+where
+    HashMap<String, T>: From<Item>,
+{
+    fn from(Items(items): Items) -> Self {
+        items.into_iter().map(Into::into).collect()
+    }
+}
+
+impl<T> From<Vec<HashMap<String, T>>> for Items
+where
+    Item: From<HashMap<String, T>>,
+{
+    fn from(items: Vec<HashMap<String, T>>) -> Self {
+        Items(items.into_iter().map(Into::into).collect())
+    }
 }
