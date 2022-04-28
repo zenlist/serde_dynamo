@@ -128,10 +128,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.47"] }
+//! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.48"] }
 //! ```
 //!
-//! See [`__rusoto_dynamodb_0_47`] for examples and more information.
+//! See [`__rusoto_dynamodb_0_48`] for examples and more information.
 //!
 //!
 //! ## JSON
@@ -206,7 +206,7 @@
 //! See the [modules](#modules) section for all possible features. Feature names are largely
 //! guessable: the library name, a plus, and the library version (with underscores instead of dots,
 //! because crates.io doesn't support feature names with dots). For example, support for
-//! `rusoto_dynamodb` version `0.47` is enabled with the feature `rusoto_dynamodb+0_47`.
+//! `rusoto_dynamodb` version `0.48` is enabled with the feature `rusoto_dynamodb+0_48`.
 //!
 //! [DynamoDB]: https://aws.amazon.com/dynamodb/
 //! [serde]: https://docs.rs/serde
