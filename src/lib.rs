@@ -286,6 +286,12 @@ rusoto_macro!(
     rusoto_version = "0.47",
 );
 
+rusoto_macro!(
+    feature = "rusoto_dynamodb+0_48",
+    crate_name = __rusoto_dynamodb_0_48,
+    rusoto_version = "0.48",
+);
+
 rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_46",
     crate_name = __rusoto_dynamodbstreams_0_46,
@@ -296,6 +302,12 @@ rusoto_streams_macro!(
     feature = "rusoto_dynamodbstreams+0_47",
     crate_name = __rusoto_dynamodbstreams_0_47,
     rusoto_version = "0.47",
+);
+
+rusoto_streams_macro!(
+    feature = "rusoto_dynamodbstreams+0_48",
+    crate_name = __rusoto_dynamodbstreams_0_48,
+    rusoto_version = "0.48",
 );
 
 #[cfg(test)]

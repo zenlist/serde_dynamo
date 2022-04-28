@@ -21,12 +21,15 @@ __aws_sdk_dynamodbstreams_0_9 = { package = "aws-sdk-dynamodbstreams", version =
 __aws_sdk_dynamodbstreams_0_10 = { package = "aws-sdk-dynamodbstreams", version = "0.10", default-features = false, optional = true }
 __rusoto_dynamodb_0_46 = { package = "rusoto_dynamodb", version = "0.46", default-features = false, optional = true }
 __rusoto_dynamodb_0_47 = { package = "rusoto_dynamodb", version = "0.47", default-features = false, optional = true }
+__rusoto_dynamodb_0_48 = { package = "rusoto_dynamodb", version = "0.48", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = "0.46", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_47 = { package = "rusoto_dynamodbstreams", version = "0.47", default-features = false, optional = true }
+__rusoto_dynamodbstreams_0_48 = { package = "rusoto_dynamodbstreams", version = "0.48", default-features = false, optional = true }
 serde = "1"
 
 __rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-features = false, features = ["rustls"], optional = true }
 __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-features = false, features = ["rustls"], optional = true }
+__rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-features = false, features = ["rustls"], optional = true }
 
 [features]
 "aws-sdk-dynamodb+0_7" = ["__aws_sdk_dynamodb_0_7"]
@@ -38,12 +41,15 @@ __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-
 "aws-sdk-dynamodbstreams+0_10" = ["__aws_sdk_dynamodbstreams_0_10"]
 "rusoto_dynamodb+0_46" = ["__rusoto_dynamodb_0_46"]
 "rusoto_dynamodb+0_47" = ["__rusoto_dynamodb_0_47"]
+"rusoto_dynamodb+0_48" = ["__rusoto_dynamodb_0_48"]
 "rusoto_dynamodbstreams+0_46" = ["__rusoto_dynamodbstreams_0_46"]
 "rusoto_dynamodbstreams+0_47" = ["__rusoto_dynamodbstreams_0_47"]
+"rusoto_dynamodbstreams+0_48" = ["__rusoto_dynamodbstreams_0_48"]
 
 __doc = [
 	"__rusoto_core_0_46_crate",
 	"__rusoto_core_0_47_crate",
+	"__rusoto_core_0_48_crate",
 	"aws-sdk-dynamodb+0_7",
 	"aws-sdk-dynamodb+0_8",
 	"aws-sdk-dynamodb+0_9",
