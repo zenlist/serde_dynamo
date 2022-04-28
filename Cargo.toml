@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "3.0.3"
+version = "3.0.4"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2021"
 license = "MIT"
