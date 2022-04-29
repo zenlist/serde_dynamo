@@ -12,7 +12,7 @@ repository = "https://github.com/zenlist/serde_dynamo"
 keywords = ["serde", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
 
 [dependencies]
-__aws_lambda_events_dynamodb_0_6 = { package = "aws_lambda_events", version = "0.6", default-features = false, features = ["dynamodb"], optional = true }
+__aws_lambda_events_dynamodb_0_6 = { package="aws_lambda_events", version = "0.6.2", default-features = false, features = ["dynamodb"], optional = true }
 __aws_sdk_dynamodb_0_7 = { package = "aws-sdk-dynamodb", version = "0.7", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_8 = { package = "aws-sdk-dynamodb", version = "0.8", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_9 = { package = "aws-sdk-dynamodb", version = "0.9", default-features = false, optional = true }

@@ -214,12 +214,7 @@ macro_rules! aws_lambda_events_macro {
                 }
 
                 fn as_n(&self) -> Option<&str> {
-                    None
-                    // if let AttributeValue::N(ref v) = self {
-                    //     Some(v)
-                    // } else {
-                    //     None
-                    // }
+                    unimplemented!()
                 }
 
                 fn as_s(&self) -> Option<&str> {
