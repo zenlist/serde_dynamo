@@ -11,16 +11,16 @@ stored in these items and strongly-typed Rust data structures.
 * [serde_dynamo on GitHub](https://github.com/zenlist/serde_dynamo)
 
 
-## Examples
-
-See [the docs](https://docs.rs/serde_dynamo) for more examples.
-
-
 ## Features
 
 Support for [aws-sdk-dynamodb], [aws_lambda_events], and [rusoto_dynamodb] is
 provided via features. See [the docs](https://docs.rs/serde_dynamo) for more
 details.
+
+
+## Examples
+
+See [the docs](https://docs.rs/serde_dynamo) for more examples.
 
 
 ### Parsing items as strongly-typed data structures.
@@ -56,7 +56,7 @@ for item in result.items.unwrap() {
 ```
 
 
-## Creating items by serializing data structures
+### Creating items by serializing data structures
 
 Writing an entire data structure to DynamoDB typically involves using `to_item` to serialize
 it.
