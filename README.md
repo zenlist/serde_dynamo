@@ -18,7 +18,7 @@ See [the docs](https://docs.rs/serde_dynamo) for more examples.
 
 ## Features
 
-Support for [aws-sdk-dynamodb], [aws-lambda-events], and [rusoto_dynamodb] is
+Support for [aws-sdk-dynamodb], [aws_lambda_events], and [rusoto_dynamodb] is
 provided via features. See [the docs](https://docs.rs/serde_dynamo) for more
 details.
 
