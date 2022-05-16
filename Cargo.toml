@@ -1,6 +1,6 @@
 [package]
 name = "serde_dynamo"
-version = "4.0.0"
+version = "4.0.1"
 authors = ["Bryan Burgers <bryan@burgers.io>"]
 edition = "2021"
 license = "MIT"
@@ -9,7 +9,7 @@ readme = "README.md"
 documentation = "https://docs.rs/serde_dynamo"
 homepage = "https://github.com/zenlist/serde_dynamo"
 repository = "https://github.com/zenlist/serde_dynamo"
-keywords = ["serde", "aws-sdk", "aws", "sdk", "rusoto", "dynamodb", "dynamo", "serde_dynamodb"]
+keywords = ["serde", "aws-sdk", "rusoto", "dynamodb", "serde_dynamodb"]
 
 [dependencies]
 __aws_lambda_events_0_6 = { package = "aws_lambda_events", version = "0.6", default-features = false, features = ["dynamodb"], optional = true }
