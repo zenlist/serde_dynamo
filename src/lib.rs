@@ -207,7 +207,7 @@
 //! See the [modules](#modules) section for all possible features. Feature names are largely
 //! guessable: the library name, a plus, and the library version (with underscores instead of dots,
 //! because crates.io doesn't support feature names with dots). For example, support for
-//! `aws-sdk-dynamodb` version `0.12` is enabled with the feature `aws-sdk-dynamodb+0_12`.
+//! `aws-sdk-dynamodb` version `0.13` is enabled with the feature `aws-sdk-dynamodb+0_13`.
 //!
 //! [DynamoDB]: https://aws.amazon.com/dynamodb/
 //! [serde]: https://docs.rs/serde
@@ -276,6 +276,13 @@ aws_sdk_macro!(
     aws_version = "0.12",
 );
 
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_13",
+    crate_name = __aws_sdk_dynamodb_0_13,
+    mod_name = aws_sdk_dynamodb_0_13,
+    aws_version = "0.13",
+);
+
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
@@ -309,6 +316,13 @@ aws_sdk_streams_macro!(
     crate_name = __aws_sdk_dynamodbstreams_0_12,
     mod_name = aws_sdk_dynamodbstreams_0_12,
     aws_version = "0.12",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_13",
+    crate_name = __aws_sdk_dynamodbstreams_0_13,
+    mod_name = aws_sdk_dynamodbstreams_0_13,
+    aws_version = "0.13",
 );
 
 rusoto_macro!(
