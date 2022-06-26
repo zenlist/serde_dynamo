@@ -283,6 +283,13 @@ aws_sdk_macro!(
     aws_version = "0.13",
 );
 
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_14",
+    crate_name = __aws_sdk_dynamodb_0_14,
+    mod_name = aws_sdk_dynamodb_0_14,
+    aws_version = "0.14",
+);
+
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
@@ -323,6 +330,13 @@ aws_sdk_streams_macro!(
     crate_name = __aws_sdk_dynamodbstreams_0_13,
     mod_name = aws_sdk_dynamodbstreams_0_13,
     aws_version = "0.13",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_14",
+    crate_name = __aws_sdk_dynamodbstreams_0_14,
+    mod_name = aws_sdk_dynamodbstreams_0_14,
+    aws_version = "0.14",
 );
 
 rusoto_macro!(
