@@ -102,11 +102,11 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_12"] }
+//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_15"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_12`] for examples and more information. See
-//! [`aws_sdk_dynamodbstreams_0_12`] for DynamoDb streams support.
+//! See [`aws_sdk_dynamodb_0_15`] for examples and more information. See
+//! [`aws_sdk_dynamodbstreams_0_15`] for DynamoDb streams support.
 //!
 //! ## aws_lambda_events support
 //!
@@ -290,6 +290,13 @@ aws_sdk_macro!(
     aws_version = "0.14",
 );
 
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_15",
+    crate_name = __aws_sdk_dynamodb_0_15,
+    mod_name = aws_sdk_dynamodb_0_15,
+    aws_version = "0.15",
+);
+
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
@@ -337,6 +344,13 @@ aws_sdk_streams_macro!(
     crate_name = __aws_sdk_dynamodbstreams_0_14,
     mod_name = aws_sdk_dynamodbstreams_0_14,
     aws_version = "0.14",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_15",
+    crate_name = __aws_sdk_dynamodbstreams_0_15,
+    mod_name = aws_sdk_dynamodbstreams_0_15,
+    aws_version = "0.15",
 );
 
 rusoto_macro!(
