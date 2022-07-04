@@ -14,7 +14,7 @@ impl DeserializerEnum {
     }
 }
 
-impl<'de, 'a> EnumAccess<'de> for DeserializerEnum {
+impl<'de> EnumAccess<'de> for DeserializerEnum {
     type Variant = DeserializerVariant;
     type Error = Error;
 
@@ -45,7 +45,7 @@ impl DeserializerVariant {
     }
 }
 
-impl<'de, 'a> VariantAccess<'de> for DeserializerVariant {
+impl<'de> VariantAccess<'de> for DeserializerVariant {
     type Error = Error;
 
     fn unit_variant(self) -> Result<()> {

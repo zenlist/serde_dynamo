@@ -14,7 +14,7 @@ impl SerializerStruct {
     }
 }
 
-impl<'a> ser::SerializeStruct for SerializerStruct {
+impl ser::SerializeStruct for SerializerStruct {
     type Ok = AttributeValue;
     type Error = Error;
 

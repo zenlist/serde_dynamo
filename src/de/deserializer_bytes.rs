@@ -12,7 +12,7 @@ impl<T> DeserializerBytes<T> {
     }
 }
 
-impl<'de, 'a, T> de::Deserializer<'de> for DeserializerBytes<T>
+impl<'de, T> de::Deserializer<'de> for DeserializerBytes<T>
 where
     T: AsRef<[u8]>,
 {

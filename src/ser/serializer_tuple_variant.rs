@@ -16,7 +16,7 @@ impl SerializerTupleVariant {
     }
 }
 
-impl<'a> ser::SerializeTupleVariant for SerializerTupleVariant {
+impl ser::SerializeTupleVariant for SerializerTupleVariant {
     type Ok = AttributeValue;
     type Error = Error;
 

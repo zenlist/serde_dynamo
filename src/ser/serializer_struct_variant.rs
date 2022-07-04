@@ -16,7 +16,7 @@ impl SerializerStructVariant {
     }
 }
 
-impl<'a> ser::SerializeStructVariant for SerializerStructVariant {
+impl ser::SerializeStructVariant for SerializerStructVariant {
     type Ok = AttributeValue;
     type Error = Error;
 

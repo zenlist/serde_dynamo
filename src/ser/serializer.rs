@@ -9,7 +9,7 @@ use std::collections::HashMap;
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Serializer;
 
-impl<'a> ser::Serializer for Serializer {
+impl ser::Serializer for Serializer {
     type Ok = AttributeValue;
     type Error = Error;
 

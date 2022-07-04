@@ -15,7 +15,7 @@ impl DeserializerSeq {
     }
 }
 
-impl<'de, 'a> SeqAccess<'de> for DeserializerSeq {
+impl<'de> SeqAccess<'de> for DeserializerSeq {
     type Error = Error;
 
     fn next_element_seed<S>(&mut self, seed: S) -> Result<Option<S::Value>, Self::Error>
@@ -43,7 +43,7 @@ impl DeserializerSeqStrings {
     }
 }
 
-impl<'de, 'a> SeqAccess<'de> for DeserializerSeqStrings {
+impl<'de> SeqAccess<'de> for DeserializerSeqStrings {
     type Error = Error;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -71,7 +71,7 @@ impl DeserializerSeqNumbers {
     }
 }
 
-impl<'de, 'a> SeqAccess<'de> for DeserializerSeqNumbers {
+impl<'de> SeqAccess<'de> for DeserializerSeqNumbers {
     type Error = Error;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -99,7 +99,7 @@ impl<T> DeserializerSeqBytes<T> {
     }
 }
 
-impl<'de, 'a, B> SeqAccess<'de> for DeserializerSeqBytes<B>
+impl<'de, B> SeqAccess<'de> for DeserializerSeqBytes<B>
 where
     B: AsRef<[u8]>,
 {
