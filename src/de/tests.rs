@@ -85,6 +85,7 @@ fn deserialize_char() {
 }
 
 #[test]
+#[allow(clippy::let_unit_value)]
 fn deserialize_unit() {
     let attribute_value = AttributeValue::Null(true);
     let result: () = from_attribute_value(attribute_value.clone()).unwrap();

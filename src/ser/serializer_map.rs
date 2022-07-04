@@ -21,7 +21,7 @@ impl SerializerMap {
     }
 }
 
-impl<'a> ser::SerializeMap for SerializerMap {
+impl ser::SerializeMap for SerializerMap {
     type Ok = AttributeValue;
     type Error = Error;
 
@@ -74,7 +74,7 @@ impl<'a> ser::SerializeMap for SerializerMap {
 
 struct MapKeySerializer;
 
-impl<'a> ser::Serializer for MapKeySerializer {
+impl ser::Serializer for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -226,7 +226,7 @@ impl<'a> ser::Serializer for MapKeySerializer {
     }
 }
 
-impl<'a> ser::SerializeSeq for MapKeySerializer {
+impl ser::SerializeSeq for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -241,7 +241,7 @@ impl<'a> ser::SerializeSeq for MapKeySerializer {
         unreachable!()
     }
 }
-impl<'a> ser::SerializeTuple for MapKeySerializer {
+impl ser::SerializeTuple for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -256,7 +256,7 @@ impl<'a> ser::SerializeTuple for MapKeySerializer {
         unreachable!()
     }
 }
-impl<'a> ser::SerializeTupleStruct for MapKeySerializer {
+impl ser::SerializeTupleStruct for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -271,7 +271,7 @@ impl<'a> ser::SerializeTupleStruct for MapKeySerializer {
         unreachable!()
     }
 }
-impl<'a> ser::SerializeTupleVariant for MapKeySerializer {
+impl ser::SerializeTupleVariant for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -287,7 +287,7 @@ impl<'a> ser::SerializeTupleVariant for MapKeySerializer {
     }
 }
 
-impl<'a> ser::SerializeStructVariant for MapKeySerializer {
+impl ser::SerializeStructVariant for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -307,7 +307,7 @@ impl<'a> ser::SerializeStructVariant for MapKeySerializer {
     }
 }
 
-impl<'a> ser::SerializeMap for MapKeySerializer {
+impl ser::SerializeMap for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
@@ -342,7 +342,7 @@ impl<'a> ser::SerializeMap for MapKeySerializer {
     }
 }
 
-impl<'a> ser::SerializeStruct for MapKeySerializer {
+impl ser::SerializeStruct for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 

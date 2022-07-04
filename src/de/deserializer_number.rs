@@ -47,7 +47,7 @@ macro_rules! deserialize_float {
     }};
 }
 
-impl<'de, 'a> de::Deserializer<'de> for DeserializerNumber {
+impl<'de> de::Deserializer<'de> for DeserializerNumber {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to

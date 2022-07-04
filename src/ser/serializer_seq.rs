@@ -17,7 +17,7 @@ impl SerializerSeq {
     }
 }
 
-impl<'a> ser::SerializeSeq for SerializerSeq {
+impl ser::SerializeSeq for SerializerSeq {
     type Ok = AttributeValue;
     type Error = Error;
 
@@ -38,7 +38,7 @@ impl<'a> ser::SerializeSeq for SerializerSeq {
     }
 }
 
-impl<'a> ser::SerializeTupleStruct for SerializerSeq {
+impl ser::SerializeTupleStruct for SerializerSeq {
     type Ok = AttributeValue;
     type Error = Error;
 
@@ -58,7 +58,7 @@ impl<'a> ser::SerializeTupleStruct for SerializerSeq {
     }
 }
 
-impl<'a> ser::SerializeTuple for SerializerSeq {
+impl ser::SerializeTuple for SerializerSeq {
     type Ok = AttributeValue;
     type Error = Error;
 
