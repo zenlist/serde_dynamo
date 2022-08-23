@@ -33,7 +33,7 @@ where
 /// Interpret an [`Item`] as an instance of type `T`.
 ///
 /// ```no_run
-/// # use __aws_sdk_dynamodb_0_16::client::Client;
+/// # use __aws_sdk_dynamodb_0_17::client::Client;
 /// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_item;
 /// #
@@ -69,7 +69,7 @@ where
 /// Interpret a [`Items`] as a `Vec<T>`.
 ///
 /// ```no_run
-/// # use __aws_sdk_dynamodb_0_16::client::Client;
+/// # use __aws_sdk_dynamodb_0_17::client::Client;
 /// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_items;
 /// #
