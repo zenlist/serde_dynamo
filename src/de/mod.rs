@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 use super::AttributeValue;
 use crate::{error::ErrorImpl, Error, Item, Items, Result};
 use serde::Deserialize;
+use std::collections::HashMap;
 
 mod deserializer;
 mod deserializer_bytes;
@@ -33,7 +32,7 @@ where
 /// Interpret an [`Item`] as an instance of type `T`.
 ///
 /// ```no_run
-/// # use __aws_sdk_dynamodb_0_17::client::Client;
+/// # use __aws_sdk_dynamodb_0_18::client::Client;
 /// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_item;
 /// #
@@ -69,7 +68,7 @@ where
 /// Interpret a [`Items`] as a `Vec<T>`.
 ///
 /// ```no_run
-/// # use __aws_sdk_dynamodb_0_17::client::Client;
+/// # use __aws_sdk_dynamodb_0_18::client::Client;
 /// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::from_items;
 /// #
