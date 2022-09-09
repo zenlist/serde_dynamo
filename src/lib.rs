@@ -102,7 +102,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws-sdk-dynamodb+0_18"] }
+//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_18"] }
 //! ```
 //!
 //! See [`aws_sdk_dynamodb_0_18`] for examples and more information. See
@@ -116,7 +116,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["aws_lambda_events+0.6"] }
+//! serde_dynamo = { version = "4", features = ["aws_lambda_events+0.6"] }
 //! ```
 //!
 //! See [`aws_lambda_events_0_6`] for examples and more information.
@@ -129,7 +129,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "3", features = ["rusoto_dynamodb+0.48"] }
+//! serde_dynamo = { version = "4", features = ["rusoto_dynamodb+0.48"] }
 //! ```
 //!
 //! See [`rusoto_dynamodb_0_48`] for examples and more information.
