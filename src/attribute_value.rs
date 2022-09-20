@@ -107,6 +107,20 @@ where
     }
 }
 
+impl<T> From<&HashMap<String, T>> for Item
+where
+    AttributeValue: From<T>,
+    T: Clone,
+{
+    fn from(m: &HashMap<String, T>) -> Self {
+        Item(
+            m.into_iter()
+                .map(|(key, value)| (key.clone(), AttributeValue::from(value.clone())))
+                .collect(),
+        )
+    }
+}
+
 /// Multiple items that come from DynamoDb.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Items(Vec<Item>);
@@ -126,5 +140,20 @@ where
 {
     fn from(items: Vec<HashMap<String, T>>) -> Self {
         Items(items.into_iter().map(Into::into).collect())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::from_item;
+    use serde_json::Value;
+
+    #[test]
+    fn from_item_aws_sdk_works() {
+        let mut item = HashMap::new();
+        item.insert("key".to_string(), AttributeValue::S("val".to_string()));
+
+        let _deserialized: Value = from_item(&item).unwrap();
     }
 }
