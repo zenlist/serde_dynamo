@@ -116,10 +116,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "4", features = ["aws_lambda_events+0.6"] }
+//! serde_dynamo = { version = "4", features = ["aws_lambda_events+0.7"] }
 //! ```
 //!
-//! See [`aws_lambda_events_0_6`] for examples and more information.
+//! See [`aws_lambda_events_0_7`] for examples and more information.
 //!
 //! ## rusoto support
 //!
@@ -456,6 +456,13 @@ aws_lambda_events_macro!(
     crate_name = __aws_lambda_events_0_6,
     mod_name = aws_lambda_events_0_6,
     aws_lambda_events_version = "0.6",
+);
+
+aws_lambda_events_macro!(
+    feature = "aws_lambda_events+0_7",
+    crate_name = __aws_lambda_events_0_7,
+    mod_name = aws_lambda_events_0_7,
+    aws_lambda_events_version = "0.7",
 );
 
 #[cfg(test)]

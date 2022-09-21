@@ -13,6 +13,7 @@ keywords = ["serde", "aws-sdk", "rusoto", "dynamodb", "serde_dynamodb"]
 
 [dependencies]
 __aws_lambda_events_0_6 = { package = "aws_lambda_events", version = "0.6", default-features = false, features = ["dynamodb"], optional = true }
+__aws_lambda_events_0_7 = { package = "aws_lambda_events", version = "0.7", default-features = false, features = ["dynamodb", "streams"], optional = true }
 __aws_sdk_dynamodb_0_7 = { package = "aws-sdk-dynamodb", version = "0.7", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_8 = { package = "aws-sdk-dynamodb", version = "0.8", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_9 = { package = "aws-sdk-dynamodb", version = "0.9", default-features = false, optional = true }
@@ -52,6 +53,7 @@ __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-
 
 [features]
 "aws_lambda_events+0_6" = ["__aws_lambda_events_0_6"]
+"aws_lambda_events+0_7" = ["__aws_lambda_events_0_7"]
 "aws-sdk-dynamodb+0_7" = ["__aws_sdk_dynamodb_0_7"]
 "aws-sdk-dynamodb+0_8" = ["__aws_sdk_dynamodb_0_8"]
 "aws-sdk-dynamodb+0_9" = ["__aws_sdk_dynamodb_0_9"]
