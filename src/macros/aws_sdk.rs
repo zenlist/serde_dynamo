@@ -37,7 +37,7 @@ macro_rules! aws_sdk_macro {
             //! let result = client.scan().table_name("user").send().await?;
             //!
             //! // And deserialize them as strongly-typed data structures
-            //! if let Some(items) = result.items {
+            //! if let Some(items) = result.items().map(|slice| slice.to_vec()) {
             //!     let users: Vec<User> = from_items(items)?;
             //!     println!("Got {} users", users.len());
             //! }
@@ -64,7 +64,7 @@ macro_rules! aws_sdk_macro {
             //! let result = client.scan().table_name("user").send().await?;
             //!
             //! // And deserialize them as strongly-typed data structures
-            //! for item in result.items.unwrap() {
+            //! for item in result.items().map(|slice| slice.to_vec()).unwrap() {
             //!     let user: User = from_item(item)?;
             //!     println!("{} is {}", user.name, user.age);
             //! }
