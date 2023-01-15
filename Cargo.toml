@@ -29,6 +29,7 @@ __aws_sdk_dynamodb_0_18 = { package = "aws-sdk-dynamodb", version = "0.18", defa
 __aws_sdk_dynamodb_0_19 = { package = "aws-sdk-dynamodb", version = "0.19", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_21 = { package = "aws-sdk-dynamodb", version = "0.21", default-features = false, optional = true }
 __aws_sdk_dynamodb_0_22 = { package = "aws-sdk-dynamodb", version = "0.22", default-features = false, optional = true }
+__aws_sdk_dynamodb_0_23 = { package = "aws-sdk-dynamodb", version = "0.23", default-features = false, optional = true }
 __aws_sdk_dynamodbstreams_0_8 = { package = "aws-sdk-dynamodbstreams", version = "0.8", default-features = false, optional = true }
 __aws_sdk_dynamodbstreams_0_9 = { package = "aws-sdk-dynamodbstreams", version = "0.9", default-features = false, optional = true }
 __aws_sdk_dynamodbstreams_0_10 = { package = "aws-sdk-dynamodbstreams", version = "0.10", default-features = false, optional = true }
@@ -43,6 +44,7 @@ __aws_sdk_dynamodbstreams_0_18 = { package = "aws-sdk-dynamodbstreams", version 
 __aws_sdk_dynamodbstreams_0_19 = { package = "aws-sdk-dynamodbstreams", version = "0.19", default-features = false, optional = true }
 __aws_sdk_dynamodbstreams_0_21 = { package = "aws-sdk-dynamodbstreams", version = "0.21", default-features = false, optional = true }
 __aws_sdk_dynamodbstreams_0_22 = { package = "aws-sdk-dynamodbstreams", version = "0.22", default-features = false, optional = true }
+__aws_sdk_dynamodbstreams_0_23 = { package = "aws-sdk-dynamodbstreams", version = "0.23", default-features = false, optional = true }
 __rusoto_dynamodb_0_46 = { package = "rusoto_dynamodb", version = "0.46", default-features = false, optional = true }
 __rusoto_dynamodb_0_47 = { package = "rusoto_dynamodb", version = "0.47", default-features = false, optional = true }
 __rusoto_dynamodb_0_48 = { package = "rusoto_dynamodb", version = "0.48", default-features = false, optional = true }
@@ -73,6 +75,7 @@ __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-
 "aws-sdk-dynamodb+0_19" = ["__aws_sdk_dynamodb_0_19"]
 "aws-sdk-dynamodb+0_21" = ["__aws_sdk_dynamodb_0_21"]
 "aws-sdk-dynamodb+0_22" = ["__aws_sdk_dynamodb_0_22"]
+"aws-sdk-dynamodb+0_23" = ["__aws_sdk_dynamodb_0_23"]
 "aws-sdk-dynamodbstreams+0_8" = ["__aws_sdk_dynamodbstreams_0_8"]
 "aws-sdk-dynamodbstreams+0_9" = ["__aws_sdk_dynamodbstreams_0_9"]
 "aws-sdk-dynamodbstreams+0_10" = ["__aws_sdk_dynamodbstreams_0_10"]
@@ -87,6 +90,7 @@ __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-
 "aws-sdk-dynamodbstreams+0_19" = ["__aws_sdk_dynamodbstreams_0_19"]
 "aws-sdk-dynamodbstreams+0_21" = ["__aws_sdk_dynamodbstreams_0_21"]
 "aws-sdk-dynamodbstreams+0_22" = ["__aws_sdk_dynamodbstreams_0_22"]
+"aws-sdk-dynamodbstreams+0_23" = ["__aws_sdk_dynamodbstreams_0_23"]
 "rusoto_dynamodb+0_46" = ["__rusoto_dynamodb_0_46"]
 "rusoto_dynamodb+0_47" = ["__rusoto_dynamodb_0_47"]
 "rusoto_dynamodb+0_48" = ["__rusoto_dynamodb_0_48"]
