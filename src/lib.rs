@@ -102,7 +102,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_22"] }
+//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_23"] }
 //! ```
 //!
 //! See [`aws_sdk_dynamodb_0_23`] for examples and more information. See
