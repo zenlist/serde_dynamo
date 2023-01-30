@@ -210,13 +210,12 @@ mod map_key {
             Ok(original_as_json) => {
                 if expect_serialized_key.is_err() {
                     panic!(
-                        "Expecting to get an error serializing {:?} to AttributeValue, \
-                        but it was able to be serialized to JSON: {}",
-                        original, original_as_json
+                        "Expecting to get an error serializing {original:?} to AttributeValue, \
+                        but it was able to be serialized to JSON: {original_as_json}"
                     );
                 }
 
-                println!("{:?} as JSON: {}", original, original_as_json);
+                println!("{original:?} as JSON: {original_as_json}");
 
                 let json_key = match &original_as_json {
                     Value::Object(object) => object
@@ -225,8 +224,7 @@ mod map_key {
                         .expect("There should be a key")
                         .to_owned(),
                     _ => panic!(
-                        "Should have gotten a JSON object with one field, got: {:?}",
-                        original_as_json
+                        "Should have gotten a JSON object with one field, got: {original_as_json:?}"
                     ),
                 };
 
@@ -235,13 +233,12 @@ mod map_key {
             Err(err) => {
                 if json_should_match && expect_serialized_key.is_ok() {
                     panic!(
-                        "Expecting to be able to serialize {:?} to AttributeValue, \
-                        but it could not be serialized to JSON: {}",
-                        original, err,
+                        "Expecting to be able to serialize {original:?} to AttributeValue, \
+                        but it could not be serialized to JSON: {err}",
                     );
                 }
 
-                println!("{:?} cannot be serialized by serde_json: {}", original, err);
+                println!("{original:?} cannot be serialized by serde_json: {err}");
 
                 (
                     json!("unsupported by serde_json"),
@@ -257,9 +254,8 @@ mod map_key {
                 expected_serialized,
                 actual_serialized.unwrap_or_else(|err| {
                     panic!(
-                        "Failed to serialize to AttributeValue: {}\n\n\
-                    The JSON representation would be:\n{}\n",
-                        err, as_json,
+                        "Failed to serialize to AttributeValue: {err}\n\n\
+                    The JSON representation would be:\n{as_json}\n",
                     )
                 }),
             ),
@@ -287,12 +283,11 @@ mod map_key {
             "Serialized map key is not what was expected"
         );
 
-        println!("{} as dynamo item: {:?}", as_json, actual_serialized);
+        println!("{as_json} as dynamo item: {actual_serialized:?}");
 
         let deserialized = from_attribute_value(actual_serialized.clone()).unwrap_or_else(|err| {
             panic!(
-                "Failed to deserialize: {}\nThe serialized value was:\n{:#?}\n",
-                err, actual_serialized
+                "Failed to deserialize: {err}\nThe serialized value was:\n{actual_serialized:#?}\n"
             )
         });
         assert_eq!(
