@@ -92,10 +92,10 @@ impl Display for ErrorImpl {
             ErrorImpl::ExpectedBytes => f.write_str("Expected binary data"),
             ErrorImpl::ExpectedSingleKey => f.write_str("Expected an item with a single key"),
             ErrorImpl::FailedToParseInt(s, err) => {
-                write!(f, "Failed to parse '{0}' as an integer: {1}", s, err)
+                write!(f, "Failed to parse '{s}' as an integer: {err}")
             }
             ErrorImpl::FailedToParseFloat(s, err) => {
-                write!(f, "Failed to parse '{0}' as a float: {1}", s, err)
+                write!(f, "Failed to parse '{s}' as a float: {err}")
             }
             ErrorImpl::KeyMustBeAString => f.write_str("Key must be a string"),
             ErrorImpl::SerializeMapKeyCalledTwice => {
