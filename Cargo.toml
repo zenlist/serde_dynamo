@@ -53,6 +53,7 @@ __rusoto_dynamodb_0_48 = { package = "rusoto_dynamodb", version = "0.48", defaul
 __rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = "0.46", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_47 = { package = "rusoto_dynamodbstreams", version = "0.47", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_48 = { package = "rusoto_dynamodbstreams", version = "0.48", default-features = false, optional = true }
+base64 = "0.21.0"
 serde = "1"
 
 __rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-features = false, features = ["rustls"], optional = true }

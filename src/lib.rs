@@ -201,13 +201,52 @@
 //! 1.0.
 //!
 //! To avoid doing a major version bump for every release of `aws-sdk-dynamodb` and
-//! `rusoto_dynamodb`, **serde_dynamo** uses features to opt into the correct version of the
+//! `aws_lambda_events`, **serde_dynamo** uses features to opt into the correct version of the
 //! dynamodb library.
 //!
 //! See the [modules](#modules) section for all possible features. Feature names are largely
 //! guessable: the library name, a plus, and the library version (with underscores instead of dots,
 //! because crates.io doesn't support feature names with dots). For example, support for
 //! `aws-sdk-dynamodb` version `0.13` is enabled with the feature `aws-sdk-dynamodb+0_13`.
+//!
+//! ## Converting to and from DynamoDB JSON
+//!
+//! In most cases, libraries already exist to handle the raw DynamoDB JSON and convert it into an
+//! item. For example, [aws-sdk-dynamodb] deals with the raw JSON if you're making API calls, and
+//! [aws_lambda_events] deals with the raw JSON if you're writing lambdas that react on DynamoDB
+//! change streams.
+//!
+//! However, in very rare cases, you may need to convert the DynamoDB JSON yourself. In those cases,
+//! both [Item] and [AttributeValue] implement [serde::Serialize] and [serde::Deserialize].
+//!
+//! ```
+//! # use serde_dynamo::{AttributeValue, Item};
+//! let input = r#"{
+//!     "Id":{
+//!         "N":"103"
+//!     },
+//!     "Title":{
+//!         "S":"Book 103 Title"
+//!     },
+//!     "Authors":{
+//!         "SS":[
+//!             "Author1",
+//!             "Author2"
+//!         ]
+//!     },
+//!     "InPublication":{
+//!         "BOOL":false
+//!     }
+//! }"#;
+//!
+//! let item: Item = serde_json::from_str(input)
+//!     .expect("expected to deserialize DynamoDB JSON format");
+//!
+//! assert_eq!(
+//!     item.get("Id").unwrap(),
+//!     &AttributeValue::N(String::from("103")),
+//! );
+//! ```
 //!
 //! [DynamoDB]: https://aws.amazon.com/dynamodb/
 //! [serde]: https://docs.rs/serde
