@@ -33,6 +33,8 @@ pub enum ErrorImpl {
 
     /// Not a map-like object
     NotMaplike,
+    /// Not a set-like sequence
+    NotSetlike,
 
     /// Expected string
     ExpectedString,
@@ -66,6 +68,12 @@ pub enum ErrorImpl {
     SerializeMapKeyCalledTwice,
     /// SerializeMap's serialize_value called before serialize_key!
     SerializeMapValueBeforeKey,
+    /// Set cannot be empty
+    SetEmpty,
+    /// Set contains elements that are not valid in a set
+    SetInvalidItem,
+    /// Set contains elements that serialized to different types
+    SetNotHomogenous,
 }
 
 #[allow(clippy::from_over_into)]
@@ -80,6 +88,7 @@ impl Display for ErrorImpl {
         match self {
             ErrorImpl::Message(ref s) => f.write_str(s),
             ErrorImpl::NotMaplike => f.write_str("Not a map-like object"),
+            ErrorImpl::NotSetlike => f.write_str("Not a set-like sequence"),
             ErrorImpl::ExpectedString => f.write_str("Expected string"),
             ErrorImpl::ExpectedMap => f.write_str("Expected map"),
             ErrorImpl::ExpectedSeq => f.write_str("Expected seq"),
@@ -104,6 +113,13 @@ impl Display for ErrorImpl {
             ErrorImpl::SerializeMapValueBeforeKey => f.write_str(
                 "SerializeMap::serialize_value called before SerializeMap::serialize_key",
             ),
+            ErrorImpl::SetEmpty => f.write_str("Set cannot be empty"),
+            ErrorImpl::SetInvalidItem => {
+                f.write_str("Set must contain only strings, numbers, or bytes")
+            }
+            ErrorImpl::SetNotHomogenous => {
+                f.write_str("Set contains elements that serialized to different types")
+            }
         }
     }
 }

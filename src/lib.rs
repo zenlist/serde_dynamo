@@ -263,6 +263,7 @@ mod de;
 mod error;
 mod macros;
 mod ser;
+pub mod set;
 
 pub use attribute_value::{AttributeValue, Item, Items};
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
