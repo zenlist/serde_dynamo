@@ -132,68 +132,16 @@ impl ser::Serializer for Serializer {
     where
         V: Serialize,
     {
-        if std::ptr::eq(name, crate::set::NEWTYPE_SYMBOL) {
-            let av = value.serialize(self)?;
+        let av = value.serialize(self)?;
 
-            let vals = match av {
-                AttributeValue::L(vals) => vals,
-                _ => return Err(crate::error::ErrorImpl::NotSetlike.into()),
-            };
-
-            if vals.is_empty() {
-                return Err(crate::error::ErrorImpl::SetEmpty.into());
-            }
-
-            fn convert_string_item(v: AttributeValue) -> Result<String, Error> {
-                if let AttributeValue::S(s) = v {
-                    Ok(s)
-                } else {
-                    Err(crate::error::ErrorImpl::SetNotHomogenous.into())
-                }
-            }
-
-            fn convert_number_item(v: AttributeValue) -> Result<String, Error> {
-                if let AttributeValue::N(s) = v {
-                    Ok(s)
-                } else {
-                    Err(crate::error::ErrorImpl::SetNotHomogenous.into())
-                }
-            }
-
-            fn convert_bytes_item(v: AttributeValue) -> Result<Vec<u8>, Error> {
-                if let AttributeValue::B(s) = v {
-                    Ok(s)
-                } else {
-                    Err(crate::error::ErrorImpl::SetNotHomogenous.into())
-                }
-            }
-
-            match vals[0] {
-                AttributeValue::S(_) => {
-                    let set = vals
-                        .into_iter()
-                        .map(convert_string_item)
-                        .collect::<Result<_, _>>()?;
-                    Ok(AttributeValue::Ss(set))
-                }
-                AttributeValue::N(_) => {
-                    let set = vals
-                        .into_iter()
-                        .map(convert_number_item)
-                        .collect::<Result<_, _>>()?;
-                    Ok(AttributeValue::Ns(set))
-                }
-                AttributeValue::B(_) => {
-                    let set = vals
-                        .into_iter()
-                        .map(convert_bytes_item)
-                        .collect::<Result<_, _>>()?;
-                    Ok(AttributeValue::Bs(set))
-                }
-                _ => Err(crate::error::ErrorImpl::SetInvalidItem.into()),
-            }
+        if crate::set::strings::should_serialize_as_string_set(name) {
+            crate::set::strings::convert_to_set(av)
+        } else if crate::set::numbers::should_serialize_as_numbers_set(name) {
+            crate::set::numbers::convert_to_set(av)
+        } else if crate::set::bytes::should_serialize_as_bytes_set(name) {
+            crate::set::bytes::convert_to_set(av)
         } else {
-            value.serialize(self)
+            Ok(av)
         }
     }
     fn serialize_struct_variant(

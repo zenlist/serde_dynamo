@@ -68,12 +68,12 @@ pub enum ErrorImpl {
     SerializeMapKeyCalledTwice,
     /// SerializeMap's serialize_value called before serialize_key!
     SerializeMapValueBeforeKey,
-    /// Set cannot be empty
-    SetEmpty,
-    /// Set contains elements that are not valid in a set
-    SetInvalidItem,
-    /// Set contains elements that serialized to different types
-    SetNotHomogenous,
+    /// String set contains non-string element
+    StringSetExpectedType,
+    /// Number set contains non-string element
+    NumberSetExpectedType,
+    /// Bytes set contains non-string element
+    BytesSetExpectedType,
 }
 
 #[allow(clippy::from_over_into)]
@@ -113,12 +113,14 @@ impl Display for ErrorImpl {
             ErrorImpl::SerializeMapValueBeforeKey => f.write_str(
                 "SerializeMap::serialize_value called before SerializeMap::serialize_key",
             ),
-            ErrorImpl::SetEmpty => f.write_str("Set cannot be empty"),
-            ErrorImpl::SetInvalidItem => {
-                f.write_str("Set must contain only strings, numbers, or bytes")
+            ErrorImpl::StringSetExpectedType => {
+                f.write_str("String set element does not serialize to string")
             }
-            ErrorImpl::SetNotHomogenous => {
-                f.write_str("Set contains elements that serialized to different types")
+            ErrorImpl::NumberSetExpectedType => {
+                f.write_str("Number set element does not serialize to number")
+            }
+            ErrorImpl::BytesSetExpectedType => {
+                f.write_str("Bytes set element does not serialize to bytes")
             }
         }
     }
