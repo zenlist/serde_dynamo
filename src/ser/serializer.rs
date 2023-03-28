@@ -134,12 +134,12 @@ impl ser::Serializer for Serializer {
     {
         let av = value.serialize(self)?;
 
-        if crate::set::strings::should_serialize_as_string_set(name) {
-            crate::set::strings::convert_to_set(av)
-        } else if crate::set::numbers::should_serialize_as_numbers_set(name) {
-            crate::set::numbers::convert_to_set(av)
-        } else if crate::set::bytes::should_serialize_as_bytes_set(name) {
-            crate::set::bytes::convert_to_set(av)
+        if crate::string_set::should_serialize_as_string_set(name) {
+            crate::string_set::convert_to_set(av)
+        } else if crate::number_set::should_serialize_as_numbers_set(name) {
+            crate::number_set::convert_to_set(av)
+        } else if crate::binary_set::should_serialize_as_binary_set(name) {
+            crate::binary_set::convert_to_set(av)
         } else {
             Ok(av)
         }

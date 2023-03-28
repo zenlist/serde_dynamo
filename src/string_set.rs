@@ -2,7 +2,7 @@
 //!
 //! # Usage
 //!
-//! To use, annotate the field with `#[serde(with = "serde_dynamo::set::strings")]`.
+//! To use, annotate the field with `#[serde(with = "serde_dynamo::string_set")]`.
 //!
 //! DynamoDB will return an error if given an empty set. Thus, it may
 //! be beneficial to additionally annotate the field with `#[serde(default)]`
@@ -28,7 +28,7 @@
 //!
 //! #[derive(Serialize, Deserialize)]
 //! struct MyStruct {
-//!     #[serde(with = "serde_dynamo::set::strings")]
+//!     #[serde(with = "serde_dynamo::string_set")]
 //!     #[serde(default, skip_serializing_if = "Vec::is_empty")]
 //!     names: Vec<String>,
 //! }
@@ -53,7 +53,7 @@ pub(crate) fn should_serialize_as_string_set(name: &str) -> bool {
 
 /// Serializes the given value as a string set
 ///
-/// See the [module documentation]p[crate::set::strings] for
+/// See the [module documentation][crate::string_set] for
 /// additional usage information.
 ///
 /// # Errors
@@ -77,6 +77,41 @@ where
     D: serde::Deserializer<'de>,
 {
     T::deserialize(deserializer)
+}
+
+/// Serializes the wrapped value as a string set
+///
+/// This is useful for [`to_attribute_value`][crate::to_attribute_value]
+/// when you want to serialize a sequence as a set of strings.
+///
+/// # Examples
+///
+/// ```
+/// use serde_dynamo::{string_set::StringSet, AttributeValue};
+///
+/// let set = vec![
+///     "orange",
+///     "apple",
+/// ];
+///
+/// let val: AttributeValue = serde_dynamo::to_attribute_value(StringSet(set)).unwrap();
+/// assert_eq!(val, AttributeValue::Ss(vec![
+///     "orange".to_string(),
+///     "apple".to_string(),
+/// ]));
+/// ```
+pub struct StringSet<T>(pub T);
+
+impl<T> serde::Serialize for StringSet<T>
+where
+    T: serde::Serialize,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_newtype_struct(NEWTYPE_SYMBOL, &self.0)
+    }
 }
 
 #[inline(never)]
@@ -104,18 +139,31 @@ pub(crate) fn convert_to_set(value: crate::AttributeValue) -> crate::Result<crat
 mod tests {
     use serde_derive::{Deserialize, Serialize};
 
+    use crate::string_set::StringSet;
+
     #[test]
     fn newtype_strings_set_in_struct() {
         let set = vec!["test".to_string(), "test2".to_string()];
         #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
         struct Struct {
-            #[serde(with = "crate::set::strings")]
+            #[serde(with = "crate::string_set")]
             set: Vec<String>,
         }
 
         let item: crate::Item = dbg!(crate::to_item(Struct { set }).unwrap());
         assert_eq!(
             item["set"],
+            crate::AttributeValue::Ss(vec!["test".to_string(), "test2".to_string(),])
+        );
+    }
+
+    #[test]
+    fn newtype_set_for_strings() {
+        let set = vec!["test", "test2"];
+
+        let val: crate::AttributeValue = dbg!(crate::to_attribute_value(StringSet(set)).unwrap());
+        assert_eq!(
+            val,
             crate::AttributeValue::Ss(vec!["test".to_string(), "test2".to_string(),])
         );
     }

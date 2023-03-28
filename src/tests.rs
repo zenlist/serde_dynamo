@@ -628,3 +628,21 @@ mod map_key {
         map_key_round_trip(Struct(5), Ok("5"), true);
     }
 }
+
+mod sets {
+    #[test]
+    fn assert_newtype_addresses_different() {
+        assert!(!std::ptr::eq(
+            crate::string_set::NEWTYPE_SYMBOL,
+            crate::number_set::NEWTYPE_SYMBOL
+        ));
+        assert!(!std::ptr::eq(
+            crate::string_set::NEWTYPE_SYMBOL,
+            crate::binary_set::NEWTYPE_SYMBOL
+        ));
+        assert!(!std::ptr::eq(
+            crate::number_set::NEWTYPE_SYMBOL,
+            crate::binary_set::NEWTYPE_SYMBOL
+        ));
+    }
+}

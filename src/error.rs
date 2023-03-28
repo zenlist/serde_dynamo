@@ -70,10 +70,10 @@ pub enum ErrorImpl {
     SerializeMapValueBeforeKey,
     /// String set contains non-string element
     StringSetExpectedType,
-    /// Number set contains non-string element
+    /// Number set contains non-number element
     NumberSetExpectedType,
-    /// Bytes set contains non-string element
-    BytesSetExpectedType,
+    /// Binary set contains non-binary element
+    BinarySetExpectedType,
 }
 
 #[allow(clippy::from_over_into)]
@@ -119,8 +119,8 @@ impl Display for ErrorImpl {
             ErrorImpl::NumberSetExpectedType => {
                 f.write_str("Number set element does not serialize to number")
             }
-            ErrorImpl::BytesSetExpectedType => {
-                f.write_str("Bytes set element does not serialize to bytes")
+            ErrorImpl::BinarySetExpectedType => {
+                f.write_str("Binary set element does not serialize to binary")
             }
         }
     }
