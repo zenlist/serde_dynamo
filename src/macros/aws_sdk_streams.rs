@@ -1,5 +1,15 @@
 macro_rules! aws_sdk_streams_macro {
     (feature = $feature:literal, crate_name = $crate_name:ident, mod_name = $mod_name:ident, aws_version = $version:literal,) => {
+        aws_sdk_streams_macro! {
+            feature = $feature,
+            crate_name = $crate_name,
+            mod_name = $mod_name,
+            aws_version = $version,
+            primitives = types,
+            types = model,
+        }
+    };
+    (feature = $feature:literal, crate_name = $crate_name:ident, mod_name = $mod_name:ident, aws_version = $version:literal, primitives = $primitives:ident, types = $types:ident,) => {
         #[cfg(feature = $feature)]
         #[cfg_attr(docsrs, doc(cfg(feature = $feature)))]
         pub mod $mod_name {
@@ -18,8 +28,8 @@ macro_rules! aws_sdk_streams_macro {
             //! [aws_sdk_dynamodbstreams::model::AttributeValue]: https://docs.rs/rusoto_dynamodbstreams/0.47.0/rusoto_dynamodbstreams/struct.AttributeValue.html
 
             use crate::Result;
-            use ::$crate_name::model::AttributeValue;
-            use ::$crate_name::types::Blob;
+            use ::$crate_name::$types::AttributeValue;
+            use ::$crate_name::$primitives::Blob;
 
             impl From<crate::AttributeValue> for AttributeValue {
                 fn from(attribute_value: crate::AttributeValue) -> AttributeValue {
@@ -126,7 +136,7 @@ macro_rules! aws_sdk_streams_macro {
         #[deprecated(since = "4.0.0", note = "The double-underscore is no longer necessary")]
         pub mod $crate_name {
             use crate::Result;
-            use ::$crate_name::model::AttributeValue;
+            use ::$crate_name::$types::AttributeValue;
 
             #[deprecated(since = "4.0.0", note = "The double-underscore on the mod name is no longer necessary")]
             pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
