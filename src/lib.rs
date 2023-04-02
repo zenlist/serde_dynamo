@@ -110,16 +110,13 @@
 //!
 //! ## aws_lambda_events support
 //!
-//! **serde_dynamo** works well with [aws_lambda_events].
-//!
-//! Add the following to your dependencies.
+//! [aws_lambda_events], starting with version 0.8, uses **serde_dynamo** directly, so no feature
+//! flags need to be enabled.
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "4", features = ["aws_lambda_events+0.7"] }
+//! serde_dynamo = { version = "4" }
 //! ```
-//!
-//! See [`aws_lambda_events_0_7`] for examples and more information.
 //!
 //! ## rusoto support
 //!
