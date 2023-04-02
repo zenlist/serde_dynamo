@@ -12,7 +12,7 @@ macro_rules! rusoto_streams_macro {
             //! [dependencies]
             #![doc = concat!("rusoto_core = { version = ", stringify!($version), ", default-features = false, features = [\"rustls\"] }")]
             #![doc = concat!("rusoto_dynamodbstreams = { version = ", stringify!($version), ", default-features = false, features = [\"rustls\"] }")]
-            #![doc = concat!("serde_dynamo = { version = \"3\", features = [", stringify!($feature), "] }")]
+            #![doc = concat!("serde_dynamo = { version = \"4\", features = [", stringify!($feature), "] }")]
             //! ```
             //!
             //! [rusoto_dynamodbstreams]: https://docs.rs/rusoto_dynamodbstreams

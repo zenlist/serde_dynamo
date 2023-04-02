@@ -20,7 +20,7 @@ macro_rules! aws_sdk_macro {
             //! [dependencies]
             #![doc = concat!("aws-config = ", stringify!($config_version))]
             #![doc = concat!("aws-sdk-dynamodb = ", stringify!($version))]
-            #![doc = concat!("serde_dynamo = { version = \"3\", features = [", stringify!($feature), "] }")]
+            #![doc = concat!("serde_dynamo = { version = \"4\", features = [", stringify!($feature), "] }")]
             //! ```
             //!
             //!

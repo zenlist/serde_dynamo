@@ -18,7 +18,7 @@ macro_rules! aws_sdk_streams_macro {
             //! ```toml
             //! [dependencies]
             #![doc = concat!("aws-sdk-dynamodbstreams = ", stringify!($version))]
-            #![doc = concat!("serde_dynamo = { version = \"3\", features = [", stringify!($feature), "] }")]
+            #![doc = concat!("serde_dynamo = { version = \"4\", features = [", stringify!($feature), "] }")]
             //! ```
             //!
             //! [aws-sdk-dynamodbstreams]: https://docs.rs/aws-sdk-dynamodbstreams

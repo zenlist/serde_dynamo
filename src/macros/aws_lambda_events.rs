@@ -11,7 +11,7 @@ macro_rules! aws_lambda_events_macro {
             //! ```toml
             //! [dependencies]
             #![doc = concat!("aws_lambda_events = ", stringify!($version))]
-            #![doc = concat!("serde_dynamo = { version = \"3\", features = [", stringify!($feature), "] }")]
+            #![doc = concat!("serde_dynamo = { version = \"4\", features = [", stringify!($feature), "] }")]
             //! ```
             //!
             //! [aws_lambda_events]: https://docs.rs/aws_sdk_dynamodb

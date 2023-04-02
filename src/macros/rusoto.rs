@@ -12,7 +12,7 @@ macro_rules! rusoto_macro {
             //! [dependencies]
             #![doc = concat!("rusoto_core = { version = ", stringify!($version), ", default-features = false, features = [\"rustls\"] }")]
             #![doc = concat!("rusoto_dynamodb = { version = ", stringify!($version), ", default-features = false, features = [\"rustls\"] }")]
-            #![doc = concat!("serde_dynamo = { version = \"3\", features = [", stringify!($feature), "] }")]
+            #![doc = concat!("serde_dynamo = { version = \"4\", features = [", stringify!($feature), "] }")]
             //! ```
             //!
             //! ## Parsing items as strongly-typed data structures.
