@@ -126,13 +126,23 @@ impl ser::Serializer for Serializer {
     }
     fn serialize_newtype_struct<V: ?Sized>(
         self,
-        _name: &'static str,
+        name: &'static str,
         value: &V,
     ) -> Result<Self::Ok, Self::Error>
     where
         V: Serialize,
     {
-        value.serialize(self)
+        let av = value.serialize(self)?;
+
+        if crate::string_set::should_serialize_as_string_set(name) {
+            crate::string_set::convert_to_set(av)
+        } else if crate::number_set::should_serialize_as_numbers_set(name) {
+            crate::number_set::convert_to_set(av)
+        } else if crate::binary_set::should_serialize_as_binary_set(name) {
+            crate::binary_set::convert_to_set(av)
+        } else {
+            Ok(av)
+        }
     }
     fn serialize_struct_variant(
         self,

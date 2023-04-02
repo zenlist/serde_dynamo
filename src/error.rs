@@ -33,6 +33,8 @@ pub enum ErrorImpl {
 
     /// Not a map-like object
     NotMaplike,
+    /// Not a set-like sequence
+    NotSetlike,
 
     /// Expected string
     ExpectedString,
@@ -66,6 +68,12 @@ pub enum ErrorImpl {
     SerializeMapKeyCalledTwice,
     /// SerializeMap's serialize_value called before serialize_key!
     SerializeMapValueBeforeKey,
+    /// String set contains non-string element
+    StringSetExpectedType,
+    /// Number set contains non-number element
+    NumberSetExpectedType,
+    /// Binary set contains non-binary element
+    BinarySetExpectedType,
 }
 
 #[allow(clippy::from_over_into)]
@@ -80,6 +88,7 @@ impl Display for ErrorImpl {
         match self {
             ErrorImpl::Message(ref s) => f.write_str(s),
             ErrorImpl::NotMaplike => f.write_str("Not a map-like object"),
+            ErrorImpl::NotSetlike => f.write_str("Not a set-like sequence"),
             ErrorImpl::ExpectedString => f.write_str("Expected string"),
             ErrorImpl::ExpectedMap => f.write_str("Expected map"),
             ErrorImpl::ExpectedSeq => f.write_str("Expected seq"),
@@ -104,6 +113,15 @@ impl Display for ErrorImpl {
             ErrorImpl::SerializeMapValueBeforeKey => f.write_str(
                 "SerializeMap::serialize_value called before SerializeMap::serialize_key",
             ),
+            ErrorImpl::StringSetExpectedType => {
+                f.write_str("String set element does not serialize to string")
+            }
+            ErrorImpl::NumberSetExpectedType => {
+                f.write_str("Number set element does not serialize to number")
+            }
+            ErrorImpl::BinarySetExpectedType => {
+                f.write_str("Binary set element does not serialize to binary")
+            }
         }
     }
 }

@@ -264,6 +264,10 @@ mod error;
 mod macros;
 mod ser;
 
+pub mod binary_set;
+pub mod number_set;
+pub mod string_set;
+
 pub use attribute_value::{AttributeValue, Item, Items};
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
