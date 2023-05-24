@@ -102,11 +102,11 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_27"] }
+//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_28"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_27`] for examples and more information. See
-//! [`aws_sdk_dynamodbstreams_0_27`] for DynamoDb streams support.
+//! See [`aws_sdk_dynamodb_0_28`] for examples and more information. See
+//! [`aws_sdk_dynamodbstreams_0_28`] for DynamoDb streams support.
 //!
 //! ## aws_lambda_events support
 //!
@@ -474,6 +474,16 @@ aws_sdk_macro!(
     config_version = "0.55",
 );
 
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_28",
+    crate_name = __aws_sdk_dynamodb_0_28,
+    mod_name = aws_sdk_dynamodb_0_28,
+    attribute_value_path = ::__aws_sdk_dynamodb_0_28::types::AttributeValue,
+    blob_path = ::__aws_sdk_dynamodb_0_28::primitives::Blob,
+    aws_version = "0.28",
+    config_version = "0.55",
+);
+
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
@@ -643,6 +653,15 @@ aws_sdk_streams_macro!(
     attribute_value_path = ::__aws_sdk_dynamodbstreams_0_27::types::AttributeValue,
     blob_path = ::__aws_sdk_dynamodbstreams_0_27::primitives::Blob,
     aws_version = "0.27",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_28",
+    crate_name = __aws_sdk_dynamodbstreams_0_28,
+    mod_name = aws_sdk_dynamodbstreams_0_28,
+    attribute_value_path = ::__aws_sdk_dynamodbstreams_0_28::types::AttributeValue,
+    blob_path = ::__aws_sdk_dynamodbstreams_0_28::primitives::Blob,
+    aws_version = "0.28",
 );
 
 rusoto_macro!(
