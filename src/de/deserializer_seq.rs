@@ -29,6 +29,10 @@ impl<'de> SeqAccess<'de> for DeserializerSeq {
             Ok(None)
         }
     }
+
+    fn size_hint(&self) -> Option<usize> {
+        Some(self.iter.len())
+    }
 }
 
 pub struct DeserializerSeqStrings {
