@@ -46,6 +46,10 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
             unreachable!("Value without a corresponding key")
         }
     }
+
+    fn size_hint(&self) -> Option<usize> {
+        Some(self.drain.len())
+    }
 }
 
 struct DeserializerMapKey {
