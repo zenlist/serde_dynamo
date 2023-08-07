@@ -84,7 +84,7 @@ where
     T: Serialize,
     AV: From<AttributeValue>,
 {
-    let serializer = Serializer::default();
+    let serializer = Serializer;
     let attribute_value = value.serialize(serializer)?;
     Ok(AV::from(attribute_value))
 }
@@ -126,7 +126,7 @@ where
     T: Serialize,
     I: From<Item>,
 {
-    let serializer = Serializer::default();
+    let serializer = Serializer;
     let attribute_value = value.serialize(serializer)?;
     if let AttributeValue::M(item) = attribute_value {
         let item = Item::from(item);

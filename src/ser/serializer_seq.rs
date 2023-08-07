@@ -26,7 +26,7 @@ impl ser::SerializeSeq for SerializerSeq {
     where
         E: ?Sized + Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())
@@ -46,7 +46,7 @@ impl ser::SerializeTupleStruct for SerializerSeq {
     where
         F: ?Sized + Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())
@@ -66,7 +66,7 @@ impl ser::SerializeTuple for SerializerSeq {
     where
         E: ?Sized + Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())

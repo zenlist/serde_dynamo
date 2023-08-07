@@ -26,7 +26,7 @@ impl ser::SerializeStruct for SerializerStruct {
     where
         F: Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let value = value.serialize(serializer)?;
         self.item.insert(key.to_string(), value);
         Ok(())
