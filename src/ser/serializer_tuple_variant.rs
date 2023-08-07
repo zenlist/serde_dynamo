@@ -24,7 +24,7 @@ impl ser::SerializeTupleVariant for SerializerTupleVariant {
     where
         F: Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let value = value.serialize(serializer)?;
         self.vec.push(value);
         Ok(())

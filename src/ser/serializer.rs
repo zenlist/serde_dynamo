@@ -164,7 +164,7 @@ impl ser::Serializer for Serializer {
     where
         V: Serialize,
     {
-        let serializer = Serializer::default();
+        let serializer = Serializer;
         let av = value.serialize(serializer)?;
         let mut item = HashMap::new();
         item.insert(variant.to_string(), av);

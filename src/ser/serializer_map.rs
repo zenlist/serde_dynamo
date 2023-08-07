@@ -47,7 +47,7 @@ impl ser::SerializeMap for SerializerMap {
             .take()
             .ok_or_else(|| ErrorImpl::SerializeMapValueBeforeKey.into())?;
 
-        let value = value.serialize(Serializer::default())?;
+        let value = value.serialize(Serializer)?;
         self.item.insert(key, value);
         Ok(())
     }
@@ -62,7 +62,7 @@ impl ser::SerializeMap for SerializerMap {
         V: Serialize,
     {
         let key = key.serialize(MapKeySerializer)?;
-        let value = value.serialize(Serializer::default())?;
+        let value = value.serialize(Serializer)?;
         self.item.insert(key, value);
         Ok(())
     }
