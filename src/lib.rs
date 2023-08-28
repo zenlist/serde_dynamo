@@ -102,11 +102,11 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_29"] }
+//! serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+0_30"] }
 //! ```
 //!
-//! See [`aws_sdk_dynamodb_0_29`] for examples and more information. See
-//! [`aws_sdk_dynamodbstreams_0_29`] for DynamoDb streams support.
+//! See [`aws_sdk_dynamodb_0_30`] for examples and more information. See
+//! [`aws_sdk_dynamodbstreams_0_30`] for DynamoDb streams support.
 //!
 //! ## aws_lambda_events support
 //!
