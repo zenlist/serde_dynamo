@@ -494,6 +494,16 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
+aws_sdk_macro!(
+    feature = "aws-sdk-dynamodb+0_30",
+    crate_name = __aws_sdk_dynamodb_0_30,
+    mod_name = aws_sdk_dynamodb_0_30,
+    attribute_value_path = ::__aws_sdk_dynamodb_0_30::types::AttributeValue,
+    blob_path = ::__aws_sdk_dynamodb_0_30::primitives::Blob,
+    aws_version = "0.30",
+    config_version = "0.56",
+);
+
 aws_sdk_streams_macro!(
     feature = "aws-sdk-dynamodbstreams+0_8",
     crate_name = __aws_sdk_dynamodbstreams_0_8,
@@ -681,6 +691,15 @@ aws_sdk_streams_macro!(
     attribute_value_path = ::__aws_sdk_dynamodbstreams_0_29::types::AttributeValue,
     blob_path = ::__aws_sdk_dynamodbstreams_0_29::primitives::Blob,
     aws_version = "0.29",
+);
+
+aws_sdk_streams_macro!(
+    feature = "aws-sdk-dynamodbstreams+0_30",
+    crate_name = __aws_sdk_dynamodbstreams_0_30,
+    mod_name = aws_sdk_dynamodbstreams_0_30,
+    attribute_value_path = ::__aws_sdk_dynamodbstreams_0_30::types::AttributeValue,
+    blob_path = ::__aws_sdk_dynamodbstreams_0_30::primitives::Blob,
+    aws_version = "0.30",
 );
 
 rusoto_macro!(
