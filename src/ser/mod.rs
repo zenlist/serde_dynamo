@@ -78,7 +78,7 @@ use serializer_tuple_variant::SerializerTupleVariant;
 /// [get_item]: https://docs.rs/aws-sdk-dynamodb/*/aws_sdk_dynamodb/client/struct.Client.html#method.get_item
 /// [put_item]: https://docs.rs/aws-sdk-dynamodb/*/aws_sdk_dynamodb/client/struct.Client.html#method.put_item
 /// [query]: https://docs.rs/aws-sdk-dynamodb/*/aws_sdk_dynamodb/client/struct.Client.html#method.query
-/// [aws_sdk_dynamodb::model::AttributeValue]: https://docs.rs/rusoto_dynamodb/0.47.0/rusoto_dynamodb/struct.AttributeValue.html
+/// [aws_sdk_dynamodb::model::AttributeValue]: https://docs.rs/aws-sdk-dynamodb/*/aws_sdk_dynamodb/types/enum.AttributeValue.html
 pub fn to_attribute_value<T, AV>(value: T) -> Result<AV>
 where
     T: Serialize,
