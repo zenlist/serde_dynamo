@@ -612,3 +612,94 @@ fn issue_27() {
 
     assert_identical_json!(Subject, attribute_value.clone());
 }
+
+mod issue_87 {
+    use super::*;
+
+    #[test]
+    fn deserialize_struct_from_list() {
+        #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
+        struct Subject {
+            first_value: String,
+            second_value: String,
+        }
+
+        let attribute_value = AttributeValue::L(vec![
+            AttributeValue::S(String::from("Value1")),
+            AttributeValue::S(String::from("Value2")),
+        ]);
+
+        let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
+        assert_eq!(
+            s,
+            Subject {
+                first_value: String::from("Value1"),
+                second_value: String::from("Value2"),
+            }
+        );
+        assert_identical_json!(Subject, attribute_value.clone());
+    }
+
+    #[test]
+    fn deserialize_enum_newtype_from_list() {
+        #[derive(Debug, Deserialize, Eq, PartialEq)]
+        #[serde(tag = "0", content = "1")]
+        enum Subject {
+            Newtype(u8),
+        }
+
+        let attribute_value = AttributeValue::L(vec![
+            AttributeValue::S(String::from("Newtype")),
+            AttributeValue::N(String::from("1")),
+        ]);
+
+        let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
+        assert_eq!(s, Subject::Newtype(1));
+
+        assert_identical_json!(Subject, attribute_value.clone())
+    }
+
+    #[test]
+    fn deserialize_enum_tuple_from_list() {
+        #[derive(Debug, Deserialize, Eq, PartialEq)]
+        #[serde(tag = "0", content = "1")]
+        enum Subject {
+            Tuple(u8, u8),
+        }
+
+        let attribute_value = AttributeValue::L(vec![
+            AttributeValue::S(String::from("Tuple")),
+            AttributeValue::L(vec![
+                AttributeValue::N(String::from("1")),
+                AttributeValue::N(String::from("2")),
+            ]),
+        ]);
+
+        let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
+        assert_eq!(s, Subject::Tuple(1, 2));
+
+        assert_identical_json!(Subject, attribute_value.clone())
+    }
+
+    #[test]
+    fn deserialize_enum_struct_variant_from_list() {
+        #[derive(Debug, Deserialize, Eq, PartialEq)]
+        #[serde(tag = "0", content = "1")]
+        enum Subject {
+            Structy { one: u8, two: u8 },
+        }
+
+        let attribute_value = AttributeValue::L(vec![
+            AttributeValue::S(String::from("Structy")),
+            AttributeValue::M(HashMap::from([
+                (String::from("one"), AttributeValue::N(String::from("1"))),
+                (String::from("two"), AttributeValue::N(String::from("2"))),
+            ])),
+        ]);
+
+        let s: Subject = from_attribute_value(attribute_value.clone()).unwrap();
+        assert_eq!(s, Subject::Structy { one: 1, two: 2 });
+
+        assert_identical_json!(Subject, attribute_value.clone())
+    }
+}
