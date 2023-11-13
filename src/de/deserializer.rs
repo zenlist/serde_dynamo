@@ -289,7 +289,11 @@ impl<'de> de::Deserializer<'de> for Deserializer {
     where
         V: Visitor<'de>,
     {
-        self.deserialize_map(visitor)
+        if let AttributeValue::L(_) = self.input {
+            self.deserialize_seq(visitor)
+        } else {
+            self.deserialize_map(visitor)
+        }
     }
 
     fn deserialize_byte_buf<V>(self, visitor: V) -> Result<V::Value, Self::Error>
