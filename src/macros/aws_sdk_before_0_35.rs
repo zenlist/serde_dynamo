@@ -1,4 +1,4 @@
-macro_rules! aws_sdk_macro {
+macro_rules! aws_sdk_macro_before_0_35 {
     (
         feature = $feature:literal,
         crate_name = $crate_name:ident,
@@ -45,9 +45,10 @@ macro_rules! aws_sdk_macro {
             //! let result = client.scan().table_name("user").send().await?;
             //!
             //! // And deserialize them as strongly-typed data structures
-            //! let items = result.items().to_vec();
-            //! let users: Vec<User> = from_items(items)?;
-            //! println!("Got {} users", users.len());
+            //! if let Some(items) = result.items().map(|slice| slice.to_vec()) {
+            //!     let users: Vec<User> = from_items(items)?;
+            //!     println!("Got {} users", users.len());
+            //! }
             //! # Ok(())
             //! # }
             //! ```
@@ -71,7 +72,7 @@ macro_rules! aws_sdk_macro {
             //! let result = client.scan().table_name("user").send().await?;
             //!
             //! // And deserialize them as strongly-typed data structures
-            //! for item in result.items().to_vec() {
+            //! for item in result.items().map(|slice| slice.to_vec()).unwrap() {
             //!     let user: User = from_item(item)?;
             //!     println!("{} is {}", user.name, user.age);
             //! }
@@ -333,4 +334,4 @@ macro_rules! aws_sdk_macro {
     };
 }
 
-pub(crate) use aws_sdk_macro;
+pub(crate) use aws_sdk_macro_before_0_35;
