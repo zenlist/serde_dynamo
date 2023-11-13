@@ -425,6 +425,20 @@ fn deserialize_maps_of_various_types() {
     test_map!(i8, "-1" => -1, "-2" => -2);
     test_map!(char, "a" => 'a', "b" => 'b');
 
+    let attribute_value = AttributeValue::M(HashMap::from([
+        (String::from("true"), AttributeValue::S(String::from("one"))),
+        (
+            String::from("false"),
+            AttributeValue::S(String::from("two")),
+        ),
+    ]));
+
+    let s: HashMap<bool, String> = from_attribute_value(attribute_value.clone()).unwrap();
+    assert_eq!(
+        s,
+        HashMap::from([(true, String::from("one")), (false, String::from("two"))]),
+    );
+
     #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
     struct Struct(i64);
     test_map!(Struct, "1" => Struct(1), "2" => Struct(2));

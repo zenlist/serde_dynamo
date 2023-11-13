@@ -569,7 +569,7 @@ mod map_key {
 
     #[test]
     fn bool() {
-        map_key_round_trip(true, key_must_be_a_string(), true);
+        map_key_round_trip(true, Ok("true"), true);
     }
 
     #[test]

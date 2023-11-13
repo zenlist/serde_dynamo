@@ -135,8 +135,11 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
         unreachable!()
     }
-    fn serialize_bool(self, _v: bool) -> Result<Self::Ok, Self::Error> {
-        Err(ErrorImpl::KeyMustBeAString.into())
+    fn serialize_bool(self, v: bool) -> Result<Self::Ok, Self::Error> {
+        match v {
+            true => Ok(String::from("true")),
+            false => Ok(String::from("false")),
+        }
     }
     fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
         self.serialize_str(&v.to_string())

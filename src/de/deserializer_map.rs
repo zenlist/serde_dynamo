@@ -151,8 +151,19 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
         deserialize_integer_key!(deserialize_u128 => visit_u128);
     }
 
+    fn deserialize_bool<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
+    where
+        V: Visitor<'de>,
+    {
+        match self.input.as_str() {
+            "true" => visitor.visit_bool(true),
+            "false" => visitor.visit_bool(false),
+            _ => Err(ErrorImpl::ExpectedString.into()),
+        }
+    }
+
     forward_to_deserialize_any! {
-        bool f32 f64 char bytes byte_buf option unit
+        f32 f64 char bytes byte_buf option unit
         unit_struct seq tuple tuple_struct map struct ignored_any
     }
 }
