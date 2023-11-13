@@ -303,6 +303,7 @@ fn serialize_maps_with_various_types() {
     test_map!(1_u8, 2_u8);
     test_map!(-1_i8, -2_i8);
     test_map!('a', 'b');
+    test_map!(true, false);
 
     #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
     struct Struct(i64);

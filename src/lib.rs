@@ -269,12 +269,12 @@ pub use attribute_value::{AttributeValue, Item, Items};
 pub use de::{from_attribute_value, from_item, from_items, Deserializer};
 pub use error::{Error, Result};
 use macros::{
-    aws_lambda_events_macro, aws_sdk_macro, aws_sdk_streams_macro, rusoto_macro,
-    rusoto_streams_macro,
+    aws_lambda_events_macro, aws_sdk_macro, aws_sdk_macro_before_0_35, aws_sdk_streams_macro,
+    rusoto_macro, rusoto_streams_macro,
 };
 pub use ser::{to_attribute_value, to_item, Serializer};
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_7",
     crate_name = __aws_sdk_dynamodb_0_7,
     mod_name = aws_sdk_dynamodb_0_7,
@@ -284,7 +284,7 @@ aws_sdk_macro!(
     config_version = "0.7",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_8",
     crate_name = __aws_sdk_dynamodb_0_8,
     mod_name = aws_sdk_dynamodb_0_8,
@@ -294,7 +294,7 @@ aws_sdk_macro!(
     config_version = "0.8",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_9",
     crate_name = __aws_sdk_dynamodb_0_9,
     mod_name = aws_sdk_dynamodb_0_9,
@@ -304,7 +304,7 @@ aws_sdk_macro!(
     config_version = "0.9",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_10",
     crate_name = __aws_sdk_dynamodb_0_10,
     mod_name = aws_sdk_dynamodb_0_10,
@@ -314,7 +314,7 @@ aws_sdk_macro!(
     config_version = "0.40",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_11",
     crate_name = __aws_sdk_dynamodb_0_11,
     mod_name = aws_sdk_dynamodb_0_11,
@@ -324,7 +324,7 @@ aws_sdk_macro!(
     config_version = "0.41",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_12",
     crate_name = __aws_sdk_dynamodb_0_12,
     mod_name = aws_sdk_dynamodb_0_12,
@@ -334,7 +334,7 @@ aws_sdk_macro!(
     config_version = "0.42",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_13",
     crate_name = __aws_sdk_dynamodb_0_13,
     mod_name = aws_sdk_dynamodb_0_13,
@@ -344,7 +344,7 @@ aws_sdk_macro!(
     config_version = "0.43",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_14",
     crate_name = __aws_sdk_dynamodb_0_14,
     mod_name = aws_sdk_dynamodb_0_14,
@@ -354,7 +354,7 @@ aws_sdk_macro!(
     config_version = "0.44",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_15",
     crate_name = __aws_sdk_dynamodb_0_15,
     mod_name = aws_sdk_dynamodb_0_15,
@@ -364,7 +364,7 @@ aws_sdk_macro!(
     config_version = "0.45",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_16",
     crate_name = __aws_sdk_dynamodb_0_16,
     mod_name = aws_sdk_dynamodb_0_16,
@@ -374,7 +374,7 @@ aws_sdk_macro!(
     config_version = "0.46",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_17",
     crate_name = __aws_sdk_dynamodb_0_17,
     mod_name = aws_sdk_dynamodb_0_17,
@@ -384,7 +384,7 @@ aws_sdk_macro!(
     config_version = "0.47",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_18",
     crate_name = __aws_sdk_dynamodb_0_18,
     mod_name = aws_sdk_dynamodb_0_18,
@@ -394,7 +394,7 @@ aws_sdk_macro!(
     config_version = "0.48",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_19",
     crate_name = __aws_sdk_dynamodb_0_19,
     mod_name = aws_sdk_dynamodb_0_19,
@@ -404,7 +404,7 @@ aws_sdk_macro!(
     config_version = "0.49",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_21",
     crate_name = __aws_sdk_dynamodb_0_21,
     mod_name = aws_sdk_dynamodb_0_21,
@@ -414,7 +414,7 @@ aws_sdk_macro!(
     config_version = "0.51",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_22",
     crate_name = __aws_sdk_dynamodb_0_22,
     mod_name = aws_sdk_dynamodb_0_22,
@@ -424,7 +424,7 @@ aws_sdk_macro!(
     config_version = "0.52",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_23",
     crate_name = __aws_sdk_dynamodb_0_23,
     mod_name = aws_sdk_dynamodb_0_23,
@@ -434,7 +434,7 @@ aws_sdk_macro!(
     config_version = "0.53",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_24",
     crate_name = __aws_sdk_dynamodb_0_24,
     mod_name = aws_sdk_dynamodb_0_24,
@@ -444,7 +444,7 @@ aws_sdk_macro!(
     config_version = "0.54",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_25",
     crate_name = __aws_sdk_dynamodb_0_25,
     mod_name = aws_sdk_dynamodb_0_25,
@@ -454,7 +454,7 @@ aws_sdk_macro!(
     config_version = "0.55",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_26",
     crate_name = __aws_sdk_dynamodb_0_26,
     mod_name = aws_sdk_dynamodb_0_26,
@@ -464,7 +464,7 @@ aws_sdk_macro!(
     config_version = "0.55",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_27",
     crate_name = __aws_sdk_dynamodb_0_27,
     mod_name = aws_sdk_dynamodb_0_27,
@@ -474,7 +474,7 @@ aws_sdk_macro!(
     config_version = "0.55",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_28",
     crate_name = __aws_sdk_dynamodb_0_28,
     mod_name = aws_sdk_dynamodb_0_28,
@@ -484,7 +484,7 @@ aws_sdk_macro!(
     config_version = "0.55",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_29",
     crate_name = __aws_sdk_dynamodb_0_29,
     mod_name = aws_sdk_dynamodb_0_29,
@@ -494,7 +494,7 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_30",
     crate_name = __aws_sdk_dynamodb_0_30,
     mod_name = aws_sdk_dynamodb_0_30,
@@ -504,7 +504,7 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_31",
     crate_name = __aws_sdk_dynamodb_0_31,
     mod_name = aws_sdk_dynamodb_0_31,
@@ -514,7 +514,7 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_32",
     crate_name = __aws_sdk_dynamodb_0_32,
     mod_name = aws_sdk_dynamodb_0_32,
@@ -524,7 +524,7 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_33",
     crate_name = __aws_sdk_dynamodb_0_33,
     mod_name = aws_sdk_dynamodb_0_33,
@@ -534,7 +534,7 @@ aws_sdk_macro!(
     config_version = "0.56",
 );
 
-aws_sdk_macro!(
+aws_sdk_macro_before_0_35!(
     feature = "aws-sdk-dynamodb+0_34",
     crate_name = __aws_sdk_dynamodb_0_34,
     mod_name = aws_sdk_dynamodb_0_34,
