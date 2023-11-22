@@ -27,7 +27,7 @@ use serializer_tuple_variant::SerializerTupleVariant;
 ///
 /// ```no_run
 /// use serde_dynamo::to_attribute_value;
-/// # use __aws_sdk_dynamodb_0_38::client::Client;
+/// # use __aws_sdk_dynamodb_0_39::client::Client;
 /// # use std::collections::HashMap;
 /// #
 /// # async fn get(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
@@ -50,7 +50,7 @@ use serializer_tuple_variant::SerializerTupleVariant;
 ///
 /// ```no_run
 /// use serde_dynamo::to_attribute_value;
-/// # use __aws_sdk_dynamodb_0_38::client::Client;
+/// # use __aws_sdk_dynamodb_0_39::client::Client;
 /// # use std::collections::HashMap;
 /// #
 /// # async fn query(client: &Client) -> Result<(), Box<dyn std::error::Error>> {
@@ -94,7 +94,7 @@ where
 /// This is frequently used when serializing an entire data structure to be sent to DynamoDB.
 ///
 /// ```no_run
-/// # use __aws_sdk_dynamodb_0_38::client::Client;
+/// # use __aws_sdk_dynamodb_0_39::client::Client;
 /// # use serde_derive::{Serialize, Deserialize};
 /// # use serde_dynamo::to_item;
 /// #
