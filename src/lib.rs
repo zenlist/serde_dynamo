@@ -595,7 +595,7 @@ aws_sdk_macro!(
 );
 
 aws_sdk_macro!(
-    feature = "aws-sdk-dynamodb+1_2",
+    feature = "aws-sdk-dynamodb+1",
     crate_name = __aws_sdk_dynamodb_1,
     mod_name = aws_sdk_dynamodb_1,
     attribute_value_path = ::__aws_sdk_dynamodb_1::types::AttributeValue,
