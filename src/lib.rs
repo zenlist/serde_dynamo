@@ -26,6 +26,8 @@
 //!     id: UserId,
 //!     name: String,
 //!     age: u8,
+//!     #[serde(with = "serde_bytes")]
+//!     public_key: Vec<u8>
 //! }
 //! ```
 //!
