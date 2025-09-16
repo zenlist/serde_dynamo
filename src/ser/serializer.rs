@@ -71,8 +71,9 @@ impl ser::Serializer for Serializer {
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
         Ok(AttributeValue::Null(true))
     }
-    fn serialize_some<V: ?Sized>(self, value: &V) -> Result<Self::Ok, Self::Error>
+    fn serialize_some<V>(self, value: &V) -> Result<Self::Ok, Self::Error>
     where
+        V: ?Sized,
         V: Serialize,
     {
         value.serialize(self)
@@ -124,12 +125,13 @@ impl ser::Serializer for Serializer {
         let serializer = SerializerTupleVariant::new(variant, len);
         Ok(serializer)
     }
-    fn serialize_newtype_struct<V: ?Sized>(
+    fn serialize_newtype_struct<V>(
         self,
         name: &'static str,
         value: &V,
     ) -> Result<Self::Ok, Self::Error>
     where
+        V: ?Sized,
         V: Serialize,
     {
         let av = value.serialize(self)?;
@@ -154,7 +156,7 @@ impl ser::Serializer for Serializer {
         let serializer = SerializerStructVariant::new(variant, len);
         Ok(serializer)
     }
-    fn serialize_newtype_variant<V: ?Sized>(
+    fn serialize_newtype_variant<V>(
         self,
         _name: &'static str,
         _variant_index: u32,
@@ -162,6 +164,7 @@ impl ser::Serializer for Serializer {
         value: &V,
     ) -> Result<Self::Ok, Self::Error>
     where
+        V: ?Sized,
         V: Serialize,
     {
         let serializer = Serializer;
