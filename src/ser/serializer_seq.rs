@@ -1,5 +1,5 @@
 use super::{AttributeValue, Error, Result, Serializer};
-use serde::{ser, Serialize};
+use serde_core::{ser, Serialize};
 
 pub struct SerializerSeq {
     vec: Vec<AttributeValue>,

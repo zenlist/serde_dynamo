@@ -1,5 +1,5 @@
 use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
-use serde::{
+use serde_core::{
     de::{self, DeserializeSeed, MapAccess, Visitor},
     forward_to_deserialize_any,
 };

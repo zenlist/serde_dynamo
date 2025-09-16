@@ -82,12 +82,12 @@ pub enum AttributeValue {
     Bs(Vec<Vec<u8>>),
 }
 
-impl serde::Serialize for AttributeValue {
+impl serde_core::Serialize for AttributeValue {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer,
+        S: serde_core::Serializer,
     {
-        use serde::ser::SerializeMap;
+        use serde_core::ser::SerializeMap;
 
         match self {
             AttributeValue::N(inner) => {
@@ -148,13 +148,13 @@ impl serde::Serialize for AttributeValue {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for AttributeValue {
+impl<'de> serde_core::Deserialize<'de> for AttributeValue {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: serde::Deserializer<'de>,
+        D: serde_core::Deserializer<'de>,
     {
         struct Visitor;
-        impl<'de> serde::de::Visitor<'de> for Visitor {
+        impl<'de> serde_core::de::Visitor<'de> for Visitor {
             type Value = AttributeValue;
 
             fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -163,9 +163,9 @@ impl<'de> serde::Deserialize<'de> for AttributeValue {
 
             fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
             where
-                A: serde::de::MapAccess<'de>,
+                A: serde_core::de::MapAccess<'de>,
             {
-                use serde::de::Error;
+                use serde_core::de::Error;
 
                 let first_key: String = match map.next_key()? {
                     Some(key) => key,
@@ -227,19 +227,19 @@ impl<'de> serde::Deserialize<'de> for AttributeValue {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for Item {
+impl<'de> serde_core::Deserialize<'de> for Item {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: serde::Deserializer<'de>,
+        D: serde_core::Deserializer<'de>,
     {
         HashMap::deserialize(deserializer).map(Item)
     }
 }
 
-impl serde::Serialize for Item {
+impl serde_core::Serialize for Item {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer,
+        S: serde_core::Serializer,
     {
         self.0.serialize(serializer)
     }

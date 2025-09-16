@@ -86,11 +86,14 @@ __rusoto_dynamodbstreams_0_46 = { package = "rusoto_dynamodbstreams", version = 
 __rusoto_dynamodbstreams_0_47 = { package = "rusoto_dynamodbstreams", version = "0.47", default-features = false, optional = true }
 __rusoto_dynamodbstreams_0_48 = { package = "rusoto_dynamodbstreams", version = "0.48", default-features = false, optional = true }
 base64 = "0.21.0"
-serde = "1"
+serde_core = "1.0.220"
 
 __rusoto_core_0_46_crate = { package = "rusoto_core", version = "0.46", default-features = false, features = ["rustls"], optional = true }
 __rusoto_core_0_47_crate = { package = "rusoto_core", version = "0.47", default-features = false, features = ["rustls"], optional = true }
 __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-features = false, features = ["rustls"], optional = true }
+
+[target.'cfg(any())'.dependencies]
+serde = { version = "1.0.220", default-features = false }
 
 [features]
 "aws_lambda_events+0_6" = ["__aws_lambda_events_0_6"]
@@ -170,6 +173,7 @@ __rusoto_core_0_48_crate = { package = "rusoto_core", version = "0.48", default-
 [dev-dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 serde_bytes = "0.11"
+serde = "1"
 serde_derive = "1"
 serde_json = "1"
 

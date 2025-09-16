@@ -70,7 +70,7 @@ macro_rules! aws_sdk_streams_macro {
             /// `AV`.
             pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
             where
-                T: serde::ser::Serialize,
+                T: serde_core::ser::Serialize,
             {
                 crate::ser::to_attribute_value(value)
             }
@@ -82,7 +82,7 @@ macro_rules! aws_sdk_streams_macro {
             /// `AV`.
             pub fn to_item<T>(value: T) -> Result<std::collections::HashMap<String, AttributeValue>>
             where
-                T: serde::ser::Serialize,
+                T: serde_core::ser::Serialize,
             {
                 crate::ser::to_item(value)
             }
@@ -94,7 +94,7 @@ macro_rules! aws_sdk_streams_macro {
             /// `AV`.
             pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_attribute_value(attribute_value)
             }
@@ -108,7 +108,7 @@ macro_rules! aws_sdk_streams_macro {
                 item: std::collections::HashMap<String, AttributeValue>,
             ) -> Result<T>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_item(item)
             }
@@ -122,7 +122,7 @@ macro_rules! aws_sdk_streams_macro {
                 items: Vec<std::collections::HashMap<String, AttributeValue>>,
             ) -> Result<Vec<T>>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_items(items)
             }
@@ -138,7 +138,7 @@ macro_rules! aws_sdk_streams_macro {
             #[deprecated(since = "4.0.0", note = "The double-underscore on the mod name is no longer necessary")]
             pub fn to_attribute_value<T>(value: T) -> Result<AttributeValue>
             where
-                T: serde::ser::Serialize,
+                T: serde_core::ser::Serialize,
             {
                 crate::ser::to_attribute_value(value)
             }
@@ -146,7 +146,7 @@ macro_rules! aws_sdk_streams_macro {
             #[deprecated(since = "4.0.0", note = "The double-underscore on the mod name is no longer necessary")]
             pub fn to_item<T>(value: T) -> Result<std::collections::HashMap<String, AttributeValue>>
             where
-                T: serde::ser::Serialize,
+                T: serde_core::ser::Serialize,
             {
                 crate::ser::to_item(value)
             }
@@ -154,7 +154,7 @@ macro_rules! aws_sdk_streams_macro {
             #[deprecated(since = "4.0.0", note = "The double-underscore on the mod name is no longer necessary")]
             pub fn from_attribute_value<'a, T>(attribute_value: AttributeValue) -> Result<T>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_attribute_value(attribute_value)
             }
@@ -164,7 +164,7 @@ macro_rules! aws_sdk_streams_macro {
                 item: std::collections::HashMap<String, AttributeValue>,
             ) -> Result<T>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_item(item)
             }
@@ -174,7 +174,7 @@ macro_rules! aws_sdk_streams_macro {
                 items: Vec<std::collections::HashMap<String, AttributeValue>>,
             ) -> Result<Vec<T>>
             where
-                T: serde::de::Deserialize<'a>,
+                T: serde_core::de::Deserialize<'a>,
             {
                 crate::de::from_items(items)
             }

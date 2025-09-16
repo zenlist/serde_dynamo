@@ -1,6 +1,6 @@
 use super::AttributeValue;
 use crate::{error::ErrorImpl, Error, Item, Items, Result};
-use serde::Deserialize;
+use serde_core::Deserialize;
 use std::collections::HashMap;
 
 mod deserializer;

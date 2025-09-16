@@ -1,6 +1,6 @@
 use super::{Error, ErrorImpl, Result};
-use serde::de::{self, Visitor};
-use serde::forward_to_deserialize_any;
+use serde_core::de::{self, Visitor};
+use serde_core::forward_to_deserialize_any;
 
 pub struct DeserializerNumber {
     input: String,

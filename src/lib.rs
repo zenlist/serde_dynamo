@@ -216,7 +216,8 @@
 //! change streams.
 //!
 //! However, in very rare cases, you may need to convert the DynamoDB JSON yourself. In those cases,
-//! both [Item] and [AttributeValue] implement [serde::Serialize] and [serde::Deserialize].
+//! both [Item] and [AttributeValue] implement [serde_core::Serialize] and
+//! [serde_core::Deserialize].
 //!
 //! ```
 //! # use serde_dynamo::{AttributeValue, Item};

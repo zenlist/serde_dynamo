@@ -8,7 +8,7 @@ use super::{
     },
     AttributeValue, Error, ErrorImpl, Result,
 };
-use serde::de::{self, IntoDeserializer, Visitor};
+use serde_core::de::{self, IntoDeserializer, Visitor};
 
 /// A structure that deserializes [`AttributeValue`]s into Rust values.
 #[derive(Debug)]

@@ -1,4 +1,4 @@
-use serde::{de, ser};
+use serde_core::{de, ser};
 use std::fmt::{self, Display};
 
 /// This type represents all possible errors that can occur when serializing or deserializing

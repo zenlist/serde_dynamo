@@ -2,7 +2,7 @@ use super::{
     AttributeValue, Error, SerializerMap, SerializerSeq, SerializerStruct, SerializerStructVariant,
     SerializerTupleVariant,
 };
-use serde::{ser, Serialize};
+use serde_core::{ser, Serialize};
 use std::collections::HashMap;
 
 /// A structure for serializing Rust values into [`AttributeValue`]s.
