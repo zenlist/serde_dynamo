@@ -1,5 +1,5 @@
 use super::{AttributeValue, Error, ErrorImpl, Result, Serializer};
-use serde::{ser, serde_if_integer128, Serialize};
+use serde::{ser, Serialize};
 use std::collections::HashMap;
 
 pub struct SerializerMap {
@@ -101,10 +101,8 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
     }
-    serde_if_integer128! {
-        fn serialize_i128(self, v: i128) -> Result<Self::Ok, Self::Error> {
-            Ok(v.to_string())
-        }
+    fn serialize_i128(self, v: i128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
     fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
@@ -115,10 +113,8 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
     }
-    serde_if_integer128! {
-        fn serialize_u128(self, v: u128) -> Result<Self::Ok, Self::Error> {
-            Ok(v.to_string())
-        }
+    fn serialize_u128(self, v: u128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
     fn serialize_f32(self, _v: f32) -> Result<Self::Ok, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())
