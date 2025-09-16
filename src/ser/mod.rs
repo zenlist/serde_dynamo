@@ -1,6 +1,6 @@
 use super::AttributeValue;
 use crate::{error::ErrorImpl, Error, Item, Result};
-use serde::Serialize;
+use serde_core::Serialize;
 
 mod serializer;
 mod serializer_map;

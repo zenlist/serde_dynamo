@@ -1,7 +1,7 @@
 use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
-use serde::{
+use serde_core::{
     de::{self, DeserializeSeed, MapAccess, Visitor},
-    forward_to_deserialize_any, serde_if_integer128,
+    forward_to_deserialize_any,
 };
 use std::collections::HashMap;
 
@@ -140,16 +140,12 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     deserialize_integer_key!(deserialize_i16  => visit_i16);
     deserialize_integer_key!(deserialize_i32  => visit_i32);
     deserialize_integer_key!(deserialize_i64  => visit_i64);
-    serde_if_integer128! {
-        deserialize_integer_key!(deserialize_i128 => visit_i128);
-    }
+    deserialize_integer_key!(deserialize_i128 => visit_i128);
     deserialize_integer_key!(deserialize_u8   => visit_u8);
     deserialize_integer_key!(deserialize_u16  => visit_u16);
     deserialize_integer_key!(deserialize_u32  => visit_u32);
     deserialize_integer_key!(deserialize_u64  => visit_u64);
-    serde_if_integer128! {
-        deserialize_integer_key!(deserialize_u128 => visit_u128);
-    }
+    deserialize_integer_key!(deserialize_u128 => visit_u128);
 
     fn deserialize_bool<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where

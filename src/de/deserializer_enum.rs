@@ -1,5 +1,5 @@
 use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
-use serde::de::{
+use serde_core::de::{
     DeserializeSeed, Deserializer as _, EnumAccess, IntoDeserializer, VariantAccess, Visitor,
 };
 use std::collections::HashMap;

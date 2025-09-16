@@ -1,5 +1,5 @@
 use super::{AttributeValue, Error, Result, Serializer};
-use serde::{ser, Serialize};
+use serde_core::{ser, Serialize};
 use std::collections::HashMap;
 
 pub struct SerializerTupleVariant {
@@ -20,8 +20,9 @@ impl ser::SerializeTupleVariant for SerializerTupleVariant {
     type Ok = AttributeValue;
     type Error = Error;
 
-    fn serialize_field<F: ?Sized>(&mut self, value: &F) -> Result<(), Self::Error>
+    fn serialize_field<F>(&mut self, value: &F) -> Result<(), Self::Error>
     where
+        F: ?Sized,
         F: Serialize,
     {
         let serializer = Serializer;

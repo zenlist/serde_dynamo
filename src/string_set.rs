@@ -64,8 +64,8 @@ pub(crate) fn should_serialize_as_string_set(name: &str) -> bool {
 /// * the sequence contains any value that is not a string
 pub fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
-    T: serde::Serialize,
-    S: serde::Serializer,
+    T: serde_core::Serialize,
+    S: serde_core::Serializer,
 {
     serializer.serialize_newtype_struct(NEWTYPE_SYMBOL, &value)
 }
@@ -73,8 +73,8 @@ where
 /// Deserializes the given value as a set
 pub fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
 where
-    T: serde::Deserialize<'de>,
-    D: serde::Deserializer<'de>,
+    T: serde_core::Deserialize<'de>,
+    D: serde_core::Deserializer<'de>,
 {
     T::deserialize(deserializer)
 }
@@ -102,13 +102,13 @@ where
 /// ```
 pub struct StringSet<T>(pub T);
 
-impl<T> serde::Serialize for StringSet<T>
+impl<T> serde_core::Serialize for StringSet<T>
 where
-    T: serde::Serialize,
+    T: serde_core::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer,
+        S: serde_core::Serializer,
     {
         serializer.serialize_newtype_struct(NEWTYPE_SYMBOL, &self.0)
     }

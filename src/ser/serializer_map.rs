@@ -1,5 +1,5 @@
 use super::{AttributeValue, Error, ErrorImpl, Result, Serializer};
-use serde::{ser, serde_if_integer128, Serialize};
+use serde_core::{ser, Serialize};
 use std::collections::HashMap;
 
 pub struct SerializerMap {
@@ -25,8 +25,9 @@ impl ser::SerializeMap for SerializerMap {
     type Ok = AttributeValue;
     type Error = Error;
 
-    fn serialize_key<K: ?Sized>(&mut self, key: &K) -> Result<(), Self::Error>
+    fn serialize_key<K>(&mut self, key: &K) -> Result<(), Self::Error>
     where
+        K: ?Sized,
         K: Serialize,
     {
         if self.next_key.is_some() {
@@ -38,8 +39,9 @@ impl ser::SerializeMap for SerializerMap {
         Ok(())
     }
 
-    fn serialize_value<V: ?Sized>(&mut self, value: &V) -> Result<(), Self::Error>
+    fn serialize_value<V>(&mut self, value: &V) -> Result<(), Self::Error>
     where
+        V: ?Sized,
         V: Serialize,
     {
         let key = self
@@ -52,13 +54,11 @@ impl ser::SerializeMap for SerializerMap {
         Ok(())
     }
 
-    fn serialize_entry<K: ?Sized, V: ?Sized>(
-        &mut self,
-        key: &K,
-        value: &V,
-    ) -> Result<(), Self::Error>
+    fn serialize_entry<K, V>(&mut self, key: &K, value: &V) -> Result<(), Self::Error>
     where
+        K: ?Sized,
         K: Serialize,
+        V: ?Sized,
         V: Serialize,
     {
         let key = key.serialize(MapKeySerializer)?;
@@ -101,10 +101,8 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
     }
-    serde_if_integer128! {
-        fn serialize_i128(self, v: i128) -> Result<Self::Ok, Self::Error> {
-            Ok(v.to_string())
-        }
+    fn serialize_i128(self, v: i128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
     fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
@@ -115,10 +113,8 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
         Ok(v.to_string())
     }
-    serde_if_integer128! {
-        fn serialize_u128(self, v: u128) -> Result<Self::Ok, Self::Error> {
-            Ok(v.to_string())
-        }
+    fn serialize_u128(self, v: u128) -> Result<Self::Ok, Self::Error> {
+        Ok(v.to_string())
     }
     fn serialize_f32(self, _v: f32) -> Result<Self::Ok, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())
@@ -147,8 +143,9 @@ impl ser::Serializer for MapKeySerializer {
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())
     }
-    fn serialize_some<T: ?Sized>(self, _value: &T) -> Result<Self::Ok, Self::Error>
+    fn serialize_some<T>(self, _value: &T) -> Result<Self::Ok, Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         Err(ErrorImpl::KeyMustBeAString.into())
@@ -196,12 +193,13 @@ impl ser::Serializer for MapKeySerializer {
     ) -> Result<Self::SerializeTupleVariant, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())
     }
-    fn serialize_newtype_struct<T: ?Sized>(
+    fn serialize_newtype_struct<T>(
         self,
         _name: &'static str,
         value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         value.serialize(self)
@@ -215,7 +213,7 @@ impl ser::Serializer for MapKeySerializer {
     ) -> Result<Self::SerializeStructVariant, Self::Error> {
         Err(ErrorImpl::KeyMustBeAString.into())
     }
-    fn serialize_newtype_variant<T: ?Sized>(
+    fn serialize_newtype_variant<T>(
         self,
         _name: &'static str,
         _variant_index: u32,
@@ -223,6 +221,7 @@ impl ser::Serializer for MapKeySerializer {
         _value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         Err(ErrorImpl::KeyMustBeAString.into())
@@ -233,8 +232,9 @@ impl ser::SerializeSeq for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_element<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_element<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
@@ -248,8 +248,9 @@ impl ser::SerializeTuple for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_element<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_element<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
@@ -263,8 +264,9 @@ impl ser::SerializeTupleStruct for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
@@ -278,8 +280,9 @@ impl ser::SerializeTupleVariant for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
@@ -294,12 +297,9 @@ impl ser::SerializeStructVariant for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(
-        &mut self,
-        _key: &'static str,
-        _value: &T,
-    ) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _key: &'static str, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
@@ -314,27 +314,27 @@ impl ser::SerializeMap for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_key<T: ?Sized>(&mut self, _key: &T) -> Result<(), Self::Error>
+    fn serialize_key<T>(&mut self, _key: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
     }
 
-    fn serialize_value<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_value<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()
     }
 
-    fn serialize_entry<K: ?Sized, V: ?Sized>(
-        &mut self,
-        _key: &K,
-        _value: &V,
-    ) -> Result<(), Self::Error>
+    fn serialize_entry<K, V>(&mut self, _key: &K, _value: &V) -> Result<(), Self::Error>
     where
+        K: ?Sized,
         K: Serialize,
+        V: ?Sized,
         V: Serialize,
     {
         unreachable!()
@@ -349,12 +349,9 @@ impl ser::SerializeStruct for MapKeySerializer {
     type Ok = String;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(
-        &mut self,
-        _key: &'static str,
-        _value: &T,
-    ) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _key: &'static str, _value: &T) -> Result<(), Self::Error>
     where
+        T: ?Sized,
         T: Serialize,
     {
         unreachable!()

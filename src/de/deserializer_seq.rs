@@ -1,7 +1,7 @@
 use super::deserializer_bytes::DeserializerBytes;
 use super::deserializer_number::DeserializerNumber;
 use super::{AttributeValue, Deserializer, Error, Result};
-use serde::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
+use serde_core::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
 pub struct DeserializerSeq {
     iter: std::vec::IntoIter<AttributeValue>,
