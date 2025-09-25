@@ -6,12 +6,12 @@ use crate::AttributeValue;
 /// This type represents all possible errors that can occur when serializing or deserializing
 /// DynamoDB data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Error(Box<(ErrorImpl, String, AttributeValue)>);
+pub struct Error(Box<(ErrorImpl, String, Option<AttributeValue>)>);
 
 impl Error {
     /// Build a new error
-    pub fn new(error: ErrorImpl, path: String, input: AttributeValue) -> Self {
-        Self(Box::new((error, path, input)))
+    pub fn new(error: ErrorImpl, path: String, input: impl Into<Option<AttributeValue>>) -> Self {
+        Self(Box::new((error, path, input.into())))
     }
 
     pub(crate) fn from_path(error: ErrorImpl, path: &ErrorPath<'_>, input: AttributeValue) -> Self {
@@ -46,7 +46,9 @@ impl Display for Error {
         if !path.is_empty() {
             write!(f, " at '{path}'")?;
         }
-        write!(f, ". Value: {input:?}")?;
+        if let Some(input) = input {
+            write!(f, ". Value: {input:?}")?;
+        }
         Ok(())
     }
 }
@@ -115,11 +117,10 @@ pub enum ErrorImpl {
     BinarySetExpectedType,
 }
 
-// TODO: Remove this impl
 #[allow(clippy::from_over_into)]
 impl Into<Error> for ErrorImpl {
     fn into(self) -> Error {
-        Error(Box::new((self, String::new(), AttributeValue::Null(true))))
+        Error::new(self, String::new(), None)
     }
 }
 
