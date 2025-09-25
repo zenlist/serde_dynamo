@@ -1,8 +1,7 @@
-use crate::de::ErrorPath;
-
 use super::deserializer_bytes::DeserializerBytes;
 use super::deserializer_number::DeserializerNumber;
 use super::{AttributeValue, Deserializer, Error, Result};
+use crate::error::ErrorPath;
 use serde_core::de::{DeserializeSeed, IntoDeserializer, SeqAccess};
 
 pub struct DeserializerSeq<'a> {

@@ -43,7 +43,8 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
         V: DeserializeSeed<'de>,
     {
         if let Some((key, value)) = self.remaining_value.take() {
-            let de = Deserializer::from_attribute_value_path(value, ErrorPath::Field(&key, &self.path));
+            let de =
+                Deserializer::from_attribute_value_path(value, ErrorPath::Field(&key, &self.path));
             seed.deserialize(de)
         } else {
             unreachable!("Value without a corresponding key")
@@ -75,7 +76,7 @@ macro_rules! deserialize_integer_key {
             let number = self
                 .input
                 .parse()
-                .map_err(|_| Error::from_path(ErrorImpl::ExpectedNum, &self.path))?;
+                .map_err(|_| Error::from_path(ErrorImpl::ExpectedNum, &self.path, AttributeValue::N(self.input.to_owned())))?;
 
             visitor.$visit(number)
         }
@@ -125,8 +126,10 @@ impl<'de, 'a> de::Deserializer<'de> for DeserializerMapKey<'a> {
     where
         V: de::Visitor<'de>,
     {
-        let de =
-            Deserializer::from_attribute_value_path(AttributeValue::S(self.input.to_owned()), self.path);
+        let de = Deserializer::from_attribute_value_path(
+            AttributeValue::S(self.input.to_owned()),
+            self.path,
+        );
         de.deserialize_enum(name, variants, visitor)
     }
 
@@ -159,7 +162,11 @@ impl<'de, 'a> de::Deserializer<'de> for DeserializerMapKey<'a> {
         match self.input {
             "true" => visitor.visit_bool(true),
             "false" => visitor.visit_bool(false),
-            _ => Err(Error::from_path(ErrorImpl::ExpectedString, &self.path)),
+            _ => Err(Error::from_path(
+                ErrorImpl::ExpectedString,
+                &self.path,
+                AttributeValue::S(self.input.to_owned()),
+            )),
         }
     }
 

@@ -167,7 +167,7 @@ mod from_items {
         ];
 
         let err = from_items::<Items, User>(items.into()).unwrap_err();
-        assert_eq!(String::from("Expected num at '[1].age'"), err.to_string());
+        assert_eq!(String::from("Expected num at '[1].age'. Value: S(\"not a number\")"), err.to_string());
     }
 }
 

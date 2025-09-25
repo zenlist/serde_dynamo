@@ -1,6 +1,5 @@
-use crate::de::ErrorPath;
-
 use super::{Error, ErrorImpl, Result};
+use crate::{error::ErrorPath, AttributeValue};
 use serde_core::de::{self, Visitor};
 use serde_core::forward_to_deserialize_any;
 
@@ -25,27 +24,37 @@ impl<'a> DeserializerNumber<'a> {
             (Ok(i), _, _) => visitor.visit_i64(i),
             (_, Ok(u), _) => visitor.visit_u64(u),
             (_, _, Ok(f)) => visitor.visit_f64(f),
-            (Err(_), Err(_), Err(e)) => Err(Error::from_path(ErrorImpl::FailedToParseFloat(self.input, e), &self.path)),
+            (Err(_), Err(_), Err(e)) => Err(Error::from_path(
+                ErrorImpl::FailedToParseFloat(e),
+                &self.path,
+                AttributeValue::N(self.input),
+            )),
         }
     }
 }
 
 macro_rules! deserialize_int {
     ($self:expr, $visitor:expr, $ty:ty, $fn:ident) => {{
-        let n = $self
-            .input
-            .parse::<$ty>()
-            .map_err(|e| Error::from_path(ErrorImpl::FailedToParseInt($self.input, e), &$self.path))?;
+        let n = $self.input.parse::<$ty>().map_err(|e| {
+            Error::from_path(
+                ErrorImpl::FailedToParseInt(e),
+                &$self.path,
+                AttributeValue::N($self.input),
+            )
+        })?;
         $visitor.$fn(n)
     }};
 }
 
 macro_rules! deserialize_float {
     ($self:expr, $visitor:expr, $ty:ty, $fn:ident) => {{
-        let n = $self
-            .input
-            .parse::<$ty>()
-            .map_err(|e| Error::from_path(ErrorImpl::FailedToParseFloat($self.input, e), &$self.path))?;
+        let n = $self.input.parse::<$ty>().map_err(|e| {
+            Error::from_path(
+                ErrorImpl::FailedToParseFloat(e),
+                &$self.path,
+                AttributeValue::N($self.input),
+            )
+        })?;
         $visitor.$fn(n)
     }};
 }

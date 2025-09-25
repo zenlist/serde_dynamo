@@ -1,18 +1,20 @@
 use serde_core::{de, ser};
 use std::fmt::{self, Display, Write};
 
+use crate::AttributeValue;
+
 /// This type represents all possible errors that can occur when serializing or deserializing
 /// DynamoDB data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Error(Box<(ErrorImpl, String)>);
+pub struct Error(Box<(ErrorImpl, String, AttributeValue)>);
 
 impl Error {
     /// Build a new error
-    pub fn new(error: ErrorImpl, path: String) -> Self {
-        Self(Box::new((error, path)))
+    pub fn new(error: ErrorImpl, path: String, input: AttributeValue) -> Self {
+        Self(Box::new((error, path, input)))
     }
 
-    pub(crate) fn from_path(error: ErrorImpl, path: &ErrorPath<'_>) -> Self {
+    pub(crate) fn from_path(error: ErrorImpl, path: &ErrorPath<'_>, input: AttributeValue) -> Self {
         let mut path_str = String::new();
         path.visit_path_depth_first(&mut |path| {
             match path {
@@ -33,17 +35,18 @@ impl Error {
         // Remove trailing '.'
         path_str.pop();
 
-        Self::new(error, path_str)
+        Self::new(error, path_str, input)
     }
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (error_kind, path) = &*self.0;
+        let (error_kind, path, input) = &*self.0;
         error_kind.fmt(f)?;
         if !path.is_empty() {
             write!(f, " at '{path}'")?;
         }
+        write!(f, ". Value: {input:?}")?;
         Ok(())
     }
 }
@@ -95,9 +98,9 @@ pub enum ErrorImpl {
     /// Expected an item with a single key
     ExpectedSingleKey,
     /// Failed to parse as an integer
-    FailedToParseInt(String, std::num::ParseIntError),
+    FailedToParseInt(std::num::ParseIntError),
     /// Failed to parse as a float
-    FailedToParseFloat(String, std::num::ParseFloatError),
+    FailedToParseFloat(std::num::ParseFloatError),
     /// Key must be a string
     KeyMustBeAString,
     /// SerializeMap's serialize_key called twice!
@@ -112,10 +115,11 @@ pub enum ErrorImpl {
     BinarySetExpectedType,
 }
 
+// TODO: Remove this impl
 #[allow(clippy::from_over_into)]
 impl Into<Error> for ErrorImpl {
     fn into(self) -> Error {
-        Error(Box::new((self, String::new())))
+        Error(Box::new((self, String::new(), AttributeValue::Null(true))))
     }
 }
 
@@ -136,11 +140,11 @@ impl Display for ErrorImpl {
             ErrorImpl::ExpectedEnum => f.write_str("Expected enum"),
             ErrorImpl::ExpectedBytes => f.write_str("Expected binary data"),
             ErrorImpl::ExpectedSingleKey => f.write_str("Expected an item with a single key"),
-            ErrorImpl::FailedToParseInt(s, err) => {
-                write!(f, "Failed to parse '{s}' as an integer: {err}")
+            ErrorImpl::FailedToParseInt(err) => {
+                write!(f, "Failed to parse integer {err}")
             }
-            ErrorImpl::FailedToParseFloat(s, err) => {
-                write!(f, "Failed to parse '{s}' as a float: {err}")
+            ErrorImpl::FailedToParseFloat(err) => {
+                write!(f, "Failed to parse float {err}")
             }
             ErrorImpl::KeyMustBeAString => f.write_str("Key must be a string"),
             ErrorImpl::SerializeMapKeyCalledTwice => {

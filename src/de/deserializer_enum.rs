@@ -19,17 +19,18 @@ impl<'de, 'a> EnumAccess<'de> for DeserializerEnum<'a> {
     type Variant = DeserializerVariant<'a>;
     type Error = Error;
 
-    fn variant_seed<V>(mut self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
+    fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
     where
         V: DeserializeSeed<'de>,
     {
-        let mut drain = self.input.drain();
-        let (key, value) = drain
-            .next()
-            .ok_or_else(|| Error::from_path(ErrorImpl::ExpectedSingleKey, &self.path))?;
-        if drain.next().is_some() {
-            return Err(Error::from_path(ErrorImpl::ExpectedSingleKey, &self.path));
+        if self.input.len() != 1 {
+            return Err(Error::from_path(
+                ErrorImpl::ExpectedSingleKey,
+                &self.path,
+                AttributeValue::M(self.input),
+            ));
         }
+        let (key, value) = self.input.into_iter().next().unwrap();
         let deserializer = DeserializerVariant::from_attribute_value(
             value,
             ErrorPath::Enum(key.clone(), Box::new(self.path)),
