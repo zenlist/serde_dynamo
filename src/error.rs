@@ -1,14 +1,50 @@
 use serde_core::{de, ser};
-use std::fmt::{self, Display};
+use std::fmt::{self, Display, Write};
 
 /// This type represents all possible errors that can occur when serializing or deserializing
 /// DynamoDB data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Error(ErrorImpl);
+pub struct Error(Box<(ErrorImpl, String)>);
+
+impl Error {
+    /// Build a new error
+    pub fn new(error: ErrorImpl, path: String) -> Self {
+        Self(Box::new((error, path)))
+    }
+
+    pub(crate) fn from_path(error: ErrorImpl, path: &ErrorPath<'_>) -> Self {
+        let mut path_str = String::new();
+        path.visit_path_depth_first(&mut |path| {
+            match path {
+                ErrorPath::Root => {}
+                ErrorPath::Field(string, _) => {
+                    path_str.push_str(string);
+                }
+                ErrorPath::Elem(i, _) => {
+                    write!(&mut path_str, "[{i}]").unwrap();
+                }
+                ErrorPath::Enum(string, _) => {
+                    path_str.push_str(string);
+                }
+            }
+            path_str.push('.');
+        });
+
+        // Remove trailing '.'
+        path_str.pop();
+
+        Self::new(error, path_str)
+    }
+}
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
+        let (error_kind, path) = &*self.0;
+        error_kind.fmt(f)?;
+        if !path.is_empty() {
+            write!(f, " at '{path}'")?;
+        }
+        Ok(())
     }
 }
 
@@ -79,7 +115,7 @@ pub enum ErrorImpl {
 #[allow(clippy::from_over_into)]
 impl Into<Error> for ErrorImpl {
     fn into(self) -> Error {
-        Error(self)
+        Error(Box::new((self, String::new())))
     }
 }
 
@@ -142,3 +178,28 @@ impl de::Error for ErrorImpl {
 
 /// Alias for a `Result` with the error type `serde_dynamo::Error`
 pub type Result<T, E = Error> = std::result::Result<T, E>;
+
+/// Used to construct error paths while minimizing allocations when there are no errors.
+#[derive(Debug, Clone)]
+pub(crate) enum ErrorPath<'a> {
+    Root,
+    Field(&'a str, &'a ErrorPath<'a>),
+    Elem(usize, &'a ErrorPath<'a>),
+    Enum(String, Box<ErrorPath<'a>>),
+}
+
+impl<'a> ErrorPath<'a> {
+    pub(crate) fn visit_path_depth_first(&self, fun: &mut impl FnMut(&ErrorPath<'a>)) {
+        match self {
+            ErrorPath::Root => {}
+            ErrorPath::Field(_, path) | ErrorPath::Elem(_, path) => {
+                path.visit_path_depth_first(fun);
+                fun(self);
+            }
+            ErrorPath::Enum(_, path) => {
+                path.visit_path_depth_first(fun);
+                fun(self);
+            }
+        }
+    }
+}

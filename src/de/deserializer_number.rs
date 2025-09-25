@@ -1,14 +1,17 @@
+use crate::de::ErrorPath;
+
 use super::{Error, ErrorImpl, Result};
 use serde_core::de::{self, Visitor};
 use serde_core::forward_to_deserialize_any;
 
-pub struct DeserializerNumber {
+pub struct DeserializerNumber<'a> {
     input: String,
+    path: ErrorPath<'a>,
 }
 
-impl DeserializerNumber {
-    pub fn from_string(input: String) -> Self {
-        DeserializerNumber { input }
+impl<'a> DeserializerNumber<'a> {
+    pub fn from_string(input: String, path: ErrorPath<'a>) -> Self {
+        DeserializerNumber { input, path }
     }
 
     fn deserialize_number<'de, V>(self, visitor: V) -> Result<V::Value>
@@ -22,7 +25,7 @@ impl DeserializerNumber {
             (Ok(i), _, _) => visitor.visit_i64(i),
             (_, Ok(u), _) => visitor.visit_u64(u),
             (_, _, Ok(f)) => visitor.visit_f64(f),
-            (Err(_), Err(_), Err(e)) => Err(ErrorImpl::FailedToParseFloat(self.input, e).into()),
+            (Err(_), Err(_), Err(e)) => Err(Error::from_path(ErrorImpl::FailedToParseFloat(self.input, e), &self.path)),
         }
     }
 }
@@ -32,7 +35,7 @@ macro_rules! deserialize_int {
         let n = $self
             .input
             .parse::<$ty>()
-            .map_err(|e| ErrorImpl::FailedToParseInt($self.input, e).into())?;
+            .map_err(|e| Error::from_path(ErrorImpl::FailedToParseInt($self.input, e), &$self.path))?;
         $visitor.$fn(n)
     }};
 }
@@ -42,12 +45,12 @@ macro_rules! deserialize_float {
         let n = $self
             .input
             .parse::<$ty>()
-            .map_err(|e| ErrorImpl::FailedToParseFloat($self.input, e).into())?;
+            .map_err(|e| Error::from_path(ErrorImpl::FailedToParseFloat($self.input, e), &$self.path))?;
         $visitor.$fn(n)
     }};
 }
 
-impl<'de> de::Deserializer<'de> for DeserializerNumber {
+impl<'de, 'a> de::Deserializer<'de> for DeserializerNumber<'a> {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to

@@ -1,4 +1,4 @@
-use super::{AttributeValue, Deserializer, Error, ErrorImpl, Result};
+use super::{AttributeValue, Deserializer, Error, ErrorImpl, ErrorPath, Result};
 use serde_core::{
     de::{self, DeserializeSeed, MapAccess, Visitor},
     forward_to_deserialize_any,
@@ -7,14 +7,16 @@ use std::collections::HashMap;
 
 pub struct DeserializerMap<'a> {
     drain: std::collections::hash_map::Drain<'a, String, AttributeValue>,
-    remaining_value: Option<AttributeValue>,
+    remaining_value: Option<(String, AttributeValue)>,
+    path: ErrorPath<'a>,
 }
 
 impl<'a> DeserializerMap<'a> {
-    pub fn from_item(item: &'a mut HashMap<String, AttributeValue>) -> Self {
+    pub fn from_item(item: &'a mut HashMap<String, AttributeValue>, path: ErrorPath<'a>) -> Self {
         Self {
             drain: item.drain(),
             remaining_value: None,
+            path,
         }
     }
 }
@@ -27,9 +29,10 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
         K: DeserializeSeed<'de>,
     {
         if let Some((key, value)) = self.drain.next() {
-            self.remaining_value = Some(value);
-            let de = DeserializerMapKey::from_string(key);
-            seed.deserialize(de).map(Some)
+            let de = DeserializerMapKey::from_string(&key, ErrorPath::Field(&key, &self.path));
+            let a = seed.deserialize(de).map(Some);
+            self.remaining_value = Some((key, value));
+            a
         } else {
             Ok(None)
         }
@@ -39,8 +42,8 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
     where
         V: DeserializeSeed<'de>,
     {
-        if let Some(value) = self.remaining_value.take() {
-            let de = Deserializer::from_attribute_value(value);
+        if let Some((key, value)) = self.remaining_value.take() {
+            let de = Deserializer::from_attribute_value_path(value, ErrorPath::Field(&key, &self.path));
             seed.deserialize(de)
         } else {
             unreachable!("Value without a corresponding key")
@@ -52,13 +55,14 @@ impl<'de, 'a> MapAccess<'de> for DeserializerMap<'a> {
     }
 }
 
-struct DeserializerMapKey {
-    input: String,
+struct DeserializerMapKey<'a> {
+    input: &'a str,
+    path: ErrorPath<'a>,
 }
 
-impl DeserializerMapKey {
-    fn from_string(input: String) -> Self {
-        Self { input }
+impl<'a> DeserializerMapKey<'a> {
+    fn from_string(input: &'a str, path: ErrorPath<'a>) -> Self {
+        Self { input, path }
     }
 }
 
@@ -71,14 +75,14 @@ macro_rules! deserialize_integer_key {
             let number = self
                 .input
                 .parse()
-                .map_err(|_| ErrorImpl::ExpectedNum.into())?;
+                .map_err(|_| Error::from_path(ErrorImpl::ExpectedNum, &self.path))?;
 
             visitor.$visit(number)
         }
     };
 }
 
-impl<'de> de::Deserializer<'de> for DeserializerMapKey {
+impl<'de, 'a> de::Deserializer<'de> for DeserializerMapKey<'a> {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
@@ -95,21 +99,21 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     where
         V: Visitor<'de>,
     {
-        visitor.visit_string(self.input)
+        visitor.visit_str(self.input)
     }
 
     fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        visitor.visit_string(self.input)
+        visitor.visit_str(self.input)
     }
 
     fn deserialize_identifier<V>(self, visitor: V) -> Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        visitor.visit_string(self.input)
+        visitor.visit_str(self.input)
     }
 
     fn deserialize_enum<V>(
@@ -121,7 +125,8 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     where
         V: de::Visitor<'de>,
     {
-        let de = Deserializer::from_attribute_value(AttributeValue::S(self.input));
+        let de =
+            Deserializer::from_attribute_value_path(AttributeValue::S(self.input.to_owned()), self.path);
         de.deserialize_enum(name, variants, visitor)
     }
 
@@ -151,10 +156,10 @@ impl<'de> de::Deserializer<'de> for DeserializerMapKey {
     where
         V: Visitor<'de>,
     {
-        match self.input.as_str() {
+        match self.input {
             "true" => visitor.visit_bool(true),
             "false" => visitor.visit_bool(false),
-            _ => Err(ErrorImpl::ExpectedString.into()),
+            _ => Err(Error::from_path(ErrorImpl::ExpectedString, &self.path)),
         }
     }
 
