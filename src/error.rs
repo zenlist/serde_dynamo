@@ -190,18 +190,14 @@ pub(crate) enum ErrorPath<'a> {
     Root,
     Field(&'a str, &'a ErrorPath<'a>),
     Elem(usize, &'a ErrorPath<'a>),
-    Enum(String, Box<ErrorPath<'a>>),
+    Enum(String, &'a ErrorPath<'a>),
 }
 
 impl<'a> ErrorPath<'a> {
     pub(crate) fn visit_path_depth_first(&self, fun: &mut impl FnMut(&ErrorPath<'a>)) {
         match self {
             ErrorPath::Root => {}
-            ErrorPath::Field(_, path) | ErrorPath::Elem(_, path) => {
-                path.visit_path_depth_first(fun);
-                fun(self);
-            }
-            ErrorPath::Enum(_, path) => {
+            ErrorPath::Field(_, path) | ErrorPath::Elem(_, path) | ErrorPath::Enum(_, path) => {
                 path.visit_path_depth_first(fun);
                 fun(self);
             }

@@ -250,7 +250,7 @@ impl<'de, 'a> de::Deserializer<'de> for Deserializer<'a> {
     {
         match self.input {
             AttributeValue::S(s) => visitor.visit_enum(s.into_deserializer()),
-            AttributeValue::M(m) => visitor.visit_enum(DeserializerEnum::from_item(m, self.path)),
+            AttributeValue::M(m) => visitor.visit_enum(DeserializerEnum::from_item(m, &self.path)),
             _ => Err(self.error(ErrorImpl::ExpectedEnum)),
         }
     }

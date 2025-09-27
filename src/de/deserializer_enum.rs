@@ -6,11 +6,11 @@ use std::collections::HashMap;
 
 pub struct DeserializerEnum<'a> {
     input: HashMap<String, AttributeValue>,
-    path: ErrorPath<'a>,
+    path: &'a ErrorPath<'a>,
 }
 
 impl<'a> DeserializerEnum<'a> {
-    pub fn from_item(input: HashMap<String, AttributeValue>, path: ErrorPath<'a>) -> Self {
+    pub fn from_item(input: HashMap<String, AttributeValue>, path: &'a ErrorPath<'a>) -> Self {
         Self { input, path }
     }
 }
@@ -33,7 +33,7 @@ impl<'de, 'a> EnumAccess<'de> for DeserializerEnum<'a> {
         let (key, value) = self.input.into_iter().next().unwrap();
         let deserializer = DeserializerVariant::from_attribute_value(
             value,
-            ErrorPath::Enum(key.clone(), Box::new(self.path)),
+            ErrorPath::Enum(key.clone(), self.path),
         );
         let value = seed.deserialize(key.into_deserializer())?;
 
