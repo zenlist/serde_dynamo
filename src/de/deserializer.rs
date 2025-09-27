@@ -6,35 +6,45 @@ use super::{
     deserializer_seq::{
         DeserializerSeq, DeserializerSeqBytes, DeserializerSeqNumbers, DeserializerSeqStrings,
     },
-    AttributeValue, Error, ErrorImpl, Result,
+    AttributeValue, Error, ErrorImpl, ErrorPath, Result,
 };
 use serde_core::de::{self, IntoDeserializer, Visitor};
 
 /// A structure that deserializes [`AttributeValue`]s into Rust values.
 #[derive(Debug)]
-pub struct Deserializer {
+pub struct Deserializer<'a> {
     input: AttributeValue,
+    path: ErrorPath<'a>,
 }
 
-impl Deserializer {
+impl<'a> Deserializer<'a> {
     /// Create a Deserializer from an AttributeValue
     pub fn from_attribute_value(input: AttributeValue) -> Self {
-        Deserializer { input }
+        Self::from_attribute_value_path(input, ErrorPath::Root)
+    }
+
+    pub(crate) fn from_attribute_value_path(input: AttributeValue, path: ErrorPath<'a>) -> Self {
+        Deserializer { input, path }
+    }
+
+    /// Helper that creates an error with context
+    fn error(self, kind: ErrorImpl) -> Error {
+        Error::from_path(kind, &self.path, self.input)
     }
 }
 
 macro_rules! deserialize_number {
     ($self:expr, $visitor:expr, $ty:ty, $fn:ident) => {
         if let AttributeValue::N(n) = $self.input {
-            let de = DeserializerNumber::from_string(n);
+            let de = DeserializerNumber::from_string(n, $self.path);
             de.$fn($visitor)
         } else {
-            return Err(ErrorImpl::ExpectedNum.into());
+            return Err($self.error(ErrorImpl::ExpectedNum));
         }
     };
 }
 
-impl<'de> de::Deserializer<'de> for Deserializer {
+impl<'de, 'a> de::Deserializer<'de> for Deserializer<'a> {
     type Error = Error;
 
     // Look at the input data to decide what Serde data model type to
@@ -45,7 +55,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         V: Visitor<'de>,
     {
         if let AttributeValue::N(s) = self.input {
-            DeserializerNumber::from_string(s).deserialize_any(visitor)
+            DeserializerNumber::from_string(s, self.path).deserialize_any(visitor)
         } else {
             match self.input {
                 AttributeValue::S(_) => self.deserialize_string(visitor),
@@ -139,7 +149,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
-            Err(ErrorImpl::ExpectedString.into())
+            Err(self.error(ErrorImpl::ExpectedString))
         }
     }
 
@@ -150,7 +160,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
-            Err(ErrorImpl::ExpectedString.into())
+            Err(self.error(ErrorImpl::ExpectedString))
         }
     }
 
@@ -160,7 +170,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
     {
         match self.input {
             AttributeValue::L(l) => {
-                let deserializer_seq = DeserializerSeq::from_vec(l);
+                let deserializer_seq = DeserializerSeq::from_vec(l, self.path);
                 visitor.visit_seq(deserializer_seq)
             }
             AttributeValue::Ss(ss) => {
@@ -168,14 +178,14 @@ impl<'de> de::Deserializer<'de> for Deserializer {
                 visitor.visit_seq(deserializer_seq)
             }
             AttributeValue::Ns(ns) => {
-                let deserializer_seq = DeserializerSeqNumbers::from_vec(ns);
+                let deserializer_seq = DeserializerSeqNumbers::from_vec(ns, self.path);
                 visitor.visit_seq(deserializer_seq)
             }
             AttributeValue::Bs(bs) => {
                 let deserializer_seq = DeserializerSeqBytes::from_vec(bs);
                 visitor.visit_seq(deserializer_seq)
             }
-            _ => Err(ErrorImpl::ExpectedSeq.into()),
+            _ => Err(self.error(ErrorImpl::ExpectedSeq)),
         }
     }
 
@@ -184,10 +194,10 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         V: Visitor<'de>,
     {
         if let AttributeValue::M(mut m) = self.input {
-            let deserializer_map = DeserializerMap::from_item(&mut m);
+            let deserializer_map = DeserializerMap::from_item(&mut m, self.path);
             visitor.visit_map(deserializer_map)
         } else {
-            Err(ErrorImpl::ExpectedMap.into())
+            Err(self.error(ErrorImpl::ExpectedMap))
         }
     }
 
@@ -198,7 +208,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::Bool(b) = self.input {
             visitor.visit_bool(b)
         } else {
-            Err(ErrorImpl::ExpectedBool.into())
+            Err(self.error(ErrorImpl::ExpectedBool))
         }
     }
 
@@ -206,21 +216,16 @@ impl<'de> de::Deserializer<'de> for Deserializer {
     where
         V: Visitor<'de>,
     {
-        if let AttributeValue::S(s) = self.input {
+        if let AttributeValue::S(s) = &self.input {
             let mut chars = s.chars();
             if let Some(ch) = chars.next() {
                 let result = visitor.visit_char(ch)?;
-                if chars.next().is_some() {
-                    Err(ErrorImpl::ExpectedChar.into())
-                } else {
-                    Ok(result)
+                if chars.next().is_none() {
+                    return Ok(result);
                 }
-            } else {
-                Err(ErrorImpl::ExpectedChar.into())
             }
-        } else {
-            Err(ErrorImpl::ExpectedChar.into())
         }
+        Err(self.error(ErrorImpl::ExpectedChar))
     }
 
     fn deserialize_unit<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -230,7 +235,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::Null(true) = self.input {
             visitor.visit_unit()
         } else {
-            Err(ErrorImpl::ExpectedUnit.into())
+            Err(self.error(ErrorImpl::ExpectedUnit))
         }
     }
 
@@ -245,8 +250,8 @@ impl<'de> de::Deserializer<'de> for Deserializer {
     {
         match self.input {
             AttributeValue::S(s) => visitor.visit_enum(s.into_deserializer()),
-            AttributeValue::M(m) => visitor.visit_enum(DeserializerEnum::from_item(m)),
-            _ => Err(ErrorImpl::ExpectedEnum.into()),
+            AttributeValue::M(m) => visitor.visit_enum(DeserializerEnum::from_item(m, &self.path)),
+            _ => Err(self.error(ErrorImpl::ExpectedEnum)),
         }
     }
 
@@ -258,7 +263,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
             let de = DeserializerBytes::from_bytes(b);
             de.deserialize_bytes(visitor)
         } else {
-            Err(ErrorImpl::ExpectedBytes.into())
+            Err(self.error(ErrorImpl::ExpectedBytes))
         }
     }
 
@@ -310,7 +315,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::S(s) = self.input {
             visitor.visit_string(s)
         } else {
-            Err(ErrorImpl::ExpectedString.into())
+            Err(self.error(ErrorImpl::ExpectedString))
         }
     }
 
@@ -325,7 +330,7 @@ impl<'de> de::Deserializer<'de> for Deserializer {
         if let AttributeValue::Null(true) = self.input {
             visitor.visit_unit()
         } else {
-            Err(ErrorImpl::ExpectedUnitStruct.into())
+            Err(self.error(ErrorImpl::ExpectedUnitStruct))
         }
     }
 

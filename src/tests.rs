@@ -103,7 +103,7 @@ fn error_eq() {
 
 #[cfg(test)]
 mod from_items {
-    use crate::{error::ErrorImpl, from_items, to_attribute_value, AttributeValue, Error, Items};
+    use crate::{from_items, to_attribute_value, AttributeValue, Items};
     use serde_derive::{Deserialize, Serialize};
     use std::collections::HashMap;
 
@@ -157,7 +157,7 @@ mod from_items {
                 (String::from("age"), to_attribute_value(20).unwrap()),
             ]),
             HashMap::from([
-                (String::from("id"), to_attribute_value(42).unwrap()),
+                (String::from("id"), to_attribute_value("two").unwrap()),
                 (String::from("name"), to_attribute_value("John").unwrap()),
                 (
                     String::from("age"),
@@ -166,8 +166,8 @@ mod from_items {
             ]),
         ];
 
-        let err = from_items::<Items, Vec<User>>(items.into()).unwrap_err();
-        assert_eq!(Into::<Error>::into(ErrorImpl::ExpectedSeq), err);
+        let err = from_items::<Items, User>(items.into()).unwrap_err();
+        assert_eq!(String::from("Expected num at '[1].age'. Value: S(\"not a number\")"), err.to_string());
     }
 }
 

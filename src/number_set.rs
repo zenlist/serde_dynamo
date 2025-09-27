@@ -118,7 +118,13 @@ where
 pub(crate) fn convert_to_set(value: crate::AttributeValue) -> crate::Result<crate::AttributeValue> {
     let vals = match value {
         crate::AttributeValue::L(vals) => vals,
-        _ => return Err(crate::error::ErrorImpl::NotSetlike.into()),
+        _ => {
+            return Err(crate::error::Error::new(
+                crate::error::ErrorImpl::NotSetlike,
+                String::new(),
+                Some(value),
+            ))
+        }
     };
 
     let set = vals
@@ -127,7 +133,11 @@ pub(crate) fn convert_to_set(value: crate::AttributeValue) -> crate::Result<crat
             if let crate::AttributeValue::N(s) = v {
                 Ok(s)
             } else {
-                Err(crate::error::ErrorImpl::NumberSetExpectedType.into())
+                Err(crate::error::Error::new(
+                    crate::error::ErrorImpl::NumberSetExpectedType,
+                    String::new(),
+                    Some(v),
+                ))
             }
         })
         .collect::<Result<_, _>>()?;
